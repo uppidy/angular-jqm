@@ -96,9 +96,15 @@ module.exports = function(grunt) {
     karma: {
       options: {
         configFile: 'test/config/karma.conf.js',
-        files: srcFiles.concat(['node_modules/grunt-karma/node_modules/karma/adapter/lib/jasmine.js',
+        files: ['node_modules/grunt-karma/node_modules/karma/adapter/lib/jasmine.js',
                 'node_modules/grunt-karma/node_modules/karma/adapter/jasmine.js',
-                'test/**/*Spec.js'])
+                'components/angular/angular.js',
+                'components/angular/angular-mocks.js',
+                'test/lib/markupValidator.js'].
+                concat(srcFiles).
+                concat(['test/**/*Spec.js']).
+                concat([{pattern: 'test/**/*', watched: true, included: false, served: true},
+                        {pattern: 'components/**/*', watched: true, included: false, served: true}])
       },
       dev: {
         options: {

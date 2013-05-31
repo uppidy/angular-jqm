@@ -2,4 +2,14 @@
  * https://github.com/opitzconsulting/angular-jqm
  * Copyright (c) 2013 OPITZ CONSULTING GmbH; Licensed MIT */
 (function(angular) {
-    "use strict";var helloWorld = 'Hello World';})(angular);
+    "use strict";
+var jqmModule = angular.module("jqm", []);
+jqmModule.directive('jqmPage', function() {
+    return {
+        restrict: 'A',
+        compile: function(cElement) {
+            // TODO: ui-body-c: Theming should be customizable!
+            cElement.addClass("ui-page ui-body-c");
+        }   
+    };
+});})(angular);

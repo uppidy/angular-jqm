@@ -1,3 +1,4 @@
 [
-"src/empty.js"
+"src/module.js",
+"src/directives/jqmPage.js"
 ]
