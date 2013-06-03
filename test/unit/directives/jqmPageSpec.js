@@ -1,18 +1,10 @@
 "use strict";
 describe('jqmPage', function() {
-    var $compile, $rootScope;
-    beforeEach(function() {
-        module("jqm");
-        inject(function(_$compile_, _$rootScope_) {
-            $compile = _$compile_;
-            $rootScope = _$rootScope_;
-        });
-    });
     it('generates same markup as data-role="page"', function() {
-        var v = markupValidator({
-            ng: '<div jqm-page></div>', 
-            jqm:'<div data-role="page"></div>'
-        });
-        v.check();
+        var ng = testutils.ng,
+            jqm = testutils.jqm;
+        var ngPage = ng.init('<div jqm-page></div>');
+        var jqmPage = jqm.init('<div data-role="page"></div>');
+        testutils.compareElementRecursive(ngPage, jqmPage);
     });
 });

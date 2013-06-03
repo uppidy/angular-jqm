@@ -1,4 +1,16 @@
 [
 "src/module.js",
-"src/directives/jqmPage.js"
+"src/services/defaultRoute.js",
+"src/services/animationComplete.js",
+"src/services/snifferDecorator.js",
+"src/services/browserDecorator.js",
+"src/services/history.js",
+"src/services/jqmViewCache.js",
+"src/services/scopeDecorator.js",
+"src/services/templateCacheDecorator.js",
+"src/directives/jqmPage.js",
+"src/directives/html.js",
+"src/directives/jqmViewport.js",
+"src/directives/jqmCachingView.js",
+"src/animations/jqmPageAnimation.js"
 ]
