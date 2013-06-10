@@ -30,26 +30,66 @@ Directory structure
 - src: The source files of the adapter
 - test/unit: The unit tests
 
-Install the dependencies: `npm install` and then `./node_modules/.bin/bower install`.
+Commands:
 
-Build it: `grunt`
-
-Auto-Run tests when file change: `grunt dev`
+- Install the dependencies: `npm install` and then `./node_modules/.bin/bower install`.
+- Build it: `grunt`
+- Auto-Run tests when file change: `grunt dev`
 
 (this needs grunt-cli installed globally: `npm install grunt-cli -g`)
 
-### Add source file: 
+Add source files:
 
-1. add it to the `src` folder
+1. add the file to the `src` folder
 2. add an entry in `build/files.js` at the right position.
 
-### Unit Tests and their access to production code
-For the whole build, we are using an immediately executing function expression to ensure that
-no variable leaks into the global scope.
-However, for unit tests we want to be able to look inside this function scope, so we can test small details like regex, ... without making them globally accessible. 
-Therefore when running the unit tests we include the source files without the immediatly excution function expression, allowing the unit tests to access every detail of our code.
+Tests:
 
-Note: The same principle is used by angular for it's sources and unit tests.
+- for all source files we have unit tests
+- for all directives, we additionally have tests that compare the markup with the real jqm widgets.
+- unit tests may access every private function in `jqm-angular`:
+
+    For the whole build, we are using an immediately executing function expression to ensure that
+no variable leaks into the global scope. However, when running the unit tests we include the source files without that protection.
+    Note: The same principle is used by angular for it's sources and unit tests.
+
+## Getting started
+
+Your main html file should look like this:
+
+    <!DOCTYPE html>
+    <html ng-app="app">
+    <head>
+        <link type="text/css" rel="stylesheet" href="jquery.mobile-1.3.1.css">
+        <script src="angular.js"></script>
+        <script src="angular-jqm.js"></script>
+        <!-- include your application script files here -->
+        <script src="app.js"></script>
+    </head>
+
+    <body jqm-viewport>
+
+    </body>
+
+    </html>
+
+Inside your application scripts, define a new module that depends on the module `jqm` and setup routes
+for all pages that you want to display. E.g.:
+
+    var mod = angular.module('app', ['jqm']);
+    mod.config(function($routeProvider) {
+        // A route for a single page
+        $routeProvider.when("/", {
+            redirectTo: "main.html"
+        });
+        // A route for all pages in one folder
+        $routeProvider.when("/:page", {
+            transition: 'slide',
+            templateUrl: function(params) {
+                return params.page;
+            }
+        });
+    });
 
 ## Docs
 The docs can be found here: [doc/index.html](https://rawgithub.com/opitzconsulting/angular-jqm/master/doc/index.html).

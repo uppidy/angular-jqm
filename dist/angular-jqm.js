@@ -336,6 +336,9 @@ jqmModule.directive('jqmViewport', ['jqmCachingViewDirective', '$animator', '$hi
                 transition = $history.urlStack[$history.previousIndex].transition;
             } else {
                 transition = newRoute.transition;
+                if (angular.isFunction(transition)) {
+                    transition = transition(newRoute.params);
+                }
                 $history.urlStack[$history.activeIndex].transition = transition;
             }
             transition = transition || 'none';

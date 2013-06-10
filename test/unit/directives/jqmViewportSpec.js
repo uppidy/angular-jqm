@@ -155,6 +155,18 @@ describe('jqmViewport', function () {
             ng.scope.$emit("$routeChangeStart", newRoute);
             expect(ng.viewPort.attr("ng-animate")).toBe("'jqmPage-none'");
         }));
+        it("allows a function as transition on routes and calls it with the route params", inject(function () {
+            var ng = testutils.ng,
+                newRoute = {
+                    params: { someParam: 'someTransition'},
+                    transition: function(params) {
+                        return params.someParam;
+                    }
+                };
+            ng.init('<div jqm-page></div>');
+            ng.scope.$emit("$routeChangeStart", newRoute);
+            expect(ng.viewPort.attr("ng-animate")).toBe("'jqmPage-someTransition'");
+        }));
         it("saves the current route's transition into the history entry", inject(function ($history) {
             var ng = testutils.ng,
                 newRoute = { transition: 'newTransition' };

@@ -21,4 +21,10 @@ mod.config(function($routeProvider) {
             return params.folder+"/"+params.page;
         }
     });
+    $routeProvider.when("/features/transitions/:transition/demo.html", {
+        transition: function(params) {
+            return params.transition;
+        },
+        templateUrl: 'features/animationDemo.html'
+    });
 });
