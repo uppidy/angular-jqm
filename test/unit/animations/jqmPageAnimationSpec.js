@@ -2,10 +2,6 @@
 describe('jqmPageAnimation', function () {
     /*global PAGE_ANIMATION_DEFS */
 
-    // Note: That we set the right css classes is already tested in
-    // jqmViewPortSpec, where we compare the resulting markup from
-    // jqm and angular!
-
     var animationCompleteQueue;
 
     function fireNextAnimationEvent() {
@@ -76,7 +72,7 @@ describe('jqmPageAnimation', function () {
                 enterFinished = jasmine.createSpy('enterFinished');
                 leaveFinished = jasmine.createSpy('leaveFinished');
             });
-            it('calls the given callback if the animation is already complete', function () {
+            it('calls the given callback if both animations are already complete', function () {
                 var enterMemento = enter.setup(enterEl);
                 var leaveMemento = leave.setup(leaveEl);
                 fireNextAnimationEvent();
@@ -86,7 +82,7 @@ describe('jqmPageAnimation', function () {
                 leave.start(leaveEl, leaveFinished, leaveMemento);
                 expect(leaveFinished).toHaveBeenCalled();
             });
-            it('calls the given callback if the animation is not yet complete', function () {
+            it('calls the given callback after both animations are complete', function () {
                 var enterMemento = enter.setup(enterEl);
                 var leaveMemento = leave.setup(leaveEl);
                 enter.start(enterEl, enterFinished, enterMemento);
@@ -95,6 +91,9 @@ describe('jqmPageAnimation', function () {
                 expect(leaveFinished).not.toHaveBeenCalled();
 
                 fireNextAnimationEvent();
+                expect(enterFinished).not.toHaveBeenCalled();
+                expect(leaveFinished).not.toHaveBeenCalled();
+
                 fireNextAnimationEvent();
                 expect(enterFinished).toHaveBeenCalled();
                 expect(leaveFinished).toHaveBeenCalled();
@@ -160,7 +159,7 @@ describe('jqmPageAnimation', function () {
                 enterFinished = jasmine.createSpy('enterFinished');
                 leaveFinished = jasmine.createSpy('leaveFinished');
             });
-            it('calls the given callback if the animation is already complete', function () {
+            it('calls the given callback if both animations are already complete', function () {
                 var enterMemento = enter.setup(enterEl);
                 var leaveMemento = leave.setup(leaveEl);
                 fireNextAnimationEvent();
@@ -170,7 +169,7 @@ describe('jqmPageAnimation', function () {
                 leave.start(leaveEl, leaveFinished, leaveMemento);
                 expect(leaveFinished).toHaveBeenCalled();
             });
-            it('calls the given callback if the animation is not yet complete', function () {
+            it('calls the given callback after both animations are complete', function () {
                 var enterMemento = enter.setup(enterEl);
                 var leaveMemento = leave.setup(leaveEl);
                 enter.start(enterEl, enterFinished, enterMemento);
@@ -179,6 +178,9 @@ describe('jqmPageAnimation', function () {
                 expect(leaveFinished).not.toHaveBeenCalled();
 
                 fireNextAnimationEvent();
+                expect(enterFinished).not.toHaveBeenCalled();
+                expect(leaveFinished).not.toHaveBeenCalled();
+
                 fireNextAnimationEvent();
                 expect(enterFinished).toHaveBeenCalled();
                 expect(leaveFinished).toHaveBeenCalled();

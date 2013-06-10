@@ -70,24 +70,29 @@ function registerPageAnimation(transitionType, reverse, direction) {
             viewPortClasses = "ui-mobile-viewport-transitioning viewport-" + degradedTransitionType,
             transitionDef = PAGE_ANIMATION_DEFS[degradedTransitionType];
 
-        if (direction === "leave") {
-            addClasses += " out";
-            removeClasses += " " + activePageClass;
-        } else {
-            addClasses += " in " + activePageClass + " " + toPreClass;
-        }
-
         if (degradedTransitionType === 'none') {
             return {
                 setup: setupNone,
                 start: startNone
             };
         } else {
-            return {
-                setup: setup,
-                start: start
-            };
+            if (direction === "leave") {
+                addClasses += " out";
+                removeClasses += " " + activePageClass;
+                return {
+                    setup: setupLeave,
+                    start: start
+                };
+            } else {
+                addClasses += " in " + activePageClass + " " + toPreClass;
+                return {
+                    setup: setupEnter,
+                    start: start
+                };
+            }
         }
+
+        // --------------
 
         function setupNone(element) {
             element = firstElement(element);
@@ -102,89 +107,65 @@ function registerPageAnimation(transitionType, reverse, direction) {
             done();
         }
 
+        function setupEnter(element) {
+            var synchronization;
+            element = firstElement(element),
+            synchronization = createSynchronizationIfNeeded(element);
+            synchronization.enter(function(done) {
+                // -----------
+                // This code is from jquery mobile 1.3.1, function "createHandler".
+                // Prevent flickering in phonegap container: see comments at #4024 regarding iOS
+                element.css("z-index", -10);
+                element.addClass(addClasses);
+                // Restores visibility of the new page: added together with $to.css( "z-index", -10 );
+                element.css("z-index", "");
+                element.removeClass(toPreClass);
+                // ------------
+                animationComplete(element, function() {
+                    element.removeClass(removeClasses);
+                    done();
+                });
+            });
+            return synchronization;
+        }
 
-        function setup(element) {
-            var parent,
-                data;
+        function setupLeave(element) {
+            var synchronization;
             element = firstElement(element);
-            parent = element.parent();
-            var parentAnimationData = parent.data("animationData") || {
-                finished: false,
-                doneCallbacks: [],
-                onLeaveDone: angular.noop,
-                finish: function() {
-                    this.finished = true;
-                    var i;
-                    for (i=0; i<this.doneCallbacks.length; i++) {
-                        this.doneCallbacks[i]();
-                    }
-                    parent.removeClass(viewPortClasses);
-                    parent.data("animationData", null);
-                },
-                addDoneCallback: function(done) {
-                    if (this.finished) {
-                        done();
-                    } else {
-                        this.doneCallbacks.push(done);
-                    }
-                }
-            };
-            parent.data("animationData", parentAnimationData);
-            parent.addClass(viewPortClasses);
+            synchronization = createSynchronizationIfNeeded(element);
+            synchronization.leave(function(done) {
+                element.addClass(addClasses);
+                animationComplete(element, function() {
+                    element.removeClass(removeClasses);
+                    done();
+                });
+            });
+            return synchronization;
+        }
 
-            if (direction === "leave") {
-                leave(element, parent, parentAnimationData);
-            } else {
+        function start(element, done, synchronization) {
+            synchronization.bindEnd(done);
+        }
+
+        function createSynchronizationIfNeeded(el) {
+            var parent = el.parent(),
+                sync = parent.data("animationSync");
+            if (!sync) {
                 if (transitionDef.sequential) {
-                    // setTimeout as we don't know if the enter or the leave
-                    // animation is started first.
-                    // Note: Don't do this for non sequential animations,
-                    // as otherwise the animations might get out of sync
-                    // (e.g. for slide).
-                    parentAnimationData.onLeaveDone = function() {
-                        enter(element, parent, parentAnimationData);
-                    };
-                    window.setTimeout(function() {
-                        if (!parentAnimationData.hasLeave) {
-                            enter(element, parent, parentAnimationData);
-                        }
-                    },0);
+                    sync = sequentialSynchronization();
                 } else {
-                    enter(element, parent, parentAnimationData);
+                    sync = parallelSynchronization();
                 }
+                sync.bindStart(function() {
+                    parent.addClass(viewPortClasses);
+                });
+                sync.bindEnd(function() {
+                    parent.removeClass(viewPortClasses);
+                    parent.data("animationSync", null);
+                });
+                parent.data("animationSync", sync);
             }
-            return parentAnimationData;
-        }
-
-        function start(element, done, parentAnimationData) {
-            parentAnimationData.addDoneCallback(done);
-        }
-
-        function leave(element, parent, parentAnimationData) {
-            parentAnimationData.hasLeave = true;
-            element.addClass(addClasses);
-            animationComplete(element, function () {
-                element.removeClass(removeClasses);
-                parentAnimationData.onLeaveDone();
-            });
-        }
-
-        function enter(element, parent, parentAnimationData) {
-            // -----------
-            // This code is from jquery mobile 1.3.1, function "createHandler".
-            // Prevent flickering in phonegap container: see comments at #4024 regarding iOS
-            element.css("z-index", -10);
-            element.addClass(addClasses);
-            // Restores visibility of the new page: added together with $to.css( "z-index", -10 );
-            element.css("z-index", "");
-            element.removeClass(toPreClass);
-            // ------------
-            animationComplete(element, function () {
-                element.removeClass(removeClasses);
-                // Do the cleanup only during the "enter" event,
-                // as that may have been delayed!
-                parentAnimationData.finish();
-            });
+            return sync;
         }
 
         function firstElement(element) {
@@ -209,5 +190,106 @@ function registerPageAnimation(transitionType, reverse, direction) {
             return transition;
         }
     }]);
+
+    function parallelSynchronization() {
+        var start = latch(),
+            end = latch(),
+            runningCount = 0;
+        return {
+            enter: enter,
+            leave: leave,
+            bindStart: start.listen,
+            bindEnd: end.listen
+        };
+
+        function enter(delegate) {
+            setup(delegate);
+        }
+
+        function leave(delegate) {
+            setup(delegate);
+        }
+
+        function setup(delegate) {
+            start.notify();
+            runningCount++;
+            delegate(function () {
+                runningCount--;
+                if (runningCount === 0) {
+                    end.notify();
+                }
+            });
+        }
+
+    }
+
+    function sequentialSynchronization() {
+        var start = latch(),
+            end = latch(),
+            enterDelegate,
+            leaveDelegate;
+        return {
+            enter: enter,
+            leave: leave,
+            bindStart: start.listen,
+            bindEnd: end.listen
+        };
+
+        function enter(delegate) {
+            enterDelegate = delegate;
+            start.notify();
+            // setTimeout as the leave animation
+            // to detect if a leave animation has been used.
+            window.setTimeout(function () {
+                if (!leaveDelegate) {
+                    enterDelegate(function () {
+                        end.notify();
+                    });
+                }
+            }, 0);
+        }
+
+        function leave(delegate) {
+            leaveDelegate = delegate;
+            start.notify();
+            delegate(function () {
+                if (enterDelegate) {
+                    enterDelegate(function () {
+                        end.notify();
+                    });
+                } else {
+                    end.notify();
+                }
+            });
+        }
+    }
+
+    function latch() {
+        var _listeners = [],
+            _notified = false;
+        return {
+            listen: listen,
+            notify: notify
+        };
+
+        function listen(callback) {
+            if (_notified) {
+                callback();
+            } else {
+                _listeners.push(callback);
+            }
+        }
+
+        function notify() {
+            if (_notified) {
+                return;
+            }
+            var i;
+            for (i = 0; i < _listeners.length; i++) {
+                _listeners[i]();
+            }
+            _notified = true;
+        }
+    }
 }
 
