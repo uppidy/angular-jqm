@@ -109,7 +109,7 @@ function registerPageAnimation(transitionType, reverse, direction) {
 
         function setupEnter(element) {
             var synchronization;
-            element = firstElement(element),
+            element = firstElement(element);
             synchronization = createSynchronizationIfNeeded(element);
             synchronization.enter(function(done) {
                 // -----------
