@@ -1,6 +1,5 @@
 [
 "src/module.js",
-"src/services/defaultRoute.js",
 "src/services/animationComplete.js",
 "src/services/snifferDecorator.js",
 "src/services/browserDecorator.js",

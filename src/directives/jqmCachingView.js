@@ -44,8 +44,26 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
                 }
 
                 function clearContent() {
-                    animate.leave(element.contents(), element);
+
+                    var contents = element.contents();
+                    contents.remove = detachNodes;
+                    animate.leave(contents, element);
                     destroyLastScope();
+
+                    // Note: element.remove() would
+                    // destroy all data associated to those nodes,
+                    // e.g. widgets, ...
+                    function detachNodes() {
+                        /*jshint -W040:true*/
+                        var i, node, parent;
+                        for (i=0; i<this.length; i++) {
+                            node = this[i];
+                            parent = node.parentNode;
+                            if (parent) {
+                                parent.removeChild(node);
+                            }
+                        }
+                    }
                 }
 
                 function update() {
@@ -59,9 +77,6 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
                             cacheEntry = compileTemplateIfNeeded(current.loadedTemplateUrl, template);
 
                         animate.enter(cacheEntry.elements, element);
-                        // TODO: If the parent scope is in mode digesting,
-                        // ensure that the reconnected scope is also digested!
-                        // -> Is it enought to add it as last child??
                         lastScope = current.scope = cacheEntry.scope;
                         lastScope.$reconnect();
                         if (current.controller) {
@@ -108,7 +123,7 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
                         link(childScope);
                         cacheEntry = {
                             elements: enterElements,
-                            scope: scope
+                            scope: childScope
                         };
                         if (templateUrl) {
                             jqmViewCache.put(templateUrl, cacheEntry);

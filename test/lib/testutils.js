@@ -1,6 +1,7 @@
 (function (window, document) {
     var exports,
-        IGNORE_CSS_CLASSES = /(ng-.*)|(jqm.*)/;
+        IGNORE_CSS_CLASSES = /(ng-.*)|(jqm.*)/,
+        ONLY_BASIC_TRANSITIONS = "basic";
     beforeEach(initIfNeeded);
     beforeEach(function () {
         exports.jqm._beforeEach();
@@ -63,6 +64,8 @@
         init: notImplemented,
         beginTransitionTo: notImplemented,
         historyGo: notImplemented,
+        // needs to be called before init.
+        enableTransitions: notImplemented,
         fireAnimationEndEvents: function () {
             fireAnimationEndEventsInWindow(this.viewPort[0]);
         },
@@ -151,7 +154,7 @@
             delete $.mobile.firstPage;
             delete $.mobile.activePage;
             var urlHistory = $.mobile.urlHistory;
-            urlHistory.stack.splice(1,urlHistory.stack.length-1);
+            urlHistory.stack.splice(1, urlHistory.stack.length - 1);
             urlHistory.activeIndex = 0;
         }
 
@@ -227,6 +230,12 @@
         jqmEvent.type = 'hashchange';
         $(this.win).triggerHandler("hashchange");
         // $.event.special.navigate.hashchange(jqmEvent);
+    };
+
+    JqmUtils.prototype.enableTransitions = function (enable) {
+        var $ = this.$;
+        $.support.cssTransitions = !!enable;
+        $.support.cssTransform3d = enable !== ONLY_BASIC_TRANSITIONS;
     };
 
     // -------
@@ -345,6 +354,16 @@
         this.tick(1);
     };
 
+    NgUtils.prototype.enableTransitions = function (enable) {
+        module("jqm", function ($provide) {
+            $provide.decorator("$sniffer", function ($delegate) {
+                $delegate.animations = !!enable;
+                $delegate.cssTransform3d = enable !== ONLY_BASIC_TRANSITIONS;
+                return $delegate;
+            });
+        });
+    };
+
     // ------
     // CommonApi utils
     function notImplemented() {
@@ -386,7 +405,7 @@
             var prop;
             for (prop in el2Classes) {
                 if (!IGNORE_CSS_CLASSES.test(prop) && !(prop in el1Classes)) {
-                    error("classes differ: "+prop, el1, el2);
+                    error("classes differ: " + prop, el1, el2);
                 }
             }
         }
