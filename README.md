@@ -30,6 +30,10 @@ Directory structure
 - src: The source files of the adapter
 - test/unit: The unit tests
 
+Commits:
+
+- Commit messages must follow the conventions [here](https://github.com/btford/grunt-conventional-changelog)
+
 Commands:
 
 - Install the dependencies: `npm install` and then `./node_modules/.bin/bower install`.
