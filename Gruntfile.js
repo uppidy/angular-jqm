@@ -127,14 +127,31 @@ module.exports = function(grunt) {
           browsers: ['PhantomJS']
         }
       }
+    },
+    changelog: {
+      dest: 'CHANGELOG.md'
     }
   });
 
+  grunt.registerTask('install', 'Prepare development environment', function() {
+      if (!grunt.file.exists('.git/hooks/commit-msg')) {
+          grunt.file.copy('build/validate-commit-msg.js', '.git/hooks/commit-msg');
+          require('fs').chmodSync('.git/hooks/commit-msg', '0755');
+
+          var gitconfig = grunt.file.read('.git/config');
+          gitconfig += '\n' + grunt.file.read('build/git-config');
+          grunt.file.write('.git/config', gitconfig);
+
+          grunt.log.writeln('Installing commit enforce hook, dist merge hook.');
+      }
+  });
+
   grunt.registerTask('dev', ['connect','karma:dev','watch']);
-  grunt.registerTask('default', ['concat','jshint','karma:localBuild']);
+  grunt.registerTask('default', ['install', 'concat','jshint','karma:localBuild']);
   grunt.registerTask('travis', ['concat','jshint','karma:travis']);
 
   grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-conventional-changelog');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-watch');
