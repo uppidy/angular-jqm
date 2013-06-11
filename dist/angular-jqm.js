@@ -5,6 +5,37 @@
     "use strict";
 var jqmModule = angular.module("jqm", []);
 
+jqmModule.provider('jqmTheme', function () {
+    var JQM_THEME = '$jqmTheme',
+        _defaultTheme = 'c';
+
+    return {
+        $get: jqmThemeFactory,
+        defaultTheme: defaultTheme
+    };
+
+    function defaultTheme(value) {
+        if (value) {
+            _defaultTheme = value;
+        }
+        return _defaultTheme;
+    }
+
+    function jqmThemeFactory() {
+        return jqmTheme;
+    }
+
+    function jqmTheme(element, value) {
+        if (arguments.length === 2) {
+            if (value) {
+                element.data(JQM_THEME, value);
+            } else {
+                element.removeData(JQM_THEME);
+            }
+        }
+        return element.inheritedData(JQM_THEME) || _defaultTheme;
+    }
+});
 jqmModule.factory('$animationComplete', ['$sniffer', function ($sniffer) {
     return function (el, callback) {
         var eventNames = 'animationend';
@@ -280,15 +311,38 @@ jqmModule.config(['$provide', function ($provide) {
 
     }]);
 }]);
-jqmModule.directive('jqmPage', function() {
+jqmModule.directive('jqmPage', ['jqmTheme', function (jqmTheme) {
     return {
         restrict: 'A',
-        compile: function(cElement) {
-            // TODO: ui-body-c: Theming should be customizable!
-            cElement.addClass("ui-page ui-body-c");
+        link: function (scope, iElement) {
+            var theme = jqmTheme(iElement);
+
+            iElement.addClass('ui-page ui-body-' + theme);
+            scope.$on('$viewContentLoaded', function () {
+                // Modify the parent when this page is shown.
+                iElement.parent().addClass("ui-overlay-" + theme);
+            });
         }
     };
-});
+}]);
+
+jqmModule.directive('jqmTheme', ['jqmTheme', function (jqmTheme) {
+    return {
+        restrict: 'A',
+        compile: function compile() {
+            return {
+                pre: function preLink(scope, iElement, iAttrs) {
+                    // Set the theme before all other link functions of children
+                    var theme = iAttrs.jqmTheme;
+                    if (theme) {
+                        jqmTheme(iElement, theme);
+                    }
+                }
+            };
+        }
+    };
+}]);
+
 jqmModule.directive('html', function() {
     return {
         restrict: 'E',
@@ -297,14 +351,15 @@ jqmModule.directive('html', function() {
         }
     };
 });
+
 jqmModule.directive('jqmViewport', ['jqmCachingViewDirective', '$animator', '$history', function (ngViewDirectives, $animator, $history) {
     // Note: Can't use template + replace here,
     // as this might be used on the <body>, which is not supported by angular.
     // So we are calling the ngViewDirective#link functions directly...
     return {
         restrict: 'A',
-        compile: function (cElement, cAttr) {
-            cElement.addClass("ui-mobile-viewport ui-overlay-c");
+        compile: function (cElement) {
+            cElement.addClass("ui-mobile-viewport");
             return link;
         },
         // for ng-view

@@ -4,8 +4,8 @@ jqmModule.directive('jqmViewport', ['jqmCachingViewDirective', '$animator', '$hi
     // So we are calling the ngViewDirective#link functions directly...
     return {
         restrict: 'A',
-        compile: function (cElement, cAttr) {
-            cElement.addClass("ui-mobile-viewport ui-overlay-c");
+        compile: function (cElement) {
+            cElement.addClass("ui-mobile-viewport");
             return link;
         },
         // for ng-view

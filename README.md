@@ -26,7 +26,7 @@ also be easy to keep track of changes in jquery mobile when they release newer v
 ## Build
 Directory structure
 
-- dist: The compiled versions of the adapter
+- dist: The compiled versions of the adapter (ignored during branch merges)
 - src: The source files of the adapter
 - test/unit: The unit tests
 
