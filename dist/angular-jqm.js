@@ -283,20 +283,40 @@ jqmModule.config(['$provide', function ($provide) {
 jqmModule.directive('jqmPage', function() {
     return {
         restrict: 'A',
-        compile: function(cElement) {
-            // TODO: ui-body-c: Theming should be customizable!
-            cElement.addClass("ui-page ui-body-c");
+        require: '?^jqmTheme',
+        link: function(scope, element, attrs, themeCtrl) {
+            var theme = themeCtrl ? themeCtrl.theme() : 'c';
+            element.addClass('ui-page ui-body-' + theme);
         }
     };
 });
+
+jqmModule.directive('jqmTheme', function () {
+    return {
+        restrict: 'A',
+        controller: ['$attrs', ThemeController]
+    };
+
+    function ThemeController($attrs) {
+        //Default Theme
+        var currentTheme = $attrs.jqmTheme || 'c';
+        this.theme = function () {
+            return currentTheme;
+        };
+    }
+});
+
 jqmModule.directive('html', function() {
     return {
         restrict: 'E',
+        //There will always be a default jqmTheme available
+        controller: 'jqmThemeController',
         compile: function(cElement) {
             cElement.addClass("ui-mobile");
         }
     };
 });
+
 jqmModule.directive('jqmViewport', ['jqmCachingViewDirective', '$animator', '$history', function (ngViewDirectives, $animator, $history) {
     // Note: Can't use template + replace here,
     // as this might be used on the <body>, which is not supported by angular.
