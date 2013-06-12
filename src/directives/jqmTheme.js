@@ -1,14 +1,16 @@
-jqmModule.directive('jqmTheme', function () {
+jqmModule.directive('jqmTheme', ['jqmTheme', function (jqmTheme) {
     return {
         restrict: 'A',
-        controller: ['$attrs', ThemeController]
+        compile: function compile() {
+            return {
+                pre: function preLink(scope, iElement, iAttrs) {
+                    // Set the theme before all other link functions of children
+                    var theme = iAttrs.jqmTheme;
+                    if (theme) {
+                        jqmTheme(iElement, theme);
+                    }
+                }
+            };
+        }
     };
-
-    function ThemeController($attrs) {
-        //Default Theme
-        var currentTheme = $attrs.jqmTheme || 'c';
-        this.theme = function () {
-            return currentTheme;
-        };
-    }
-});
+}]);

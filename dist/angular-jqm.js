@@ -5,6 +5,37 @@
     "use strict";
 var jqmModule = angular.module("jqm", []);
 
+jqmModule.provider('jqmTheme', function () {
+    var JQM_THEME = '$jqmTheme',
+        _defaultTheme = 'c';
+
+    return {
+        $get: jqmThemeFactory,
+        defaultTheme: defaultTheme
+    };
+
+    function defaultTheme(value) {
+        if (value) {
+            _defaultTheme = value;
+        }
+        return _defaultTheme;
+    }
+
+    function jqmThemeFactory() {
+        return jqmTheme;
+    }
+
+    function jqmTheme(element, value) {
+        if (arguments.length === 2) {
+            if (value) {
+                element.data(JQM_THEME, value);
+            } else {
+                element.removeData(JQM_THEME);
+            }
+        }
+        return element.inheritedData(JQM_THEME) || _defaultTheme;
+    }
+});
 jqmModule.factory('$animationComplete', ['$sniffer', function ($sniffer) {
     return function (el, callback) {
         var eventNames = 'animationend';
@@ -280,37 +311,41 @@ jqmModule.config(['$provide', function ($provide) {
 
     }]);
 }]);
-jqmModule.directive('jqmPage', function() {
+jqmModule.directive('jqmPage', ['jqmTheme', function (jqmTheme) {
     return {
         restrict: 'A',
-        require: '?^jqmTheme',
-        link: function(scope, element, attrs, themeCtrl) {
-            var theme = themeCtrl ? themeCtrl.theme() : 'c';
-            element.addClass('ui-page ui-body-' + theme);
+        link: function (scope, iElement) {
+            var theme = jqmTheme(iElement);
+
+            iElement.addClass('ui-page ui-body-' + theme);
+            scope.$on('$viewContentLoaded', function () {
+                // Modify the parent when this page is shown.
+                iElement.parent().addClass("ui-overlay-" + theme);
+            });
         }
     };
-});
+}]);
 
-jqmModule.directive('jqmTheme', function () {
+jqmModule.directive('jqmTheme', ['jqmTheme', function (jqmTheme) {
     return {
         restrict: 'A',
-        controller: ['$attrs', ThemeController]
+        compile: function compile() {
+            return {
+                pre: function preLink(scope, iElement, iAttrs) {
+                    // Set the theme before all other link functions of children
+                    var theme = iAttrs.jqmTheme;
+                    if (theme) {
+                        jqmTheme(iElement, theme);
+                    }
+                }
+            };
+        }
     };
-
-    function ThemeController($attrs) {
-        //Default Theme
-        var currentTheme = $attrs.jqmTheme || 'c';
-        this.theme = function () {
-            return currentTheme;
-        };
-    }
-});
+}]);
 
 jqmModule.directive('html', function() {
     return {
         restrict: 'E',
-        //There will always be a default jqmTheme available
-        controller: 'jqmThemeController',
         compile: function(cElement) {
             cElement.addClass("ui-mobile");
         }
@@ -323,8 +358,8 @@ jqmModule.directive('jqmViewport', ['jqmCachingViewDirective', '$animator', '$hi
     // So we are calling the ngViewDirective#link functions directly...
     return {
         restrict: 'A',
-        compile: function (cElement, cAttr) {
-            cElement.addClass("ui-mobile-viewport ui-overlay-c");
+        compile: function (cElement) {
+            cElement.addClass("ui-mobile-viewport");
             return link;
         },
         // for ng-view

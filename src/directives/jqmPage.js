@@ -1,10 +1,14 @@
-jqmModule.directive('jqmPage', function() {
+jqmModule.directive('jqmPage', ['jqmTheme', function (jqmTheme) {
     return {
         restrict: 'A',
-        require: '?^jqmTheme',
-        link: function(scope, element, attrs, themeCtrl) {
-            var theme = themeCtrl ? themeCtrl.theme() : 'c';
-            element.addClass('ui-page ui-body-' + theme);
+        link: function (scope, iElement) {
+            var theme = jqmTheme(iElement);
+
+            iElement.addClass('ui-page ui-body-' + theme);
+            scope.$on('$viewContentLoaded', function () {
+                // Modify the parent when this page is shown.
+                iElement.parent().addClass("ui-overlay-" + theme);
+            });
         }
     };
-});
+}]);

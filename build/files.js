@@ -1,6 +1,6 @@
 [
 "src/module.js",
-"src/controllers/jqmTheme.js",
+"src/services/jqmTheme.js",
 "src/services/animationComplete.js",
 "src/services/snifferDecorator.js",
 "src/services/browserDecorator.js",
