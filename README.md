@@ -50,7 +50,8 @@ Add source files:
 Tests:
 
 - for all source files we have unit tests
-- for all directives, we additionally have tests that compare the markup with the real jqm widgets.
+- for all directives, we additionally have tests that compare the markup with the real jqm widgets
+  (see `testutils.js#compareElementRecursive`).
 - unit tests may access every private function in `jqm-angular`:
 
     For the whole build, we are using an immediately executing function expression to ensure that
@@ -94,6 +95,16 @@ for all pages that you want to display. E.g.:
             }
         });
     });
+
+## Snippet-Pages ##
+
+We already set up pages to play with during development and compare your directive with jquery mobile.
+For this, first do a `grunt dev`. Then visit one of the following pages:
+
+* [http://localhost:9000/test/jqmSnippet.html](http://localhost:9000/test/jqmSnippet.html): Html page that includes jquery mobile (but not angular)
+* [http://localhost:9000/test/ngSnippet.html](http://localhost:9000/test/ngSnippet.html): Html page that includes angular and the `angular-jqm`.
+
+
 
 ## Docs
 The docs can be found here: [doc/index.html](https://rawgithub.com/opitzconsulting/angular-jqm/master/doc/index.html).

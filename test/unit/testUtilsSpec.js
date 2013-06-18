@@ -1,62 +1,86 @@
 "use strict";
-describe('testutils', function() {
-    var $;
-    beforeEach(function() {
-        $ = angular.element;
-    });
-    describe('compareElement', function() {
-        function createCompareSpec(not, differenceType, el1, el2) {
-            it('detects '+not+'diffs in '+differenceType, function() {
-                var test = expect(function() {
-                    testutils.compareElement($(el1), $(el2));
-                });
-                if (not) {
-                    test = test.not;
-                }
-                test.toThrow();
+describe('testutils', function () {
+    var $ = angular.element;
+
+    function checkCompareError(callback, expectedErr) {
+        var err, errMsg;
+        try {
+            callback();
+        } catch (e) {
+            err = e;
+            errMsg = e.toString();
+        }
+        if (!expectedErr) {
+            if (err) {
+                throw err;
+            }
+        } else {
+            expectedErr = 'Error: compareElement: ' + expectedErr;
+            expect(errMsg).toBe(expectedErr);
+            if (errMsg !== expectedErr) {
+                throw err;
+            }
+        }
+    }
+
+    function textNode(string) {
+        return window.document.createTextNode(string);
+    }
+
+    function commentNode(string) {
+        return window.document.createComment(string);
+    }
+
+    describe('compareElement', function () {
+        function createCompareSpec(differenceType, expectedError, el1, el2) {
+            it(differenceType, function () {
+                checkCompareError(function () {
+                    testutils.compareElement(el1, el2);
+                }, expectedError);
             });
         }
-        function detectsDiffsIn(differenceType, el1, el2) {
-            createCompareSpec('', differenceType, el1, el2);
+        createCompareSpec('detects empty and filled element', 'node does not exist on other side. <div> [null]', $('<div></div>'), $());
+        createCompareSpec('detects empty and filled element with null', 'node does not exist on other side. <div> [null]', $('<div></div>'), null);
+
+        createCompareSpec('detects different element type', 'node types differ. <div> [text:test]', $('<div></div>'), $(textNode('test')));
+        createCompareSpec('detects different text for text nodes', 'text differs. [text:a] [text:b]', $(textNode('a')), $(textNode('b')));
+
+        createCompareSpec('detects different element name', 'node names differ. <div> <span>', $('<div></div>'), $('<span></span>'));
+        createCompareSpec('detects different class name', 'classes differ: b. <div class="a"> <div class="b">', $('<div class="a"></div>'), $('<div class="b"></div>'));
+        createCompareSpec('detects same class name order', null, $('<div class="a b"></div>'), $('<div class="b a"></div>'));
+        createCompareSpec('detects same class diffs with ng- classes', null, $('<div class="ng-a"></div>'), $('<div class="ng-b"></div>'));
+        createCompareSpec('detects same class diffs with jqm* classes', null, $('<div class="jqmA"></div>'), $('<div class="jqmB"></div>'));
+        createCompareSpec('detects same same elements', null, $('<div class="a">test</div>'), $('<div class="a">test</div>'));
+        createCompareSpec('detects same same trimmed text', null, $(textNode('a')), $(textNode(' a ')));
+        createCompareSpec('ignores children', null, $('<div><div></div></div>'), $('<div><span></span></div>'));
+    });
+    describe('compareElementRecursive', function () {
+        function createCompareSpec(differenceType, expectedError, el1, el2) {
+            it(differenceType, function () {
+                checkCompareError(function () {
+                    testutils.compareElementRecursive(el1, el2);
+                }, expectedError);
+            });
         }
 
-        function detectsNoDiffsIn(differenceType, el1, el2) {
-            createCompareSpec('no ', differenceType, el1, el2);
-        }
-
-        detectsDiffsIn('element name', '<div></div>', '<span></span>');
-        detectsDiffsIn('class name', '<div class="a"></div>', '<div class="b"></div>');
-        detectsDiffsIn('text content', '<div>a</div>', '<div>b</div>');
-        detectsNoDiffsIn('class name order', '<div class="a b"></div>', '<div class="b a"></div>');
-        detectsNoDiffsIn('class diffs with ng- classes', '<div class="ng-a"></div>', '<div class="ng-b"></div>');
-        detectsNoDiffsIn('class diffs with jqm* classes', '<div class="jqmA"></div>', '<div class="jqmB"></div>');
-        detectsNoDiffsIn('same elements', '<div class="a">test</div>', '<div class="a">test</div>');
-        detectsNoDiffsIn('children', '<div><div></div></div>', '<div><span></span></div>');
+        createCompareSpec('detects different elements', 'node names differ. <div> <span>', $('<div></div>'), $('<span></span>'));
+        createCompareSpec('detects different child elements', 'node names differ. <div> <span>', $('<h1><div></div></h1>'), $('<h1><span></span></h1>'));
+        createCompareSpec('detects different child element number', 'node does not exist on other side. <div> [null]', $('<h1><div></div></h1>'), $('<h1></h1>'));
+        createCompareSpec('ignores empty trimmed text nodes', '', $('<h1></h1>').append($(textNode(' '))), $('<h1></h1>'));
+        createCompareSpec('ignores comment nodes', '', $('<h1></h1>').append($(commentNode('hello'))), $('<h1></h1>'));
     });
-    describe('compareElementRecursive', function() {
-        it('detects diffs in the element', function() {
-            expect(function() {
-                testutils.compareElementRecursive($('<div></div>'), $('<span></span>'));
-            }).toThrow();
-        });
-        it('detects diffs in children', function() {
-            expect(function() {
-                testutils.compareElementRecursive($('<div><div></div></div>'), $('<div><span></span></div>'));
-            }).toThrow();
-        });
-    });
-    describe('fireEvent', function() {
-        it('fires an event on an element', function() {
+    describe('fireEvent', function () {
+        it('fires an event on an element', function () {
             var el = angular.element('<div></div>'),
                 spy = jasmine.createSpy();
             el.bind('click', spy);
             testutils.fireEvent(el, 'click');
             expect(spy).toHaveBeenCalled();
         });
-        it('merges the given props into the event', function() {
+        it('merges the given props into the event', function () {
             var el = angular.element('<div></div>'),
                 spy = jasmine.createSpy(),
-                evt = {a:1},
+                evt = {a: 1},
                 realEvt;
             el.bind('click', spy);
             testutils.fireEvent(el, 'click', evt);
@@ -65,21 +89,21 @@ describe('testutils', function() {
             expect(realEvt.a).toBe(1);
         });
     });
-    describe('ng', function() {
+    describe('ng', function () {
         var api;
-        beforeEach(function() {
+        beforeEach(function () {
             api = testutils.ng;
         });
         createCommonTests('ng');
     });
-    describe('jqm', function() {
+    describe('jqm', function () {
         var api;
-        beforeEach(function() {
+        beforeEach(function () {
             api = testutils.jqm;
         });
         createCommonTests('jqm');
-        describe('tick - further test cases', function() {
-            it('does not control timeouts in the main window', function() {
+        describe('tick - further test cases', function () {
+            it('does not control timeouts in the main window', function () {
                 var spy = jasmine.createSpy();
                 window.setTimeout(spy, 1000);
                 expect(spy).not.toHaveBeenCalled();
@@ -91,12 +115,12 @@ describe('testutils', function() {
 
     function createCommonTests(apiName) {
         var api, emptyPageStr;
-        beforeEach(function() {
+        beforeEach(function () {
             api = testutils[apiName];
-            emptyPageStr = '<div '+api.pageAttr+'></div>';
+            emptyPageStr = '<div ' + api.pageAttr + '></div>';
         });
-        describe('tick', function() {
-            it('controls timeouts in the corresponding window', function() {
+        describe('tick', function () {
+            it('controls timeouts in the corresponding window', function () {
                 var spy = jasmine.createSpy();
                 api.win.setTimeout(spy, 1000);
                 expect(spy).not.toHaveBeenCalled();
@@ -104,32 +128,32 @@ describe('testutils', function() {
                 expect(spy).toHaveBeenCalled();
             });
         });
-        describe('activePage', function() {
-            it('returns the children of the viewport', function() {
+        describe('activePage', function () {
+            it('returns the children of the viewport', function () {
                 var page = api.init(emptyPageStr);
                 expect(api.activePage()[0]).toBe(page[0]);
                 expect(api.activePage().hasClass("ui-page")).toBe(true);
             });
         });
-        describe('init', function() {
-            it('compiles simple elements within an implicit page and returns them', function() {
+        describe('init', function () {
+            it('compiles simple elements within an implicit page and returns them', function () {
                 var el = api.init('<div id="test"></div>');
                 expect(el.attr("id")).toBe("test");
                 expect(api.activePage().hasClass("ui-page")).toBe(true);
                 expect(api.activePage().children()[0]).toBe(el[0]);
             });
-            it('compiles pages and returns them', function() {
+            it('compiles pages and returns them', function () {
                 var el = api.init(emptyPageStr);
                 expect(el[0]).toBe(api.activePage()[0]);
                 expect(el.hasClass("ui-page")).toBe(true);
             });
-            it('compiles multiple pages and returns the viewPort', function() {
+            it('compiles multiple pages and returns the viewPort', function () {
                 var viewPort = api.init({
                     '': {
-                        template: '<div '+api.pageAttr+'>firstPage</div>'
+                        template: '<div ' + api.pageAttr + '>firstPage</div>'
                     },
                     '/page2': {
-                        template: '<div '+api.pageAttr+'>secondPage</div>',
+                        template: '<div ' + api.pageAttr + '>secondPage</div>',
                         transition: 'none'
                     }
                 });
@@ -138,14 +162,14 @@ describe('testutils', function() {
                 expect(api.activePage().text()).toBe('firstPage');
             });
         });
-        describe('beginTransitionTo', function() {
-            it('switches between pages if transition is none', function() {
+        describe('beginTransitionTo', function () {
+            it('switches between pages if transition is none', function () {
                 var viewPort = api.init({
                     '': {
-                        template: '<div '+api.pageAttr+'>firstPage</div>'
+                        template: '<div ' + api.pageAttr + '>firstPage</div>'
                     },
                     '/page2': {
-                        template: '<div '+api.pageAttr+'>secondPage</div>',
+                        template: '<div ' + api.pageAttr + '>secondPage</div>',
                         transition: 'none'
                     }
                 });
@@ -155,15 +179,15 @@ describe('testutils', function() {
                 expect(api.activePage().text()).toBe('secondPage');
             });
         });
-        describe('fireAnimationEndEvents', function() {
-            it('triggers animationend listeners for elements with .in classes', function() {
+        describe('fireAnimationEndEvents', function () {
+            it('triggers animationend listeners for elements with .in classes', function () {
                 var spy = jasmine.createSpy();
                 var el = api.init('<div class="in"></div>');
                 el.bind('animationend', spy);
                 api.fireAnimationEndEvents();
                 expect(spy).toHaveBeenCalled();
             });
-            it('triggers animationend listeners for elements with .out classes', function() {
+            it('triggers animationend listeners for elements with .out classes', function () {
                 var spy = jasmine.createSpy();
                 var el = api.init('<div class="out"></div>');
                 el.bind('animationend', spy);

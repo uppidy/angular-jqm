@@ -378,28 +378,59 @@
 
     function compareElementRecursive(el1, el2) {
         var res,
-            i,
-            children1 = el1.children(),
-            children2 = el2.children(),
-            maxLen = Math.max(children1.length, children2.length);
+            counters = [0, 0],
+            children,
+            child1, child2;
         compareElement(el1, el2);
-        for (i = 0; i < maxLen; i++) {
-            compareElementRecursive(children1.eq(i), children2.eq(i));
+        children = [el1.contents(), el2.contents()];
+        do {
+            child1 = nextChild(0);
+            child2 = nextChild(1);
+            if (child1 || child2) {
+                compareElementRecursive(child1, child2);
+            }
+        } while (child1 || child2);
+
+        function nextChild(elementIndex) {
+            var curr;
+            while (counters[elementIndex] < children[elementIndex].length) {
+                curr = children[elementIndex].eq(counters[elementIndex]++);
+                if (curr[0].nodeType === Node.TEXT_NODE) {
+                    // ignore empty text nodes
+                    if (curr.text().trim().length > 0) {
+                        return curr;
+                    }
+                } else if (curr[0].nodeType === Node.ELEMENT_NODE) {
+                    return curr;
+                }
+            }
         }
     }
 
     function compareElement(el1, el2) {
+        var el1Empty = (!el1 || !el1[0]),
+            el2Empty = (!el2 || !el2[0]);
+        if (el1Empty ^ el2Empty) {
+            error("node does not exist on other side", el1, el2);
+        }
+        if (el1[0].nodeType !== el2[0].nodeType) {
+            error("node types differ", el1, el2);
+        }
         if (el1[0].nodeName !== el2[0].nodeName) {
             error("node names differ", el1, el2);
         }
-        if (el1.text().trim() !== el2.text().trim()) {
-            error("text differs", el1, el2);
+        if (el1[0].nodeType === Node.TEXT_NODE) {
+            if (el1.text().trim() !== el2.text().trim()) {
+                error("text differs", el1, el2);
+            }
         }
-        var el1Classes = convertListToHash(el1[0].className.split(' ')),
-            el2Classes = convertListToHash(el2[0].className.split(' '));
+        if (el1[0].nodeType === Node.ELEMENT_NODE) {
+            var el1Classes = convertListToHash(el1[0].className.split(' ')),
+                el2Classes = convertListToHash(el2[0].className.split(' '));
 
-        containsAllClasses(el1Classes, el2Classes);
-        containsAllClasses(el2Classes, el1Classes);
+            containsAllClasses(el1Classes, el2Classes);
+            containsAllClasses(el2Classes, el1Classes);
+        }
 
         function containsAllClasses(el1Classes, el2Classes) {
             var prop;
@@ -411,7 +442,7 @@
         }
 
         function error(text, el1, el2) {
-            throw new Error(text + ". " + elementToString(el1) + " " + elementToString(el2));
+            throw new Error('compareElement: ' + text + ". " + elementToString(el1) + " " + elementToString(el2));
         }
     }
 
@@ -424,6 +455,12 @@
     }
 
     function elementToString(el) {
+        if (!el || !el[0]) {
+            return '[null]';
+        }
+        if (el[0].nodeType === Node.TEXT_NODE) {
+            return '[text:' + el.text() + ']';
+        }
         var doc = el[0].ownerDocument,
             div = doc.createElement('div');
         div.appendChild(el[0].cloneNode(false));
@@ -432,16 +469,16 @@
     }
 
     function fireAnimationEndEventsInWindow(rootEl) {
-        fireEvent(rootEl.querySelectorAll(".in,.out"), "animationend");
-    }
-
-    function fireEvent(elements, eventName, event) {
         // TODO: Use a more generic approach here,
         // that even works if the browser does not support animations!
         // A generic "fireEvent" function, that first
         // instrumented Element.prototype.addEventListener
         // and afterwards triggers those listeners manually,
         // simulating event bubbling, ...
+        fireEvent(rootEl.querySelectorAll(".in,.out"), "animationend");
+    }
+
+    function fireEvent(elements, eventName, event) {
         // TODO: also support touch, click, keydown, ...
         var i, el, evt;
         for (i = 0; i < elements.length; i++) {
