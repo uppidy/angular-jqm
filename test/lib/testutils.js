@@ -392,7 +392,7 @@
         if (el1[0].nodeName !== el2[0].nodeName) {
             error("node names differ", el1, el2);
         }
-        if (el1.text() !== el2.text()) {
+        if (el1.text().trim() !== el2.text().trim()) {
             error("text differs", el1, el2);
         }
         var el1Classes = convertListToHash(el1[0].className.split(' ')),

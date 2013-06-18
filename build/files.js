@@ -9,6 +9,7 @@
 "src/services/scopeDecorator.js",
 "src/services/templateCacheDecorator.js",
 "src/directives/jqmPage.js",
+"src/directives/jqmCheckbox.js",
 "src/directives/jqmTheme.js",
 "src/directives/html.js",
 "src/directives/jqmViewport.js",
