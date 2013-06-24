@@ -1,4 +1,4 @@
-/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-06-18
+/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-06-24
  * https://github.com/opitzconsulting/angular-jqm
  * Copyright (c) 2013 OPITZ CONSULTING GmbH; Licensed MIT */
 (function(window, angular) {
@@ -537,6 +537,15 @@ jqmModule.directive('jqmTheme', ['jqmTheme', function (jqmTheme) {
             };
         }
     };
+}]);
+
+jqmModule.directive('jqmThemeClass', ['jqmTheme', function (jqmTheme) {
+  return function postLink(scope, element, attrs) {
+      if (attrs.jqmThemeClass) {
+          var theme = jqmTheme(element);
+          element.addClass( attrs.jqmThemeClass.replace(/\$/g, theme) );
+      }
+  };
 }]);
 
 jqmModule.directive('html', function() {
