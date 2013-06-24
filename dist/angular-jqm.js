@@ -539,12 +539,14 @@ jqmModule.directive('jqmTheme', ['jqmTheme', function (jqmTheme) {
     };
 }]);
 
-jqmModule.directive('jqmThemeClass', function(jqmTheme) {
+jqmModule.directive('jqmThemeClass', ['jqmTheme', function (jqmTheme) {
   return function postLink(scope, element, attrs) {
-      var theme = jqmTheme(element);
-      element.addClass( attrs.jqmThemeClass.replace(/\$/g, theme) );
+      if (attrs.jqmThemeClass) {
+          var theme = jqmTheme(element);
+          element.addClass( attrs.jqmThemeClass.replace(/\$/g, theme) );
+      }
   };
-});
+}]);
 
 jqmModule.directive('html', function() {
     return {
