@@ -11,8 +11,18 @@ module.exports = function(grunt) {
           banner: grunt.file.read('build/header.js'),
           footer: grunt.file.read('build/footer.js')
         },
-        src: srcFiles,
+        src: srcFiles.concat('<%= html2js.all.dest %>'),
         dest: 'dist/<%= pkg.name %>.js'
+      }
+    },
+    html2js: {
+      options: {
+        base: 'src',
+        module: 'jqm-templates'
+      },
+      all: {
+        src: ['src/templates/**/*.html'],
+        dest: '.tmp/angular-jqm-templates.js'
       }
     },
     uglify: {
@@ -103,6 +113,7 @@ module.exports = function(grunt) {
                 'components/angular/angular.js',
                 'components/angular/angular-mocks.js',
                 'test/lib/testutils.js'].
+                concat('<%= html2js.all.dest %>').
                 concat(srcFiles).
                 concat(['test/**/*Spec.js']).
                 concat([{pattern: 'test/**/*', watched: true, included: false, served: true},
@@ -146,11 +157,13 @@ module.exports = function(grunt) {
       }
   });
 
+  grunt.registerTask('build', ['html2js', 'concat']);
   grunt.registerTask('dev', ['connect','karma:dev','watch']);
-  grunt.registerTask('default', ['install', 'concat','jshint','karma:localBuild']);
-  grunt.registerTask('travis', ['concat','jshint','karma:travis']);
+  grunt.registerTask('default', ['install', 'build','jshint','karma:localBuild']);
+  grunt.registerTask('travis', ['build','jshint','karma:travis']);
 
   grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-html2js');
   grunt.loadNpmTasks('grunt-conventional-changelog');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-connect');

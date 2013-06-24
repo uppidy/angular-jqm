@@ -5,6 +5,9 @@
 node_modules
 components
 
+# HTML2js tmp folder
+.tmp
+
 # Ignore IDEA files
 .idea
 *.iml
