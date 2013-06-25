@@ -1,1 +1,1 @@
-var jqmModule = angular.module("jqm", ["jqm-templates"]);
+var jqmModule = angular.module("jqm", ["jqm-templates", "ngMobile"]);

@@ -1,12 +1,16 @@
 "use strict";
 describe('jqmTheme directive', function () {
-    it('sets the given theme in the element', inject(function (jqmTheme) {
+    it('sets the given theme in the scope', function () {
         var div = testutils.ng.init('<div jqm-theme="someTheme"></div>');
-        expect(jqmTheme(div)).toBe('someTheme');
-    }));
-    it('does not set a theme if no value is given', inject(function (jqmTheme) {
-        var div = testutils.ng.init('<div jqm-theme="someParentTheme"><div jqm-theme></div></div>'),
-            child = div.children();
-        expect(jqmTheme(child)).toBe('someParentTheme');
-    }));
+        expect(div.scope().$theme).toBe('someTheme');
+    });
+    it('sets the given theme in the child scope', function () {
+        var div = testutils.ng.init('<div jqm-theme="parentTheme"><div jqm-theme="childTheme"></div></div>');
+        expect(div.scope().$theme).toBe('parentTheme');
+        expect(div.children().scope().$theme).toBe('childTheme');
+    });
+    it('does not set a theme if no value is given', function () {
+        var div = testutils.ng.init('<div jqm-theme="parentTheme"><div jqm-theme=""></div></div>');
+        expect(div.children().scope().$theme).toBe('parentTheme');
+    });
 });

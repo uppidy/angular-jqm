@@ -1,8 +1,7 @@
 <div jqm-scope-as="jqmCheckbox"
-     ng-click="$scopeAs.jqmCheckbox.toggleChecked()"
      class="ui-checkbox" ng-class="{'ui-disabled': $scopeAs.jqmCheckbox.disabled}">
     <label ng-class="{'ui-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-checkbox-off': !$scopeAs.jqmCheckbox.checked}"
-           jqm-theme-class="ui-btn-up-$"
+           ng-click="$scopeAs.jqmCheckbox.toggleChecked()"
            class="ui-btn ui-btn-corner-all ui-fullsize ui-btn-icon-left">
         <span class="ui-btn-inner">
             <span class="ui-btn-text" ng-transclude></span>

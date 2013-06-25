@@ -1,5 +1,28 @@
 "use strict";
 describe('scopeDecorator', function() {
+    describe('$theme inheritance', function() {
+        it('sets the default theme to $rootScope', function() {
+            var someTheme = "someTheme";
+            module(function(jqmConfigProvider) {
+                jqmConfigProvider.defaultTheme(someTheme);
+            });
+            inject(function($rootScope) {
+                expect($rootScope.$theme).toBe(someTheme);
+            });
+        });
+
+        it('inherits the $theme for normal and isolated child scopes', function() {
+            var someTheme = "someTheme";
+            module(function(jqmConfigProvider) {
+                jqmConfigProvider.defaultTheme(someTheme);
+            });
+            inject(function($rootScope) {
+                expect($rootScope.$new().$theme).toBe(someTheme);
+                expect($rootScope.$new(true).$theme).toBe(someTheme);
+                expect($rootScope.$new(true).$new(true).$theme).toBe(someTheme);
+            });
+        });
+    });
     describe('scope reconnect', function() {
         var rootScope, childScope, counter;
         beforeEach(function() {

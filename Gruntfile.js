@@ -111,6 +111,7 @@ module.exports = function(grunt) {
         files: ['node_modules/grunt-karma/node_modules/karma/adapter/lib/jasmine.js',
                 'node_modules/grunt-karma/node_modules/karma/adapter/jasmine.js',
                 'components/angular/angular.js',
+                'components/angular/angular-mobile.js',
                 'components/angular/angular-mocks.js',
                 'test/lib/testutils.js',
                 'test/lib/matchers.js'].

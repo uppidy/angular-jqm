@@ -1,5 +1,8 @@
 jqmModule.config(['$provide', function ($provide) {
-    $provide.decorator('$rootScope', ['$delegate', function scopeReconnectDecorator($rootScope) {
+    $provide.decorator('$rootScope', ['$delegate', scopeReconnectDecorator]);
+    $provide.decorator('$rootScope', ['$delegate', 'jqmConfig', inheritThemeDecorator]);
+
+    function scopeReconnectDecorator($rootScope) {
         $rootScope.$disconnect = function () {
             if (this.$root === this) {
                 return; // we can't disconnect the root node;
@@ -42,5 +45,23 @@ jqmModule.config(['$provide', function ($provide) {
 
         };
         return $rootScope;
-    }]);
+    }
+
+    function inheritThemeDecorator($rootScope, jqmConfig) {
+        instrumentScope($rootScope, jqmConfig.defaultTheme);
+        return $rootScope;
+
+        function instrumentScope(scope, theme) {
+            scope.$theme = theme;
+            var _new = scope.$new;
+            scope.$new = function (isolate) {
+                var res = _new.apply(this, arguments);
+                if (isolate) {
+                    instrumentScope(res, this.$theme);
+                }
+                return res;
+
+            };
+        }
+    }
 }]);

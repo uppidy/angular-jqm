@@ -1,63 +1,80 @@
 "use strict";
 describe("jqmCheckbox", function () {
-    var ng, jqm;
+    var ng, jqm, ngElement, jqmElement;
     beforeEach(function () {
         ng = testutils.ng;
         jqm = testutils.jqm;
         module('templates/jqmCheckbox.html');
     });
 
+    function triggerNgLabel(event) {
+        ng.$(ngElement[0].getElementsByTagName("label")).triggerHandler(event);
+    }
+
+    function triggerJqmLabel(event) {
+        jqm.$(jqmElement[0].getElementsByTagName("label")).trigger(event);
+    }
+
     describe('markup compared to jqm', function () {
         it("has same markup if unchecked", function () {
-            var ngElement = ng.init('<div jqm-checkbox>someLabel</div>');
-            var jqmElement = jqm.init('<label for="someChk">someLabel</label>'+
+            ngElement = ng.init('<div jqm-checkbox>someLabel</div>');
+            jqmElement = jqm.init('<label for="someChk">someLabel</label>'+
                 '<input id="someChk" type="checkbox">');
             testutils.compareElementRecursive(ngElement, jqmElement);
         });
         it("has same markup if checked", function () {
-            var ngElement = ng.init('<div jqm-checkbox>someLabel</div>');
-            var jqmElement = jqm.init('<label>someLabel<input type="checkbox"></label>');
-            jqmElement.children("label").triggerHandler('vclick');
-            ngElement.triggerHandler("click");
+            ngElement = ng.init('<div jqm-checkbox>someLabel</div>');
+            jqmElement = jqm.init('<label>someLabel<input type="checkbox"></label>');
+            triggerNgLabel("click");
+            triggerJqmLabel("click");
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup if pressed", function () {
+            ngElement = ng.init('<div jqm-checkbox>someLabel</div>');
+            jqmElement = jqm.init('<label>someLabel<input type="checkbox"></label>');
+            triggerNgLabel("mousedown");
+            triggerJqmLabel("mousedown");
             testutils.compareElementRecursive(ngElement, jqmElement);
         });
         it("has same markup when disabled", function() {
-            var ngElement = ng.init('<div jqm-checkbox disabled="disabled">someLabel</div>');
-            var jqmElement = jqm.init('<label>someLabel<input type="checkbox" disabled="disabled"></label>');
+            ngElement = ng.init('<div jqm-checkbox disabled="disabled">someLabel</div>');
+            jqmElement = jqm.init('<label>someLabel<input type="checkbox" disabled="disabled"></label>');
             testutils.compareElementRecursive(ngElement, jqmElement);
         });
         it("has same markup with custom theme", function () {
-            var ngElement = ng.init('<div jqm-checkbox jqm-theme="someTheme">someLabel</div>');
-            var jqmElement = jqm.init('<label for="someChk">someLabel</label>'+
+            ngElement = ng.init('<div jqm-checkbox jqm-theme="someTheme">someLabel</div>');
+            jqmElement = jqm.init('<label for="someChk">someLabel</label>'+
                 '<input id="someChk" type="checkbox" data-theme="someTheme">');
             testutils.compareElementRecursive(ngElement, jqmElement);
         });
     });
     describe('details', function() {
         it("allows label interpolation", function() {
-            var ngElement = ng.init('<div jqm-checkbox>{{someVar}}</div>');
+            ngElement = ng.init('<div jqm-checkbox>{{someVar}}</div>');
             ng.scope.someVar = 'someLabel';
             ng.scope.$apply();
             expect(ngElement.text().trim()).toBe('someLabel');
         });
         it("allows disabled interpolation", function() {
-            var ngElement = ng.init('<div jqm-checkbox ng-disabled="disabled">someLabel</div>');
+            ngElement = ng.init('<div jqm-checkbox ng-disabled="disabled">someLabel</div>');
             expect(ngElement.hasClass("ui-disabled")).toBe(false);
             ng.scope.disabled = true;
             ng.scope.$apply();
             expect(ngElement.hasClass("ui-disabled")).toBe(true);
         });
         it("updates the input element when changing", function() {
-            var ngElement = ng.init('<div jqm-checkbox ng-disabled="disabled">someLabel</div>'),
-                input = ngElement[0].getElementsByTagName("input")[0];
+            var input;
+            ngElement = ng.init('<div jqm-checkbox ng-disabled="disabled">someLabel</div>');
+            input = ngElement[0].getElementsByTagName("input")[0];
             expect(input.checked).toBe(false);
-            ngElement.triggerHandler("click");
+            triggerNgLabel("click");
             expect(input.checked).toBe(true);
         });
-        it("works with ng-model", function() {
-            var ngElement = ng.init('<div ng-init="someModel=false;"><div jqm-checkbox ng-model="someModel"></div></div>');
-            ngElement.children().triggerHandler("click");
-            expect(ngElement.scope().someModel).toBe(true);
+        it("works with ng-model without using $parent", function() {
+            var wrapper = ng.init('<div ng-init="someModel=false;"><div jqm-checkbox ng-model="someModel"></div></div>');
+            ngElement = wrapper.children();
+            triggerNgLabel("click");
+            expect(wrapper.scope().someModel).toBe(true);
         });
     });
 
@@ -75,7 +92,7 @@ describe("jqmCheckbox", function () {
         }
 
         function browserTrigger(el, event) {
-            el.triggerHandler(event);
+            angular.element(el[0].getElementsByTagName("label")).triggerHandler(event);
         }
 
         beforeEach(inject(function($injector, _$sniffer_, _$browser_) {
