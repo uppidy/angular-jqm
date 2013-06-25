@@ -37,7 +37,7 @@ module.exports = function(grunt) {
     },
     watch: {
       files: ['src/**/*','test/**/*'],
-      tasks: ['concat','karma:dev:run']
+      tasks: ['html2js','concat','karma:dev:run']
     },
     jshint: {
       options: {

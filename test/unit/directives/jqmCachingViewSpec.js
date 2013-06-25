@@ -3,7 +3,8 @@
 describe('ngCachingView', function () {
     var someUrl = '/someUrl',
         someOtherUrl = '/someOtherUrl',
-        someTemplateUrl = '/someTemplateUrl';
+        someTemplateUrl = '/someTemplateUrl',
+        someNonPageTemplateUrl = '/someNonPageTemplateUrl';
 
     function SomeCtrl($scope) {
         $scope.someCtrl = true;
@@ -22,16 +23,21 @@ describe('ngCachingView', function () {
                     template: '<div></div>'
                 });
                 return function($templateCache, $compile, $rootScope) {
-                    $templateCache.put(someTemplateUrl, '<div id="somePage">{{counter}}</div>');
+                    $templateCache.put(someTemplateUrl, '<div id="somePage" jqm-page>{{counter}}</div>');
+                    $templateCache.put(someNonPageTemplateUrl, '<div></div>');
                     viewEl = $compile('<div jqm-caching-view></div>')($rootScope);
                 };
             });
         });
-        it('should precompile entries with templateUrl in $templateCache into $jqmViewCache', inject(function($jqmViewCache) {
+        it('should precompile jqm pages in $templateCache into $jqmViewCache', inject(function($jqmViewCache) {
             var entry = $jqmViewCache.get(someTemplateUrl);
 
             expect(entry.elements.attr("id")).toBe("somePage");
             expect(entry.elements.scope()).toBe(entry.scope);
+        }));
+
+        it('should not precompile other elements in $templateCache into $jqmViewCache', inject(function($jqmViewCache, $templateCache) {
+            expect($jqmViewCache.get(someNonPageTemplateUrl)).toBeUndefined();
         }));
 
         it('should update the controller in the cacheEntry on first access and reuse it afterwards', inject(function($jqmViewCache, $rootScope, $location, $route) {

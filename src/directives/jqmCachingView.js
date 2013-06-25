@@ -103,8 +103,10 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
                     var urls = $templateCache.keys();
                     angular.forEach(urls, function (url) {
                         var template, ctrlFn;
-                        template = $templateCache.get(url);
-                        compileTemplateIfNeeded(url, template);
+                        template = angular.element($templateCache.get(url));
+                        if (angular.isDefined(template.attr('jqm-page')) || angular.isDefined(template.attr('data-jqm-page'))) {
+                            compileTemplateIfNeeded(url, template);
+                        }
                     });
                 }
 
@@ -115,7 +117,8 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
 
                     cacheEntry = jqmViewCache.get(templateUrl);
                     if (!cacheEntry) {
-                        enterElements = angular.element('<div></div>').html(template).contents();
+                        enterElements = angular.element(template);
+
                         link = $compile(enterElements);
 
                         childScope = scope.$new();
