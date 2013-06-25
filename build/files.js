@@ -12,6 +12,7 @@
 "src/directives/jqmPage.js",
 "src/directives/jqmCheckbox.js",
 "src/directives/jqmTheme.js",
+"src/directives/jqmThemeClass.js",
 "src/directives/html.js",
 "src/directives/jqmViewport.js",
 "src/directives/jqmCachingView.js",
