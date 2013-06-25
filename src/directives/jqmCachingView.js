@@ -103,11 +103,18 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
                     var urls = $templateCache.keys();
                     angular.forEach(urls, function (url) {
                         var template, ctrlFn;
-                        template = angular.element($templateCache.get(url));
+                        template = stringToElement($templateCache.get(url));
                         if (angular.isDefined(template.attr('jqm-page')) || angular.isDefined(template.attr('data-jqm-page'))) {
                             compileTemplateIfNeeded(url, template);
                         }
                     });
+                }
+
+                function stringToElement(string) {
+                    if (string.html) {
+                        return string;
+                    }
+                    return angular.element('<div></div>').html(string).contents();
                 }
 
                 function compileTemplateIfNeeded(templateUrl, template) {
@@ -117,7 +124,7 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
 
                     cacheEntry = jqmViewCache.get(templateUrl);
                     if (!cacheEntry) {
-                        enterElements = angular.element(template);
+                        enterElements = stringToElement(template);
 
                         link = $compile(enterElements);
 

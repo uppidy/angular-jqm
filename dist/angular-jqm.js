@@ -468,61 +468,31 @@ jqmModule.directive('jqmPage', ['jqmTheme', function (jqmTheme) {
     };
 }]);
 
-// Note: No theme dependency in the css classes of checkboxes!
 jqmModule.directive('jqmCheckbox', [function () {
     return {
         restrict: 'A',
-        template: '<div class="ui-checkbox">' +
-            '<label class="ui-btn ui-btn-up-c ui-btn-corner-all ui-fullsize ui-btn-icon-left">' +
-            '<span class="ui-btn-inner">' +
-            '<span class="ui-btn-text"></span>' +
-            '<span class="ui-icon ui-icon-shadow"></span>' +
-            '</span>' +
-            '</label>' +
-            '<input type="checkbox"></div>',
-        require: '?ngModel',
+        transclude: true,
         replace: true,
-        link: function (scope, element, attr, ctrl) {
-            var checked = false,
-                disabled = false,
-                label = angular.element(element[0].children[0]),
-                input = angular.element(element[0].children[1]),
-                innerSpan = label[0].children[0],
-                textSpan = angular.element(innerSpan.children[0]),
-                iconSpan = angular.element(innerSpan.children[1]);
+        templateUrl: 'templates/jqmCheckbox.html',
+        scope: {
+            disabled: '@'
+        },
+        require: '?ngModel',
+        link: function (scope, element, attr, ngModelCtrl) {
+            scope.toggleChecked = toggleChecked;
 
-            observeLabel();
-            observeDisabled();
-            renderChecked();
-
-            bindClick();
-            if (ctrl) {
+            if (ngModelCtrl) {
                 enableNgModelCollaboration();
             }
 
-            function observeDisabled() {
-                attr.$observe('disabled', function (value) {
-                    disabled = value;
-                    renderDisabled();
-                });
-            }
-
-            function observeLabel() {
-                attr.$observe('label', function (value) {
-                    textSpan.text(value);
-                });
-            }
-
-            function bindClick() {
-                element.bind('click', function () {
-                    scope.$apply(function () {
-                        checked = !checked;
-                        renderChecked();
-                        if (ctrl) {
-                            ctrl.$setViewValue(checked);
-                        }
-                    });
-                });
+            function toggleChecked() {
+                if (scope.disabled) {
+                    return;
+                }
+                scope.checked = !scope.checked;
+                if (ngModelCtrl) {
+                    ngModelCtrl.$setViewValue(scope.checked);
+                }
             }
 
             function enableNgModelCollaboration() {
@@ -537,44 +507,23 @@ jqmModule.directive('jqmCheckbox', [function () {
                     falseValue = false;
                 }
 
-                ctrl.$render = function () {
-                    checked = ctrl.$viewValue;
-                    renderChecked();
+                ngModelCtrl.$render = function () {
+                    scope.checked = ngModelCtrl.$viewValue;
                 };
 
-                ctrl.$formatters.push(function (value) {
+                ngModelCtrl.$formatters.push(function (value) {
                     return value === trueValue;
                 });
 
-                ctrl.$parsers.push(function (value) {
+                ngModelCtrl.$parsers.push(function (value) {
                     return value ? trueValue : falseValue;
                 });
             }
 
-            // Note: Can't use interpolation in the template, as this would require an isolate scope.
-            // However, an isolate scope does not work with ngModelController!
-            function renderChecked() {
-                label.removeClass("ui-checkbox-off ui-checkbox-on");
-                iconSpan.removeClass("ui-icon-checkbox-on ui-icon-checkbox-off");
-                if (checked) {
-                    label.addClass("ui-checkbox-on");
-                    iconSpan.addClass("ui-icon-checkbox-on");
-                } else {
-                    label.addClass("ui-checkbox-off");
-                    iconSpan.addClass("ui-icon-checkbox-off");
-                }
-                input[0].checked = checked;
-            }
-
-            function renderDisabled() {
-                element.removeClass("ui-disabled");
-                if (disabled) {
-                    element.addClass("ui-disabled");
-                }
-            }
         }
     };
 }]);
+
 jqmModule.directive('jqmTheme', ['jqmTheme', function (jqmTheme) {
     return {
         restrict: 'A',
@@ -779,11 +728,18 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
                     var urls = $templateCache.keys();
                     angular.forEach(urls, function (url) {
                         var template, ctrlFn;
-                        template = angular.element($templateCache.get(url));
+                        template = stringToElement($templateCache.get(url));
                         if (angular.isDefined(template.attr('jqm-page')) || angular.isDefined(template.attr('data-jqm-page'))) {
                             compileTemplateIfNeeded(url, template);
                         }
                     });
+                }
+
+                function stringToElement(string) {
+                    if (string.html) {
+                        return string;
+                    }
+                    return angular.element('<div></div>').html(string).contents();
                 }
 
                 function compileTemplateIfNeeded(templateUrl, template) {
@@ -793,7 +749,7 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
 
                     cacheEntry = jqmViewCache.get(templateUrl);
                     if (!cacheEntry) {
-                        enterElements = angular.element(template);
+                        enterElements = stringToElement(template);
 
                         link = $compile(enterElements);
 
@@ -1109,6 +1065,23 @@ function registerPageAnimation(transitionType, reverse, direction) {
 }
 
 
-angular.module('jqm-templates', []);
+angular.module('jqm-templates', ['templates/jqmCheckbox.html']);
 
+angular.module("templates/jqmCheckbox.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("templates/jqmCheckbox.html",
+    "<div jqm-scope-as=\"jqmCheckbox\"\n" +
+    "     ng-click=\"$scopeAs.jqmCheckbox.toggleChecked()\"\n" +
+    "     class=\"ui-checkbox\" ng-class=\"{'ui-disabled': $scopeAs.jqmCheckbox.disabled}\">\n" +
+    "    <label ng-class=\"{'ui-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-checkbox-off': !$scopeAs.jqmCheckbox.checked}\"\n" +
+    "           jqm-theme-class=\"ui-btn-up-$\"\n" +
+    "           class=\"ui-btn ui-btn-corner-all ui-fullsize ui-btn-icon-left\">\n" +
+    "        <span class=\"ui-btn-inner\">\n" +
+    "            <span class=\"ui-btn-text\" ng-transclude></span>\n" +
+    "            <span ng-class=\"{'ui-icon-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-icon-checkbox-off': !$scopeAs.jqmCheckbox.checked}\"\n" +
+    "                  class=\"ui-icon ui-icon-shadow\"></span>\n" +
+    "        </span>\n" +
+    "    </label>\n" +
+    "    <input type=\"checkbox\" ng-model=\"$scopeAs.jqmCheckbox.checked\">\n" +
+    "</div>");
+}]);
 })(window, angular);
