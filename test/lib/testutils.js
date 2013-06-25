@@ -381,6 +381,8 @@
             counters = [0, 0],
             children,
             child1, child2;
+        el1 = normalizeNode(el1);
+        el2 = normalizeNode(el2);
         compareElement(el1, el2);
         children = [el1.contents(), el2.contents()];
         do {
@@ -405,6 +407,14 @@
                 }
             }
         }
+
+        function normalizeNode(el) {
+            // Normalize interpolated text of angular to the actual text node.
+            if (el && el[0] && el[0].nodeName === 'SPAN' && el[0].className === 'ng-scope') {
+                return el.contents();
+            }
+            return el;
+        }
     }
 
     function compareElement(el1, el2) {
@@ -425,8 +435,8 @@
             }
         }
         if (el1[0].nodeType === Node.ELEMENT_NODE) {
-            var el1Classes = convertListToHash(el1[0].className.split(' ')),
-                el2Classes = convertListToHash(el2[0].className.split(' '));
+            var el1Classes = convertListToHash(el1[0].className.split(/\s+/)),
+                el2Classes = convertListToHash(el2[0].className.split(/\s+/));
 
             containsAllClasses(el1Classes, el2Classes);
             containsAllClasses(el2Classes, el1Classes);
@@ -435,7 +445,7 @@
         function containsAllClasses(el1Classes, el2Classes) {
             var prop;
             for (prop in el2Classes) {
-                if (!IGNORE_CSS_CLASSES.test(prop) && !(prop in el1Classes)) {
+                if (prop && !IGNORE_CSS_CLASSES.test(prop) && !(prop in el1Classes)) {
                     error("classes differ: " + prop, el1, el2);
                 }
             }

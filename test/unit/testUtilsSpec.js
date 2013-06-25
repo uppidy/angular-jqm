@@ -47,11 +47,12 @@ describe('testutils', function () {
 
         createCompareSpec('detects different element name', 'node names differ. <div> <span>', $('<div></div>'), $('<span></span>'));
         createCompareSpec('detects different class name', 'classes differ: b. <div class="a"> <div class="b">', $('<div class="a"></div>'), $('<div class="b"></div>'));
-        createCompareSpec('detects same class name order', null, $('<div class="a b"></div>'), $('<div class="b a"></div>'));
+        createCompareSpec('detects same classes without order', null, $('<div class="a b"></div>'), $('<div class="b a"></div>'));
+        createCompareSpec('detects same classes without spaces', null, $('<div class=" a   b "></div>'), $('<div class="b a"></div>'));
         createCompareSpec('detects same class diffs with ng- classes', null, $('<div class="ng-a"></div>'), $('<div class="ng-b"></div>'));
         createCompareSpec('detects same class diffs with jqm* classes', null, $('<div class="jqmA"></div>'), $('<div class="jqmB"></div>'));
         createCompareSpec('detects same same elements', null, $('<div class="a">test</div>'), $('<div class="a">test</div>'));
-        createCompareSpec('detects same same trimmed text', null, $(textNode('a')), $(textNode(' a ')));
+        createCompareSpec('detects same trimmed text', null, $(textNode('a')), $(textNode(' a ')));
         createCompareSpec('ignores children', null, $('<div><div></div></div>'), $('<div><span></span></div>'));
     });
     describe('compareElementRecursive', function () {
@@ -66,6 +67,7 @@ describe('testutils', function () {
         createCompareSpec('detects different elements', 'node names differ. <div> <span>', $('<div></div>'), $('<span></span>'));
         createCompareSpec('detects different child elements', 'node names differ. <div> <span>', $('<h1><div></div></h1>'), $('<h1><span></span></h1>'));
         createCompareSpec('detects different child element number', 'node does not exist on other side. <div> [null]', $('<h1><div></div></h1>'), $('<h1></h1>'));
+        createCompareSpec('detects same text children for interpolated text', null, $('<h1>someLabel</h1>'), $('<h1><span class="ng-scope">someLabel</span></h1>'));
         createCompareSpec('ignores empty trimmed text nodes', '', $('<h1></h1>').append($(textNode(' '))), $('<h1></h1>'));
         createCompareSpec('ignores comment nodes', '', $('<h1></h1>').append($(commentNode('hello'))), $('<h1></h1>'));
     });
