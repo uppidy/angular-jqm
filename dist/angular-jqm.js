@@ -498,7 +498,8 @@ jqmModule.directive('jqmCheckbox', [function () {
         templateUrl: 'templates/jqmCheckbox.html',
         scope: {
             disabled: '@',
-            mini: '@'
+            mini: '@',
+            iconpos: '@'
         },
         require: ['?ngModel','^?jqmControlgroup'],
         link: function (scope, element, attr, ctrls) {
@@ -506,9 +507,18 @@ jqmModule.directive('jqmCheckbox', [function () {
                 jqmControlGroupCtrl = ctrls[1];
             scope.toggleChecked = toggleChecked;
             scope.isMini = isMini;
+            scope.getIconPos = getIconPos;
 
             if (ngModelCtrl) {
                 enableNgModelCollaboration();
+            }
+
+            function isMini() {
+                return scope.mini || (jqmControlGroupCtrl && jqmControlGroupCtrl.$scope.mini);
+            }
+
+            function getIconPos() {
+                return scope.iconpos || (jqmControlGroupCtrl && jqmControlGroupCtrl.$scope.iconpos);
             }
 
             function toggleChecked() {
@@ -519,10 +529,6 @@ jqmModule.directive('jqmCheckbox', [function () {
                 if (ngModelCtrl) {
                     ngModelCtrl.$setViewValue(scope.checked);
                 }
-            }
-
-            function isMini() {
-                return scope.mini || (jqmControlGroupCtrl && jqmControlGroupCtrl.$scope.mini);
             }
 
             function enableNgModelCollaboration() {
@@ -562,6 +568,7 @@ jqmModule.directive('jqmControlgroup', function() {
         templateUrl: 'templates/jqmControlgroup.html',
         scope: {
             mini: '@',
+            iconpos: '@',
             type: '@',
             shadow: '@',
             corners: '@',
@@ -1131,9 +1138,10 @@ angular.module("templates/jqmCheckbox.html", []).run(["$templateCache", function
     "     class=\"ui-checkbox\" ng-class=\"{'ui-disabled': $scopeAs.jqmCheckbox.disabled}\">\n" +
     "    <label ng-class=\"{'ui-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-checkbox-off': !$scopeAs.jqmCheckbox.checked,\n" +
     "           'ui-first-child': $scopeAs.jqmCheckbox.$position.first, 'ui-last-child': $scopeAs.jqmCheckbox.$position.last,\n" +
-    "           'ui-mini':$scopeAs.jqmCheckbox.isMini(), 'ui-fullsize':!$scopeAs.jqmCheckbox.isMini()}\"\n" +
+    "           'ui-mini':$scopeAs.jqmCheckbox.isMini(), 'ui-fullsize':!$scopeAs.jqmCheckbox.isMini(),\n" +
+    "           'ui-btn-icon-left': $scopeAs.jqmCheckbox.getIconPos()!='right', 'ui-btn-icon-right': $scopeAs.jqmCheckbox.getIconPos()=='right'}\"\n" +
     "           ng-click=\"$scopeAs.jqmCheckbox.toggleChecked()\"\n" +
-    "           class=\"ui-btn ui-btn-corner-all ui-btn-icon-left\">\n" +
+    "           class=\"ui-btn ui-btn-corner-all\">\n" +
     "        <span class=\"ui-btn-inner\">\n" +
     "            <span class=\"ui-btn-text\" ng-transclude></span>\n" +
     "            <span ng-class=\"{'ui-icon-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-icon-checkbox-off': !$scopeAs.jqmCheckbox.checked}\"\n" +

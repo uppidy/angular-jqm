@@ -51,6 +51,10 @@ describe("jqmCheckbox", function () {
             compile('data-mini="true"','data-mini="true"');
             testutils.compareElementRecursive(ngElement, jqmElement);
         });
+        it("has same markup with iconpos option", function () {
+            compile('data-iconpos="right"','data-iconpos="right"');
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
     });
     describe('details', function() {
         it("allows label interpolation", function() {
@@ -84,6 +88,11 @@ describe("jqmCheckbox", function () {
             var wrapper = ng.init('<div jqm-controlgroup data-mini="true"><div jqm-checkbox></div></div>');
             var label = wrapper.find("label");
             expect(label).toHaveClass("ui-mini");
+        });
+        it("uses the iconpos option of a parent controlgroup", function() {
+            var wrapper = ng.init('<div jqm-controlgroup data-iconpos="right"><div jqm-checkbox></div></div>');
+            var label = wrapper.find("label");
+            expect(label).toHaveClass("ui-btn-icon-right");
         });
     });
 

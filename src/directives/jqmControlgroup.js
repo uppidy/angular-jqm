@@ -6,6 +6,7 @@ jqmModule.directive('jqmControlgroup', function() {
         templateUrl: 'templates/jqmControlgroup.html',
         scope: {
             mini: '@',
+            iconpos: '@',
             type: '@',
             shadow: '@',
             corners: '@',
