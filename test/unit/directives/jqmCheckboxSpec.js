@@ -8,43 +8,47 @@ describe("jqmCheckbox", function () {
     });
 
     function triggerNgLabel(event) {
-        ng.$(ngElement[0].getElementsByTagName("label")).triggerHandler(event);
+        ngElement.find("label").triggerHandler(event);
     }
 
     function triggerJqmLabel(event) {
-        jqm.$(jqmElement[0].getElementsByTagName("label")).trigger(event);
+        jqmElement.find("label").trigger(event);
     }
 
     describe('markup compared to jqm', function () {
-        it("has same markup if unchecked", function () {
-            ngElement = ng.init('<div jqm-checkbox>someLabel</div>');
+        function compile(ngAttrs, jqmAttrs) {
+            ngElement = ng.init('<div jqm-checkbox '+ngAttrs+'>someLabel</div>');
             jqmElement = jqm.init('<label for="someChk">someLabel</label>'+
-                '<input id="someChk" type="checkbox">');
+                '<input id="someChk" type="checkbox" '+jqmAttrs+'>');
+        }
+
+
+        it("has same markup if unchecked", function () {
+            compile('','');
             testutils.compareElementRecursive(ngElement, jqmElement);
         });
         it("has same markup if checked", function () {
-            ngElement = ng.init('<div jqm-checkbox>someLabel</div>');
-            jqmElement = jqm.init('<label>someLabel<input type="checkbox"></label>');
+            compile('','');
             triggerNgLabel("click");
             triggerJqmLabel("click");
             testutils.compareElementRecursive(ngElement, jqmElement);
         });
         it("has same markup if pressed", function () {
-            ngElement = ng.init('<div jqm-checkbox>someLabel</div>');
-            jqmElement = jqm.init('<label>someLabel<input type="checkbox"></label>');
+            compile('','');
             triggerNgLabel("mousedown");
             triggerJqmLabel("mousedown");
             testutils.compareElementRecursive(ngElement, jqmElement);
         });
         it("has same markup when disabled", function() {
-            ngElement = ng.init('<div jqm-checkbox disabled="disabled">someLabel</div>');
-            jqmElement = jqm.init('<label>someLabel<input type="checkbox" disabled="disabled"></label>');
+            compile('disabled="disabled"','disabled="disabled"');
             testutils.compareElementRecursive(ngElement, jqmElement);
         });
         it("has same markup with custom theme", function () {
-            ngElement = ng.init('<div jqm-checkbox jqm-theme="someTheme">someLabel</div>');
-            jqmElement = jqm.init('<label for="someChk">someLabel</label>'+
-                '<input id="someChk" type="checkbox" data-theme="someTheme">');
+            compile('jqm-theme="someTheme"','data-theme="someTheme"');
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup with mini option", function () {
+            compile('data-mini="true"','data-mini="true"');
             testutils.compareElementRecursive(ngElement, jqmElement);
         });
     });
@@ -65,7 +69,7 @@ describe("jqmCheckbox", function () {
         it("updates the input element when changing", function() {
             var input;
             ngElement = ng.init('<div jqm-checkbox ng-disabled="disabled">someLabel</div>');
-            input = ngElement[0].getElementsByTagName("input")[0];
+            input = ngElement.find("input")[0];
             expect(input.checked).toBe(false);
             triggerNgLabel("click");
             expect(input.checked).toBe(true);
@@ -75,6 +79,11 @@ describe("jqmCheckbox", function () {
             ngElement = wrapper.children();
             triggerNgLabel("click");
             expect(wrapper.scope().someModel).toBe(true);
+        });
+        it("uses the mini option of a parent controlgroup", function() {
+            var wrapper = ng.init('<div jqm-controlgroup data-mini="true"><div jqm-checkbox></div></div>');
+            var label = wrapper.find("label");
+            expect(label).toHaveClass("ui-mini");
         });
     });
 
@@ -88,11 +97,11 @@ describe("jqmCheckbox", function () {
             $compile(formElm)(scope);
             scope.$apply();
             inputElm = formElm.children().eq(0);
-            realInputElm = angular.element(formElm[0].getElementsByTagName("input"));
+            realInputElm = formElm.find("input");
         }
 
         function browserTrigger(el, event) {
-            angular.element(el[0].getElementsByTagName("label")).triggerHandler(event);
+            el.find("label").triggerHandler(event);
         }
 
         beforeEach(inject(function($injector, _$sniffer_, _$browser_) {

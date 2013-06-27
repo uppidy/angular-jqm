@@ -7,9 +7,10 @@
 "src/directives/ngClickDecorator.js",
 "src/directives/jqmCachingView.js",
 "src/directives/jqmCheckbox.js",
+"src/directives/jqmControlgroup.js",
 "src/directives/jqmOnceClass.js",
 "src/directives/jqmPage.js",
-"src/directives/jqmPositionClass.js",
+"src/directives/jqmPositionAnchor.js",
 "src/directives/jqmScopeAs.js",
 "src/directives/jqmTheme.js",
 "src/directives/jqmViewport.js",
@@ -22,6 +23,5 @@
 "src/services/parseDecorator.js",
 "src/services/scopeDecorator.js",
 "src/services/snifferDecorator.js",
-"src/services/templateCacheDecorator.js",
-"src/services/watchPositionInParent.js"
+"src/services/templateCacheDecorator.js"
 ]

@@ -497,11 +497,15 @@ jqmModule.directive('jqmCheckbox', [function () {
         replace: true,
         templateUrl: 'templates/jqmCheckbox.html',
         scope: {
-            disabled: '@'
+            disabled: '@',
+            mini: '@'
         },
-        require: '?ngModel',
-        link: function (scope, element, attr, ngModelCtrl) {
+        require: ['?ngModel','^?jqmControlgroup'],
+        link: function (scope, element, attr, ctrls) {
+            var ngModelCtrl = ctrls[0],
+                jqmControlGroupCtrl = ctrls[1];
             scope.toggleChecked = toggleChecked;
+            scope.isMini = isMini;
 
             if (ngModelCtrl) {
                 enableNgModelCollaboration();
@@ -515,6 +519,10 @@ jqmModule.directive('jqmCheckbox', [function () {
                 if (ngModelCtrl) {
                     ngModelCtrl.$setViewValue(scope.checked);
                 }
+            }
+
+            function isMini() {
+                return scope.mini || (jqmControlGroupCtrl && jqmControlGroupCtrl.$scope.mini);
             }
 
             function enableNgModelCollaboration() {
@@ -546,6 +554,26 @@ jqmModule.directive('jqmCheckbox', [function () {
     };
 }]);
 
+jqmModule.directive('jqmControlgroup', function() {
+    return {
+        restrict: 'A',
+        replace: true,
+        transclude: true,
+        templateUrl: 'templates/jqmControlgroup.html',
+        scope: {
+            mini: '@',
+            type: '@',
+            shadow: '@',
+            corners: '@',
+            legend: '@'
+        },
+        controller: ['$scope', JqmControlGroupCtrl]
+    };
+
+    function JqmControlGroupCtrl($scope) {
+        this.$scope = $scope;
+    }
+});
 
 /**
  * Sets the given class string once, with no watching.
@@ -579,31 +607,68 @@ jqmModule.directive('jqmPage', [function () {
     };
 }]);
 
-
 /**
- * Sets the classes ui-first-child and ui-last-child depending on the position in parent (first, middle, or last)
+ * For every child element that has an own scope this will set the property $position in the child's scope
+ * and keep that value updated whenever elements are added, moved or removed from the element.
+ *
  * @example
-   <div jqm-position-class></div>
+ <div jqm-position-anchor></div>
+ And value of $position in the first child:
+ {first: true, middle: false, last: false}
  */
-jqmModule.directive('jqmPositionClass', ['watchPositionInParent', function(watchPositionInParent) {
-    var JQM_POSITION_CLASSES = {
-        first: 'ui-first-child',
-        last: 'ui-last-child'
-    };
+jqmModule.directive('jqmPositionAnchor', [ '$rootScope', function ($rootScope) {
     return {
-        compile: function(element, iAttr) {
-            return function postLink(scope, element) {
-                watchPositionInParent(element, function(newPos, oldPos) {
-                    if (oldPos) {
-                        element.removeClass(JQM_POSITION_CLASSES[oldPos]);
+        restrict: 'A',
+        link: function (scope, element) {
+            var elementNode = element[0];
+            afterFn(elementNode, 'appendChild', enqueueUpdate);
+            afterFn(elementNode, 'insertBefore', enqueueUpdate);
+            afterFn(elementNode, 'removeChild', enqueueUpdate);
+
+            enqueueUpdate();
+
+            function afterFn(context, fnName, afterCb) {
+                var fn = context[fnName];
+                context[fnName] = function (arg1, arg2) {
+                    fn.call(context, arg1, arg2);
+                    afterCb(arg1, arg2);
+                };
+            }
+
+            function enqueueUpdate() {
+                if (!enqueueUpdate.started) {
+                    enqueueUpdate.started = true;
+                    $rootScope.$evalAsync(function () {
+                        updateChildren();
+                        enqueueUpdate.started = false;
+                    });
+                }
+            }
+
+            function updateChildren() {
+                var children = element.children(),
+                    length = children.length,
+                    i, child, newPos, childScope;
+                for (i = 0; i < length; i++) {
+                    child = children.eq(i);
+                    childScope = child.scope();
+                    if (childScope !== scope) {
+                        childScope.$position = getPosition(i, length);
                     }
-                    element.addClass(JQM_POSITION_CLASSES[newPos]);
-                });
-            };
+                }
+            }
+
+            function getPosition(index, length) {
+                return {
+                    first: index === 0,
+                    last: index === length - 1,
+                    middle: index > 0 && index < length - 1
+                };
+            }
+
         }
     };
 }]);
-
 jqmModule.directive('jqmScopeAs', [function () {
     return {
         restrict: 'A',
@@ -1058,104 +1123,17 @@ jqmModule.config(['$provide', function ($provide) {
 
     }]);
 }]);
-/**
- * watchPositionInParent will watch the position of a given set of elements within their common parent node.
- * For example, if three children of a parent element each call `watchPositionInParent(me, callback)`, then
- * whenever the position of any of those children changes relative to the parent, the changed childs' callbacks
- * will be called.
- *
- * The callback is called with parameters `(newPosition, previousPosition)`.  The `position` is a string: either
- * 'first', 'middle', or 'last'.
- *
- */
-jqmModule.factory('watchPositionInParent', [ '$rootScope', function ($rootScope) {
-
-    var WATCH_DATA_KEY_CHILD = '$watchPositionChild';
-    var WATCH_DATA_KEY_PARENT = '$watchPositionParent';
-    function ParentWatcher($parent) {
-        $parent.data(WATCH_DATA_KEY_PARENT, this);
-
-        var parent = $parent[0];
-
-        this.watchChild = function($element, callback) {
-            var watchData = $element.data(WATCH_DATA_KEY_CHILD);
-            if (!watchData) {
-                $element.data(WATCH_DATA_KEY_CHILD, (watchData = {
-                    callbacks: [],
-                    position: undefined
-                }));
-            }
-            watchData.callbacks.push(callback);
-            enqueueUpdate();
-        };
-
-        afterFn(parent, 'appendChild', enqueueUpdate);
-        afterFn(parent, 'insertBefore', enqueueUpdate);
-        afterFn(parent, 'removeChild', enqueueUpdate);
-
-        var _updateEnqueued = false;
-        function enqueueUpdate() {
-            if (!_updateEnqueued) {
-                _updateEnqueued = true;
-                $rootScope.$evalAsync(function() {
-                    updateChildren();
-                    _updateEnqueued = false;
-                });
-            }
-        }
-
-        function updateChildren() {
-            var children = $parent.children();
-            var length = children.length;
-            angular.forEach(children, function(child, index) {
-                var childData = angular.element(child).data(WATCH_DATA_KEY_CHILD);
-                if (childData) {
-                    var newPos = getPosition(index, length);
-                    if (newPos !== childData.position) {
-                        angular.forEach(childData.callbacks, function(cb) {
-                            cb(newPos, childData.position);
-                        });
-                        childData.position = newPos;
-                    }
-                }
-            });
-        }
-    }
-
-    function getPosition(index, length) {
-        if (index === 0) {
-            return 'first';
-        } else if (index === length - 1) {
-            return 'last';
-        } else {
-            return 'middle';
-        }
-    }
-
-    function afterFn(context, fnName, afterCb) {
-        var fn = context[fnName];
-        context[fnName] = function(arg1, arg2) {
-            fn.call(context, arg1, arg2);
-            afterCb(arg1, arg2);
-        };
-    }
-
-    return function watchPositionInParent(element, callback) {
-        var parent = element.parent();
-        var parentWatcher = parent.data(WATCH_DATA_KEY_PARENT) || new ParentWatcher(parent);
-        parentWatcher.watchChild(element, callback);
-    };
-}]);
-
-angular.module('jqm-templates', ['templates/jqmCheckbox.html']);
+angular.module('jqm-templates', ['templates/jqmCheckbox.html', 'templates/jqmControlgroup.html']);
 
 angular.module("templates/jqmCheckbox.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/jqmCheckbox.html",
     "<div jqm-scope-as=\"jqmCheckbox\"\n" +
     "     class=\"ui-checkbox\" ng-class=\"{'ui-disabled': $scopeAs.jqmCheckbox.disabled}\">\n" +
-    "    <label ng-class=\"{'ui-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-checkbox-off': !$scopeAs.jqmCheckbox.checked}\"\n" +
+    "    <label ng-class=\"{'ui-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-checkbox-off': !$scopeAs.jqmCheckbox.checked,\n" +
+    "           'ui-first-child': $scopeAs.jqmCheckbox.$position.first, 'ui-last-child': $scopeAs.jqmCheckbox.$position.last,\n" +
+    "           'ui-mini':$scopeAs.jqmCheckbox.isMini(), 'ui-fullsize':!$scopeAs.jqmCheckbox.isMini()}\"\n" +
     "           ng-click=\"$scopeAs.jqmCheckbox.toggleChecked()\"\n" +
-    "           class=\"ui-btn ui-btn-corner-all ui-fullsize ui-btn-icon-left\">\n" +
+    "           class=\"ui-btn ui-btn-corner-all ui-btn-icon-left\">\n" +
     "        <span class=\"ui-btn-inner\">\n" +
     "            <span class=\"ui-btn-text\" ng-transclude></span>\n" +
     "            <span ng-class=\"{'ui-icon-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-icon-checkbox-off': !$scopeAs.jqmCheckbox.checked}\"\n" +
@@ -1165,5 +1143,17 @@ angular.module("templates/jqmCheckbox.html", []).run(["$templateCache", function
     "    <input type=\"checkbox\" ng-model=\"$scopeAs.jqmCheckbox.checked\">\n" +
     "</div>\n" +
     "");
+}]);
+
+angular.module("templates/jqmControlgroup.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("templates/jqmControlgroup.html",
+    "<fieldset class=\"ui-controlgroup\"\n" +
+    "     ng-class=\"{'ui-mini': mini, 'ui-shadow': shadow, 'ui-corner-all': corners!='false',\n" +
+    "     'ui-controlgroup-vertical': type!='horizontal', 'ui-controlgroup-horizontal': type=='horizontal'}\">\n" +
+    "    <div ng-if=\"legend\" class=\"ui-controlgroup-label\">\n" +
+    "        <legend>{{legend}}</legend>\n" +
+    "    </div>\n" +
+    "    <div class=\"ui-controlgroup-controls\" ng-transclude jqm-position-anchor></div>\n" +
+    "</fieldset>");
 }]);
 })(window, angular);

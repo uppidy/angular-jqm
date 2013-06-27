@@ -5,11 +5,15 @@ jqmModule.directive('jqmCheckbox', [function () {
         replace: true,
         templateUrl: 'templates/jqmCheckbox.html',
         scope: {
-            disabled: '@'
+            disabled: '@',
+            mini: '@'
         },
-        require: '?ngModel',
-        link: function (scope, element, attr, ngModelCtrl) {
+        require: ['?ngModel','^?jqmControlgroup'],
+        link: function (scope, element, attr, ctrls) {
+            var ngModelCtrl = ctrls[0],
+                jqmControlGroupCtrl = ctrls[1];
             scope.toggleChecked = toggleChecked;
+            scope.isMini = isMini;
 
             if (ngModelCtrl) {
                 enableNgModelCollaboration();
@@ -23,6 +27,10 @@ jqmModule.directive('jqmCheckbox', [function () {
                 if (ngModelCtrl) {
                     ngModelCtrl.$setViewValue(scope.checked);
                 }
+            }
+
+            function isMini() {
+                return scope.mini || (jqmControlGroupCtrl && jqmControlGroupCtrl.$scope.mini);
             }
 
             function enableNgModelCollaboration() {
