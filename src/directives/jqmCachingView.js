@@ -71,11 +71,20 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
                         template = locals && locals.$template;
 
                     if (template) {
-                        clearContent();
                         var current = $route.current,
                             controller,
-                            cacheEntry = compileTemplateIfNeeded(current.loadedTemplateUrl, template);
+                            cacheEntry;
+                        // New in jqmCachingView:
+                        // We need to wait for directives that use templateUrl,
+                        // even if they are cached (as they need an extra $q tick).
+                        scope.$watch('$$viewReady', contentLoaded);
+                        cacheEntry = compileTemplateIfNeeded(current.loadedTemplateUrl, template);
+                    } else {
+                        clearContent();
+                    }
 
+                    function contentLoaded() {
+                        clearContent();
                         animate.enter(cacheEntry.elements, element);
                         lastScope = current.scope = cacheEntry.scope;
                         lastScope.$reconnect();
@@ -90,12 +99,10 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
                                 element.children().data('$ngControllerController', controller);
                             }
                         }
-                        lastScope.$emit('$viewContentLoaded');
+                        lastScope.$emit('$viewContentLoaded', cacheEntry.elements);
                         lastScope.$eval(onloadExp);
                         // $anchorScroll might listen on event...
                         $anchorScroll();
-                    } else {
-                        clearContent();
                     }
                 }
 
@@ -125,6 +132,8 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
                     cacheEntry = jqmViewCache.get(templateUrl);
                     if (!cacheEntry) {
                         enterElements = stringToElement(template);
+                        // take first element (e.g. non text node)...
+                        enterElements.children().eq(0).parent().attr('view-ready', 'true');
 
                         link = $compile(enterElements);
 
@@ -144,3 +153,14 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
             }
         };
     }]);
+// New in jqmCachingView:
+// helper directive to detect when a view has really been loaded,
+// as it might contain directives with a templateUrl.
+jqmModule.directive('viewReady', function() {
+    return {
+        restrict: 'A',
+        link: function($scope) {
+            $scope.$$viewReady = true;
+        }
+    };
+});

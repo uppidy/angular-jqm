@@ -11,7 +11,7 @@ module.exports = function(grunt) {
           banner: grunt.file.read('build/header.js'),
           footer: grunt.file.read('build/footer.js')
         },
-        src: srcFiles.concat('<%= html2js.all.dest %>'),
+        src: srcFiles.concat('<%= html2js.all.dest %>').concat('<%= css2js.all.dest %>'),
         dest: 'dist/<%= pkg.name %>.js'
       }
     },
@@ -23,6 +23,12 @@ module.exports = function(grunt) {
       all: {
         src: ['src/templates/**/*.html'],
         dest: '.tmp/angular-jqm-templates.js'
+      }
+    },
+    css2js: {
+      all: {
+        src: ['src/css/**/*.css'],
+        dest: '.tmp/angular-jqm.css.js'
       }
     },
     uglify: {
@@ -37,7 +43,7 @@ module.exports = function(grunt) {
     },
     watch: {
       files: ['src/**/*','test/**/*'],
-      tasks: ['html2js','concat','karma:dev:run']
+      tasks: ['html2js','css2js','concat','karma:dev:run']
     },
     jshint: {
       options: {
@@ -158,6 +164,7 @@ module.exports = function(grunt) {
              so we use a javascript that adds the style (jquery.mobile.css.js)
           '//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.3.1/jquery.mobile.css'
           */
+          'docs/scripts/example_resets.css'
         ],
         navTemplate: 'docs/template/nav.html',
         html5Mode: false,
@@ -176,7 +183,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('install', 'Prepare development environment', install); 
-  grunt.registerTask('build', ['html2js', 'concat']);
+  grunt.registerTask('build', ['html2js', 'css2js', 'concat']);
   grunt.registerTask('dev', ['connect','karma:dev','watch']);
   grunt.registerTask('default', ['install','build','jshint','karma:localBuild','ngdocs']);
   grunt.registerTask('travis', ['build','jshint','karma:travis']);
@@ -189,6 +196,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-ngdocs');
+  grunt.loadTasks('build/grunt');
 
   function install() {
       if (!grunt.file.exists('.git/hooks/commit-msg')) {

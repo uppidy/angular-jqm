@@ -197,9 +197,9 @@
                     return self.viewPort.children();
                 }
             } else {
-                pageStr = '<div ' + self.pageAttr + '>' + inputStr + '</div>';
+                pageStr = '<div ' + self.pageAttr + '><div data-role="content">' + inputStr + '</div></div>';
                 resultFn = function () {
-                    return self.viewPort.children().children();
+                    return self.viewPort.children().children().children();
                 }
             }
             return {
@@ -322,7 +322,7 @@
             } else {
                 pageStr = '<div ' + self.pageAttr + '>' + inputStr + '</div>';
                 resultFn = function () {
-                    return self.viewPort.children().children();
+                    return self.viewPort.children().children().children();
                 }
             }
             return {

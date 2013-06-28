@@ -84,7 +84,7 @@ function registerPageAnimation(transitionType, reverse, direction) {
                     start: start
                 };
             } else {
-                addClasses += " in " + activePageClass + " " + toPreClass;
+                addClasses += " in";
                 return {
                     setup: setupEnter,
                     start: start
@@ -111,31 +111,44 @@ function registerPageAnimation(transitionType, reverse, direction) {
             var synchronization;
             element = firstElement(element);
             synchronization = createSynchronizationIfNeeded(element);
-            synchronization.enter(function(done) {
-                // -----------
-                // This code is from jquery mobile 1.3.1, function "createHandler".
-                // Prevent flickering in phonegap container: see comments at #4024 regarding iOS
+            if (!transitionDef.sequential) {
+                synchronization.bindStart(addStartClasses);
+            }
+            synchronization.enter(function (done) {
+                if (transitionDef.sequential) {
+                    addStartClasses();
+                }
                 element.css("z-index", -10);
+                element.addClass(activePageClass + " " + toPreClass);
+                // Browser has settled after setting the page to display:block.
+                // Now start the animation and show the page.
                 element.addClass(addClasses);
                 // Restores visibility of the new page: added together with $to.css( "z-index", -10 );
                 element.css("z-index", "");
                 element.removeClass(toPreClass);
-                // ------------
-                animationComplete(element, function() {
+                animationComplete(element, function () {
                     element.removeClass(removeClasses);
                     done();
                 });
             });
             return synchronization;
+
+            function addStartClasses() {
+                // Set the new page to display:block but don't show it yet.
+                // This code is from jquery mobile 1.3.1, function "createHandler".
+                // Prevent flickering in phonegap container: see comments at #4024 regarding iOS
+                element.css("z-index", -10);
+                element.addClass(activePageClass + " " + toPreClass);
+            }
         }
 
         function setupLeave(element) {
             var synchronization;
             element = firstElement(element);
             synchronization = createSynchronizationIfNeeded(element);
-            synchronization.leave(function(done) {
+            synchronization.leave(function (done) {
                 element.addClass(addClasses);
-                animationComplete(element, function() {
+                animationComplete(element, function () {
                     element.removeClass(removeClasses);
                     done();
                 });
@@ -156,10 +169,10 @@ function registerPageAnimation(transitionType, reverse, direction) {
                 } else {
                     sync = parallelSynchronization();
                 }
-                sync.bindStart(function() {
+                sync.bindStart(function () {
                     parent.addClass(viewPortClasses);
                 });
-                sync.bindEnd(function() {
+                sync.bindEnd(function () {
                     parent.removeClass(viewPortClasses);
                     parent.data("animationSync", null);
                 });
@@ -193,8 +206,20 @@ function registerPageAnimation(transitionType, reverse, direction) {
 
     function parallelSynchronization() {
         var start = latch(),
+            startAsync = latch(),
             end = latch(),
             runningCount = 0;
+        start.listen(function() {
+            // setTimeout to allow
+            // the browser to settle after the new page
+            // has been set to display:block and before the css animation starts.
+            // Without this transitions are sometimes not shown,
+            // unless you call window.scrollTo or click on a link (weired dependency...)
+            window.setTimeout(function() {
+                startAsync.notify();
+            },0);
+        });
+
         return {
             enter: enter,
             leave: leave,
@@ -211,13 +236,15 @@ function registerPageAnimation(transitionType, reverse, direction) {
         }
 
         function setup(delegate) {
-            start.notify();
             runningCount++;
-            delegate(function () {
-                runningCount--;
-                if (runningCount === 0) {
-                    end.notify();
-                }
+            start.notify();
+            startAsync.listen(function() {
+                delegate(function () {
+                    runningCount--;
+                    if (runningCount === 0) {
+                        end.notify();
+                    }
+                });
             });
         }
 
@@ -238,8 +265,7 @@ function registerPageAnimation(transitionType, reverse, direction) {
         function enter(delegate) {
             enterDelegate = delegate;
             start.notify();
-            // setTimeout as the leave animation
-            // to detect if a leave animation has been used.
+            // setTimeout to detect if a leave animation has been used.
             window.setTimeout(function () {
                 if (!leaveDelegate) {
                     enterDelegate(function () {

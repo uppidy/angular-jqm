@@ -1,4 +1,4 @@
-/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-07-02
+/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-07-09
  * https://github.com/opitzconsulting/angular-jqm
  * Copyright (c) 2013 OPITZ CONSULTING GmbH; Licensed MIT */
 (function(window, angular) {
@@ -98,7 +98,7 @@ function registerPageAnimation(transitionType, reverse, direction) {
                     start: start
                 };
             } else {
-                addClasses += " in " + activePageClass + " " + toPreClass;
+                addClasses += " in";
                 return {
                     setup: setupEnter,
                     start: start
@@ -125,31 +125,44 @@ function registerPageAnimation(transitionType, reverse, direction) {
             var synchronization;
             element = firstElement(element);
             synchronization = createSynchronizationIfNeeded(element);
-            synchronization.enter(function(done) {
-                // -----------
-                // This code is from jquery mobile 1.3.1, function "createHandler".
-                // Prevent flickering in phonegap container: see comments at #4024 regarding iOS
+            if (!transitionDef.sequential) {
+                synchronization.bindStart(addStartClasses);
+            }
+            synchronization.enter(function (done) {
+                if (transitionDef.sequential) {
+                    addStartClasses();
+                }
                 element.css("z-index", -10);
+                element.addClass(activePageClass + " " + toPreClass);
+                // Browser has settled after setting the page to display:block.
+                // Now start the animation and show the page.
                 element.addClass(addClasses);
                 // Restores visibility of the new page: added together with $to.css( "z-index", -10 );
                 element.css("z-index", "");
                 element.removeClass(toPreClass);
-                // ------------
-                animationComplete(element, function() {
+                animationComplete(element, function () {
                     element.removeClass(removeClasses);
                     done();
                 });
             });
             return synchronization;
+
+            function addStartClasses() {
+                // Set the new page to display:block but don't show it yet.
+                // This code is from jquery mobile 1.3.1, function "createHandler".
+                // Prevent flickering in phonegap container: see comments at #4024 regarding iOS
+                element.css("z-index", -10);
+                element.addClass(activePageClass + " " + toPreClass);
+            }
         }
 
         function setupLeave(element) {
             var synchronization;
             element = firstElement(element);
             synchronization = createSynchronizationIfNeeded(element);
-            synchronization.leave(function(done) {
+            synchronization.leave(function (done) {
                 element.addClass(addClasses);
-                animationComplete(element, function() {
+                animationComplete(element, function () {
                     element.removeClass(removeClasses);
                     done();
                 });
@@ -170,10 +183,10 @@ function registerPageAnimation(transitionType, reverse, direction) {
                 } else {
                     sync = parallelSynchronization();
                 }
-                sync.bindStart(function() {
+                sync.bindStart(function () {
                     parent.addClass(viewPortClasses);
                 });
-                sync.bindEnd(function() {
+                sync.bindEnd(function () {
                     parent.removeClass(viewPortClasses);
                     parent.data("animationSync", null);
                 });
@@ -207,8 +220,20 @@ function registerPageAnimation(transitionType, reverse, direction) {
 
     function parallelSynchronization() {
         var start = latch(),
+            startAsync = latch(),
             end = latch(),
             runningCount = 0;
+        start.listen(function() {
+            // setTimeout to allow
+            // the browser to settle after the new page
+            // has been set to display:block and before the css animation starts.
+            // Without this transitions are sometimes not shown,
+            // unless you call window.scrollTo or click on a link (weired dependency...)
+            window.setTimeout(function() {
+                startAsync.notify();
+            },0);
+        });
+
         return {
             enter: enter,
             leave: leave,
@@ -225,13 +250,15 @@ function registerPageAnimation(transitionType, reverse, direction) {
         }
 
         function setup(delegate) {
-            start.notify();
             runningCount++;
-            delegate(function () {
-                runningCount--;
-                if (runningCount === 0) {
-                    end.notify();
-                }
+            start.notify();
+            startAsync.listen(function() {
+                delegate(function () {
+                    runningCount--;
+                    if (runningCount === 0) {
+                        end.notify();
+                    }
+                });
             });
         }
 
@@ -252,8 +279,7 @@ function registerPageAnimation(transitionType, reverse, direction) {
         function enter(delegate) {
             enterDelegate = delegate;
             start.notify();
-            // setTimeout as the leave animation
-            // to detect if a leave animation has been used.
+            // setTimeout to detect if a leave animation has been used.
             window.setTimeout(function () {
                 if (!leaveDelegate) {
                     enterDelegate(function () {
@@ -426,11 +452,20 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
                         template = locals && locals.$template;
 
                     if (template) {
-                        clearContent();
                         var current = $route.current,
                             controller,
-                            cacheEntry = compileTemplateIfNeeded(current.loadedTemplateUrl, template);
+                            cacheEntry;
+                        // New in jqmCachingView:
+                        // We need to wait for directives that use templateUrl,
+                        // even if they are cached (as they need an extra $q tick).
+                        scope.$watch('$$viewReady', contentLoaded);
+                        cacheEntry = compileTemplateIfNeeded(current.loadedTemplateUrl, template);
+                    } else {
+                        clearContent();
+                    }
 
+                    function contentLoaded() {
+                        clearContent();
                         animate.enter(cacheEntry.elements, element);
                         lastScope = current.scope = cacheEntry.scope;
                         lastScope.$reconnect();
@@ -445,12 +480,10 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
                                 element.children().data('$ngControllerController', controller);
                             }
                         }
-                        lastScope.$emit('$viewContentLoaded');
+                        lastScope.$emit('$viewContentLoaded', cacheEntry.elements);
                         lastScope.$eval(onloadExp);
                         // $anchorScroll might listen on event...
                         $anchorScroll();
-                    } else {
-                        clearContent();
                     }
                 }
 
@@ -480,6 +513,8 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
                     cacheEntry = jqmViewCache.get(templateUrl);
                     if (!cacheEntry) {
                         enterElements = stringToElement(template);
+                        // take first element (e.g. non text node)...
+                        enterElements.children().eq(0).parent().attr('view-ready', 'true');
 
                         link = $compile(enterElements);
 
@@ -499,6 +534,17 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
             }
         };
     }]);
+// New in jqmCachingView:
+// helper directive to detect when a view has really been loaded,
+// as it might contain directives with a templateUrl.
+jqmModule.directive('viewReady', function() {
+    return {
+        restrict: 'A',
+        link: function($scope) {
+            $scope.$$viewReady = true;
+        }
+    };
+});
 /**
  * @ngdoc directive
  * @name jqm.directive:jqmCheckbox
@@ -623,6 +669,103 @@ jqmModule.directive('jqmControlgroup', function() {
         this.$scope = $scope;
     }
 });
+/**
+ * @ngdoc directive
+ * @name jqm.directive:jqmHeader
+ * @restrict A
+ *
+ * @description
+ * Defines the header of a `jqm-page`.
+ *
+ * @example
+ <example module="jqm">
+ <file name="index.html">
+ <div jqm-page class="jqm-standalone-page" style="height: 100px;">
+   <div jqm-header>
+     <h1>Header of Page1</h1>
+   </div>
+   Hello world!
+ </div>
+ </file>
+ </example>
+ */
+jqmModule.directive('jqmHeader', function () {
+    return {
+        restrict: 'A',
+        // Own scope as we have a different default theme
+        // than the page.
+        scope: true,
+        require: '^jqmPage',
+        controller: angular.noop,
+        link: function (scope, element, attr, jqmPageCtrl) {
+            jqmPageCtrl.header = element;
+            var hasExplicitTheme = scope.hasOwnProperty('$theme');
+            if (!hasExplicitTheme) {
+                scope.$theme = 'a';
+            }
+            element.addClass("ui-header ui-bar-"+scope.$theme);
+        }
+    };
+});
+
+angular.forEach(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7'], function (headerName) {
+    jqmModule.directive(headerName, hxDirective);
+});
+function hxDirective() {
+    return {
+        restrict: 'E',
+        require: ['?^jqmHeader', '?^jqmFooter'],
+        compile: function () {
+            return function (scope, element, attrs, ctrls) {
+                var i;
+                for (i=0; i<ctrls.length; i++) {
+                    if (ctrls[i]) {
+                        element.addClass("ui-title");
+                        break;
+                    }
+                }
+            };
+        }
+    };
+}
+/**
+ * @ngdoc directive
+ * @name jqm.directive:jqmFooter
+ * @restrict A
+ *
+ * @description
+ * Defines the footer of a `jqm-page`.
+ *
+ * @example
+ <example module="jqm">
+ <file name="index.html">
+ <div jqm-page class="jqm-standalone-page" style="height: 100px;">
+   Hello world!
+   <div jqm-footer>
+     <h1>Footer of Page1</h1>
+   </div>
+ </div>
+ </file>
+ </example>
+ */
+jqmModule.directive('jqmFooter', function () {
+    return {
+        restrict: 'A',
+        // Own scope as we have a different default theme
+        // than the page.
+        scope: true,
+        require: '^jqmPage',
+        controller: angular.noop,
+        link: function (scope, element, attr, jqmPageCtrl) {
+            jqmPageCtrl.footer = element;
+            var hasExplicitTheme = scope.hasOwnProperty('$theme');
+            if (!hasExplicitTheme) {
+                scope.$theme = 'a';
+            }
+            element.addClass("ui-footer ui-bar-"+scope.$theme);
+        }
+    };
+});
 jqmModule.directive('jqmLiLink', [function() {
     var isdef = angular.isDefined;
     return {
@@ -690,11 +833,22 @@ jqmModule.directive('jqmListview', [function() {
     };
 }]);
 
-
 /**
+ * @ngdoc directive
+ * @name jqm.directive:jqmOnceClass
+ * @restrict A
+ *
+ * @description
  * Sets the given class string once, with no watching.
+ *
  * @example
-   <div jqm-once-class="body-{{$theme}}"></div.
+ <example module="jqm">
+ <file name="index.html">
+   <div ng-init="someClass='a'" jqm-once-class="{{someClass}}">
+       <input type="text" ng-model="someClass">
+   </div>
+ </file>
+ </example>
  */
 jqmModule.directive('jqmOnceClass', ['$interpolate', function($interpolate) {
     return {
@@ -710,27 +864,79 @@ jqmModule.directive('jqmOnceClass', ['$interpolate', function($interpolate) {
     };
 }]);
 
+/**
+ * @ngdoc directive
+ * @name jqm.directive:jqmPage
+ * @restrict A
+ *
+ * @description
+ * Creates a jquery mobile page. Also adds automatic overflow scrolling for it's content.
+ *
+ * @example
+ <example module="jqm">
+ <file name="index.html">
+ <div jqm-page class="jqm-standalone-page" style="height: 100px;">
+     <p>Hello world!</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+ </div>
+ </file>
+ </example>
+ */
 jqmModule.directive('jqmPage', [function () {
     return {
         restrict: 'A',
-        link: function (scope, iElement) {
-            iElement.addClass('ui-page ui-body-' + scope.$theme);
-            scope.$root.$on('$viewContentLoaded', function () {
-                // Modify the parent when this page is shown.
-                iElement.parent().addClass("ui-overlay-" + scope.$theme);
-            });
+        require: 'jqmPage',
+        controller: angular.noop,
+        // Note: We are not using a template here by purpose,
+        // so that other directives like dialog may reuse this directive in a template themselves.
+        compile: function(cElement, cAttr) {
+            var content = angular.element('<div class="ui-content" jqm-scrollable></div>');
+            content.append(cElement.contents());
+            cElement.append(content);
+            cElement.addClass("ui-page");
+            return function(scope, lElement, lAttr, jqmPageCtrl) {
+                cElement.addClass("ui-body-"+scope.$theme);
+                var content = lElement.children();
+                if (jqmPageCtrl.header) {
+                    content.addClass('jqm-content-with-header');
+                    lElement.prepend(jqmPageCtrl.header);
+                }
+                if (jqmPageCtrl.footer) {
+                    content.addClass('jqm-content-with-footer');
+                    lElement.append(jqmPageCtrl.footer);
+                }
+            };
         }
     };
 }]);
-
 /**
+ * @ngdoc directive
+ * @name jqm.directive:jqmPositionAnchor
+ * @restrict A
+ *
+ * @description
  * For every child element that has an own scope this will set the property $position in the child's scope
  * and keep that value updated whenever elements are added, moved or removed from the element.
  *
  * @example
- <div jqm-position-anchor></div>
- And value of $position in the first child:
- {first: true, middle: false, last: false}
+ <example module="jqm">
+ <file name="index.html">
+ <div jqm-position-anchor>
+     <div ng-controller="angular.noop">First child: {{$position}}</div>
+     <div ng-controller="angular.noop">Middle child: {{$position}}</div>
+     <div ng-controller="angular.noop">Last child: {{$position}}</div>
+ </div>
+ </file>
+ </example>
  */
 jqmModule.directive('jqmPositionAnchor', [ '$rootScope', function ($rootScope) {
     return {
@@ -799,6 +1005,67 @@ jqmModule.directive('jqmScopeAs', [function () {
     };
 }]);
 
+/**
+ * @ngdoc directive
+ * @name jqm.directive:jqmScrollable
+ * @restrict A
+ *
+ * @description
+ * Adds overflow scrolling to an element.
+ *
+ * @example
+ <example module="jqm">
+ <file name="index.html">
+ <div jqm-scrollable style="height: 100px;">
+     <p>Hello world!</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+     <p>New Line</p>
+ </div>
+ </file>
+ </example>
+ */
+jqmModule.directive('jqmScrollable', [function () {
+    return {
+        restrict: 'A',
+        controller: angular.noop,
+        require: 'jqmScrollable',
+        link: function(scope, element, attrs, ctrl) {
+            // TODO add other directives for jqmScrollable with a higher priority than 0
+            // who set ctrl.fakeScrolling to true!
+            if (!ctrl.fakeScrolling) {
+                element.addClass('jqm-native-scrollable');
+            }
+        }
+    };
+}]);
+
+/**
+ * @ngdoc directive
+ * @name jqm.directive:jqmTheme
+ * @restrict A
+ *
+ * @description
+ * Sets the jqm theme for this element and it's children by adding a `$theme` property to the scope.
+ * Other directives like `jqmCheckbox` evaluate that property.
+ *
+ * @example
+ <example module="jqm">
+ <file name="index.html">
+ <div>
+   <div jqm-checkbox jqm-theme="a">Theme a</div>
+   <div jqm-checkbox jqm-theme="b">Theme b</div>
+ </div>
+ </file>
+ </example>
+ */
 jqmModule.directive('jqmTheme', [function () {
     return {
         restrict: 'A',
@@ -838,14 +1105,16 @@ jqmModule.directive('jqmViewport', ['jqmCachingViewDirective', '$animator', '$hi
         angular.forEach(ngViewDirectives, function (directive) {
             directive.link.apply(self, args);
         });
-
-        scope.$on('$viewContentLoaded', function (scope) {
+        scope.$on('$viewContentLoaded', function (event, page) {
+            // Note: event.targetScope does not work when we put a jqm-theme on the page.
+            var pageScope = page.scope();
             // if animations are disabled,
             // add the "ui-page-active" css class manually.
             // E.g. needed for the initial page.
             if (!$animator.enabled()) {
                 iElement.children().addClass("ui-page-active");
             }
+            iElement.addClass("ui-overlay-" + pageScope.$theme);
         });
         scope.$on('$routeChangeStart', function (scope, newRoute) {
             // Use $routeChangeStart and not $watch:
@@ -868,6 +1137,29 @@ jqmModule.directive('jqmViewport', ['jqmCachingViewDirective', '$animator', '$hi
     }
 }]);
 
+/**
+ * @ngdoc function
+ * @name jqm.$anchorScroll
+ * @requires $hideAddressBar
+ *
+ * @description
+ * This overrides the default `$anchorScroll` of angular and calls `$hideAddressBar` instead.
+ * By this, the address bar is hidden on every view change, orientation change, ...
+ */
+jqmModule.factory('$anchorScroll', ['$hideAddressBar', function ($hideAddressBar) {
+    return deferredHideAddressBar;
+
+    // We almost always want to allow the browser to settle after
+    // showing a page, orientation change, ... before we hide the address bar.
+    function deferredHideAddressBar() {
+        window.setTimeout($hideAddressBar, 50);
+    }
+}]);
+jqmModule.run(['$anchorScroll', '$rootScope', function($anchorScroll, $rootScope) {
+    $rootScope.$on('$orientationChanged', function(event) {
+        $anchorScroll();
+    });
+}]);
 jqmModule.factory('$animationComplete', ['$sniffer', function ($sniffer) {
     return function (el, callback) {
         var eventNames = 'animationend';
@@ -920,6 +1212,96 @@ jqmModule.config(['$provide', function ($provide) {
             }
         };
         return $browser;
+    }
+}]);
+/**
+ * @ngdoc function
+ * @name jqm.$hideAddressBar
+ * @requires $window
+ * @requires $rootElement
+ * @requires $orientation
+ *
+ * @description
+ * When called, this will hide the address bar on mobile devices that support it.
+ */
+jqmModule.factory('$hideAddressBar', ['$window', '$rootElement', '$orientation', function ($window, $rootElement, $orientation) {
+    var MIN_SCREEN_HEIGHT_WIDTH_OPT_OUT = 500,
+        MAX_SCREEN_HEIGHT = 800,
+        scrollToHideAddressBar,
+        cachedHeights = {
+        };
+    if (!$window.addEventListener || addressBarHidingOptOut()) {
+        return noop;
+    } else {
+        return hideAddressBar;
+    }
+
+    function noop(done) {
+        if (done) {
+            done();
+        }
+    }
+
+    // -----------------
+    function hideAddressBar(done) {
+        var orientation = $orientation(),
+            docHeight = cachedHeights[orientation];
+        if (!docHeight) {
+            // if we don't know the exact height of the document without the address bar,
+            // start with one that is always higher than the screen to be
+            // sure the address bar can be hidden.
+            docHeight = MAX_SCREEN_HEIGHT;
+        }
+        setDocumentHeight(docHeight);
+        if (!angular.isDefined(scrollToHideAddressBar)) {
+            // iOS needs a scrollTo(0,0) and android a scrollTo(0,1).
+            // We always do a scrollTo(0,1) at first and check the scroll position
+            // afterwards for future scrolls.
+            $window.scrollTo(0, 1);
+        } else {
+            $window.scrollTo(0, scrollToHideAddressBar);
+        }
+        // Wait for a scroll event or a timeout, whichever is first.
+        $window.addEventListener('scroll', afterScrollOrTimeout, false);
+        var timeoutHandle = $window.setTimeout(afterScrollOrTimeout, 400);
+
+        function afterScrollOrTimeout() {
+            $window.removeEventListener('scroll', afterScrollOrTimeout, false);
+            $window.clearTimeout(timeoutHandle);
+            if (!cachedHeights[orientation]) {
+                cachedHeights[orientation] = getViewportHeight();
+                setDocumentHeight(cachedHeights[orientation]);
+            }
+            if (!angular.isDefined(scrollToHideAddressBar)) {
+                if ($window.pageYOffset === 1) {
+                    // iOS
+                    scrollToHideAddressBar = 0;
+                    $window.scrollTo(0, 0);
+                } else {
+                    // Android
+                    scrollToHideAddressBar = 1;
+                }
+            }
+            if (done) {
+                done();
+            }
+        }
+    }
+
+    function addressBarHidingOptOut() {
+        return Math.max(getViewportHeight(), getViewportWidth()) > MIN_SCREEN_HEIGHT_WIDTH_OPT_OUT;
+    }
+
+    function getViewportWidth() {
+        return $window.innerWidth;
+    }
+
+    function getViewportHeight() {
+        return $window.innerHeight;
+    }
+
+    function setDocumentHeight(height) {
+        $rootElement.css('height', height + 'px');
     }
 }]);
 jqmModule.factory('$history', function $historyFactory() {
@@ -1018,6 +1400,72 @@ jqmModule.factory("$jqmViewCache", ['$cacheFactory', function($cacheFactory) {
     return $cacheFactory('views');
 }]);
 
+/**
+ * @ngdoc function
+ * @name jqm.$orientation
+ * @requires $window
+ * @requires $rootScope
+ *
+ * @description
+ * Provides access to the orientation of the browser. This will also
+ * broadcast a `$orientationChanged` event on the root scope and do a digest whenever the orientation changes.
+ */
+jqmModule.factory('$orientation', ['$window', '$rootScope', function($window, $rootScope) {
+    if (!$window.addEventListener) {
+        // For tests
+        return angular.noop;
+    }
+    var lastOrientation = getOrientation(),
+        VERTICAL = "vertical",
+        HORIZONTAL = "horizontal";
+
+    initOrientationChangeListening();
+
+    return getOrientation;
+
+    // ------------------
+
+    function initOrientationChangeListening() {
+        // Start listening for orientation changes
+        $window.addEventListener('resize', resizeListener, false);
+
+        function resizeListener() {
+            if (!orientationChanged()) {
+                return;
+            }
+            $rootScope.$apply(function() {
+                $rootScope.$broadcast('$orientationChanged', getOrientation());
+            });
+        }
+    }
+
+    function getOrientation() {
+        var w = $window.innerWidth,
+            h = $window.innerHeight;
+        if (h < 200) {
+            // In case of the Android screen size bug we assume
+            // vertical, as the keyboard takes the whole screen
+            // when horizontal.
+            // See http://stackoverflow.com/questions/7958527/jquery-mobile-footer-or-viewport-size-wrong-after-android-keyboard-show
+            // and http://android-developers.blogspot.mx/2009/04/updating-applications-for-on-screen.html
+            return VERTICAL;
+        }
+        if (w > h) {
+            return HORIZONTAL;
+        } else {
+            return VERTICAL;
+        }
+    }
+
+    function orientationChanged() {
+        var newOrientation = getOrientation();
+        if (lastOrientation === newOrientation) {
+            return false;
+        }
+        lastOrientation = newOrientation;
+        return true;
+    }
+}]);
 jqmModule.config(['$provide', function ($provide) {
     $provide.decorator('$parse', ['$delegate', jqmScopeAsParseDecorator]);
 
@@ -1311,4 +1759,5 @@ angular.module("templates/jqmListview.html", []).run(["$templateCache", function
     "</ul>\n" +
     "");
 }]);
-})(window, angular);
+
+angular.element(window.document).find('head').append('<style type="text/css">/* browser resets */\n.ui-mobile, .ui-mobile html, .ui-mobile body {\n    height: 100%;\n    margin: 0\n}\n\n.ui-footer {\n    position: absolute;\n    bottom: 0;\n    width: 100%\n}\n\n.ui-header {\n    position: absolute;\n    top: 0;\n    width: 100%\n}\n\n.ui-mobile .ui-page {\n    height: 100%;\n    min-height: 0\n}\n.ui-content {\n    position: absolute;\n    width: 100%;\n    top: 0;\n    bottom: 0;\n    padding: 0\n}\n.ui-content.jqm-content-with-header {\n    top: 42px\n}\n\n.ui-content.jqm-content-with-footer {\n    bottom: 43px\n}\n.jqm-standalone-page {\n    display: block;\n    position: relative;\n}\n\n.jqm-native-scrollable {\n    overflow: scroll;\n    overflow-scrolling: touch;\n    -webkit-overflow-scrolling: touch;\n    -moz-overflow-scrolling: touch;\n    -o-overflow-scrolling: touch\n}\n\n\n\n\n\n.ui-mobile-viewport {\n    /* needed to allow multiple viewports */\n    position: relative;\n    height:100%\n}\n</style>');})(window, angular);

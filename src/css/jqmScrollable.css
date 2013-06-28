@@ -1,0 +1,11 @@
+.jqm-native-scrollable {
+    overflow: scroll;
+    overflow-scrolling: touch;
+    -webkit-overflow-scrolling: touch;
+    -moz-overflow-scrolling: touch;
+    -o-overflow-scrolling: touch
+}
+
+
+
+

@@ -1,11 +1,22 @@
 /**
+ * @ngdoc directive
+ * @name jqm.directive:jqmPositionAnchor
+ * @restrict A
+ *
+ * @description
  * For every child element that has an own scope this will set the property $position in the child's scope
  * and keep that value updated whenever elements are added, moved or removed from the element.
  *
  * @example
- <div jqm-position-anchor></div>
- And value of $position in the first child:
- {first: true, middle: false, last: false}
+ <example module="jqm">
+ <file name="index.html">
+ <div jqm-position-anchor>
+     <div ng-controller="angular.noop">First child: {{$position}}</div>
+     <div ng-controller="angular.noop">Middle child: {{$position}}</div>
+     <div ng-controller="angular.noop">Last child: {{$position}}</div>
+ </div>
+ </file>
+ </example>
  */
 jqmModule.directive('jqmPositionAnchor', [ '$rootScope', function ($rootScope) {
     return {

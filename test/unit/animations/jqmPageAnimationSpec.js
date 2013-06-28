@@ -40,7 +40,8 @@ describe('jqmPageAnimation', function () {
         describe('setup', function () {
             it('adds the correct classes when enter is called before leave', function () {
                 enter.setup(enterEl);
-                expect(enterEl.prop("className")).toBe('slide in ui-page-active');
+                testutils.ng.tick(1);
+                expect(enterEl.prop("className")).toBe('ui-page-active slide in');
                 expect(parentEl.prop("className")).toBe('ui-mobile-viewport-transitioning viewport-slide');
 
                 leave.setup(leaveEl);
@@ -48,14 +49,16 @@ describe('jqmPageAnimation', function () {
             });
             it('adds the correct classes when leave is called before enter', function () {
                 leave.setup(leaveEl);
+                testutils.ng.tick(1);
                 expect(leaveEl.prop("className")).toBe('ui-page-active slide out');
                 expect(parentEl.prop("className")).toBe('ui-mobile-viewport-transitioning viewport-slide');
 
                 enter.setup(enterEl);
-                expect(enterEl.prop("className")).toBe('slide in ui-page-active');
+                expect(enterEl.prop("className")).toBe('ui-page-active slide in');
             });
             it('removes the classes after animationComplete', function () {
                 enter.setup(enterEl);
+                testutils.ng.tick(1);
 
                 leave.setup(leaveEl);
                 fireNextAnimationEvent();
@@ -75,6 +78,7 @@ describe('jqmPageAnimation', function () {
             it('calls the given callback if both animations are already complete', function () {
                 var enterMemento = enter.setup(enterEl);
                 var leaveMemento = leave.setup(leaveEl);
+                testutils.ng.tick(1);
                 fireNextAnimationEvent();
                 fireNextAnimationEvent();
                 enter.start(enterEl, enterFinished, enterMemento);
@@ -85,6 +89,7 @@ describe('jqmPageAnimation', function () {
             it('calls the given callback after both animations are complete', function () {
                 var enterMemento = enter.setup(enterEl);
                 var leaveMemento = leave.setup(leaveEl);
+                testutils.ng.tick(1);
                 enter.start(enterEl, enterFinished, enterMemento);
                 leave.start(leaveEl, leaveFinished, leaveMemento);
                 expect(enterFinished).not.toHaveBeenCalled();
@@ -122,10 +127,11 @@ describe('jqmPageAnimation', function () {
                 expect(leaveEl.prop("className")).toBe('ui-page-active fade out');
 
                 fireNextAnimationEvent();
-                expect(enterEl.prop("className")).toBe('fade in ui-page-active');
+                expect(enterEl.prop("className")).toBe('ui-page-active fade in');
             });
             it('adds the correct classes when leave is called before enter', function () {
                 leave.setup(leaveEl);
+                testutils.ng.tick(1);
                 expect(leaveEl.prop("className")).toBe('ui-page-active fade out');
                 expect(parentEl.prop("className")).toBe('ui-mobile-viewport-transitioning viewport-fade');
 
@@ -133,11 +139,12 @@ describe('jqmPageAnimation', function () {
                 expect(enterEl.prop("className")).toBe('');
 
                 fireNextAnimationEvent();
-                expect(enterEl.prop("className")).toBe('fade in ui-page-active');
+                expect(enterEl.prop("className")).toBe('ui-page-active fade in');
             });
             it('removes the classes after animationComplete', function () {
                 enter.setup(enterEl);
                 leave.setup(leaveEl);
+                testutils.ng.tick(1);
 
                 fireNextAnimationEvent();
                 expect(leaveEl.prop("className")).toBe('');
@@ -150,7 +157,7 @@ describe('jqmPageAnimation', function () {
             it('detects if there is not leave animation and start the enter animation alone', function() {
                 enter.setup(enterEl);
                 testutils.ng.tick(1);
-                expect(enterEl.prop("className")).toBe('fade in ui-page-active');
+                expect(enterEl.prop("className")).toBe('ui-page-active fade in');
             });
         });
         describe('start', function () {

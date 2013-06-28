@@ -18,14 +18,16 @@ jqmModule.directive('jqmViewport', ['jqmCachingViewDirective', '$animator', '$hi
         angular.forEach(ngViewDirectives, function (directive) {
             directive.link.apply(self, args);
         });
-
-        scope.$on('$viewContentLoaded', function (scope) {
+        scope.$on('$viewContentLoaded', function (event, page) {
+            // Note: event.targetScope does not work when we put a jqm-theme on the page.
+            var pageScope = page.scope();
             // if animations are disabled,
             // add the "ui-page-active" css class manually.
             // E.g. needed for the initial page.
             if (!$animator.enabled()) {
                 iElement.children().addClass("ui-page-active");
             }
+            iElement.addClass("ui-overlay-" + pageScope.$theme);
         });
         scope.$on('$routeChangeStart', function (scope, newRoute) {
             // Use $routeChangeStart and not $watch:

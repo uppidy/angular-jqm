@@ -13,10 +13,10 @@ describe('jqmViewport', function () {
             }
         });
         jqm.init({
-            '': { template: '<div data-role="page">initPage</div>' },
+            '': { template: '<div data-role="page"><div data-role="content">initPage</div></div>' },
             '/somePage': {
                 transition: transition,
-                template: '<div data-role="page">somePage</div>'
+                template: '<div data-role="page"><div data-role="content">somePage</div></div>'
             }
         });
     }

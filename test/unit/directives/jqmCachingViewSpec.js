@@ -1,6 +1,6 @@
 'use strict';
 
-describe('ngCachingView', function () {
+describe('jqmCachingView', function () {
     var someUrl = '/someUrl',
         someOtherUrl = '/someOtherUrl',
         someTemplateUrl = '/someTemplateUrl',
@@ -106,6 +106,46 @@ describe('ngCachingView', function () {
         }));
     });
 
+    describe('details', function() {
+        it('should fire $viewContentLoaded event not until directives with templateUrl have been loaded', function () {
+            module(function ($compileProvider, $routeProvider) {
+                $compileProvider.directive('test', function() {
+                    return {
+                        templateUrl: 'test.html'
+                    };
+                });
+                $routeProvider.when('/foo', {template: '<div test></div>'});
+            });
+
+            inject(function ($templateCache, $rootScope, $location, $compile) {
+                var element;
+                $templateCache.put('test.html', 'template-url-content');
+                $rootScope.$on('$viewContentLoaded', function() {
+                    expect(element.text()).toBe('template-url-content');
+                });
+                element = $compile('<div jqm-caching-view></div>')($rootScope);
+                $location.path('/foo');
+                $rootScope.$digest();
+            });
+        });
+        it('should fire $viewContentLoaded with the new element', function () {
+            module(function ($compileProvider, $routeProvider) {
+                $routeProvider.when('/foo', {template: '<div class="page"></div>'});
+            });
+
+            inject(function ($templateCache, $rootScope, $location, $compile) {
+                var element;
+                $templateCache.put('test.html', 'template-url-content');
+                $rootScope.$on('$viewContentLoaded', function(event, element) {
+                    expect(element).toHaveClass('page');
+                });
+                element = $compile('<div jqm-caching-view></div>')($rootScope);
+                $location.path('/foo');
+                $rootScope.$digest();
+            });
+        });
+    });
+
 
     /**
      * Note: We copied the tests from angular's ngView over to here,
@@ -127,7 +167,7 @@ describe('ngCachingView', function () {
         beforeEach(module(function ($provide) {
             $provide.value('$window', angular.mock.createMockWindow());
             return function ($rootScope, $compile, $animator) {
-                element = $compile('<ng:view onload="load()"></ng:view>')($rootScope);
+                element = $compile('<div jqm-caching-view onload="load()"></div>')($rootScope);
                 $animator.enabled(true);
             };
         }));
@@ -313,7 +353,7 @@ describe('ngCachingView', function () {
             });
 
             inject(function ($httpBackend, $location, $route, $compile, $rootScope) {
-                $httpBackend.whenGET('includePartial.html').respond('view: <ng:view></ng:view>');
+                $httpBackend.whenGET('includePartial.html').respond('view: <div jqm-caching-view></div>');
                 $httpBackend.whenGET('viewPartial.html').respond('content');
                 $location.path('/foo');
 
@@ -327,48 +367,6 @@ describe('ngCachingView', function () {
                 expect(elm.text()).toEqual('include: view: content');
                 expect($route.current.templateUrl).toEqual('viewPartial.html');
                 dealoc(elm);
-            });
-        });
-
-
-        it('should initialize view template after the view controller was initialized even when ' +
-            'templates were cached', function () {
-            //this is a test for a regression that was introduced by making the ng-view cache sync
-            function ParentCtrl($scope) {
-                $scope.log.push('parent');
-            }
-
-            module(function ($routeProvider) {
-                $routeProvider.when('/foo', {controller: ParentCtrl, templateUrl: 'viewPartial.html'});
-            });
-
-
-            inject(function ($rootScope, $compile, $location, $httpBackend, $route) {
-                $rootScope.log = [];
-
-                $rootScope.ChildCtrl = function ($scope) {
-                    $scope.log.push('child');
-                };
-
-                $location.path('/foo');
-                $httpBackend.expect('GET', 'viewPartial.html').
-                    respond('<div ng-init="log.push(\'init\')">' +
-                        '<div ng-controller="ChildCtrl"></div>' +
-                        '</div>');
-                $rootScope.$apply();
-                $httpBackend.flush();
-
-                expect($rootScope.log).toEqual(['parent', 'init', 'child']);
-
-                $location.path('/');
-                $rootScope.$apply();
-                expect($rootScope.log).toEqual(['parent', 'init', 'child']);
-
-                $rootScope.log = [];
-                $location.path('/foo');
-                $rootScope.$apply();
-
-                expect($rootScope.log).toEqual(['parent', 'init', 'child']);
             });
         });
 
@@ -448,7 +446,7 @@ describe('ngCachingView', function () {
 
                 expect(element.text()).toBe('bound-value');
                 expect(log).toEqual([
-                    '$routeChangeStart', 'init-ctrl', '$viewContentLoaded', '$routeChangeSuccess' ]);
+                    '$routeChangeStart', '$routeChangeSuccess', 'init-ctrl', '$viewContentLoaded' ]);
             });
         });
 
@@ -476,91 +474,6 @@ describe('ngCachingView', function () {
                 expect(element.text()).toBe('');
                 expect($rootScope.$$childHead).toBeNull();
                 expect($rootScope.$$childTail).toBeNull();
-            });
-        });
-
-
-        it('should destroy previous scope if multiple route changes occur before server responds',
-            function () {
-                var log = [];
-                var createCtrl = function (name) {
-                    return function ($scope) {
-                        log.push('init-' + name);
-                        $scope.$on('$destroy', function () {
-                            log.push('destroy-' + name);
-                        });
-                    };
-                };
-
-                module(function ($routeProvider) {
-                    $routeProvider.when('/one', {templateUrl: 'one.html', controller: createCtrl('ctrl1')});
-                    $routeProvider.when('/two', {templateUrl: 'two.html', controller: createCtrl('ctrl2')});
-                });
-
-                inject(function ($httpBackend, $rootScope, $location) {
-                    $httpBackend.whenGET('one.html').respond('content 1');
-                    $httpBackend.whenGET('two.html').respond('content 2');
-
-                    $location.path('/one');
-                    $rootScope.$digest();
-                    $location.path('/two');
-                    $rootScope.$digest();
-
-                    $httpBackend.flush();
-                    expect(element.text()).toBe('content 2');
-                    expect(log).toEqual(['init-ctrl2']);
-
-                    $location.path('/non-existing');
-                    $rootScope.$digest();
-
-                    expect(element.text()).toBe('');
-                    expect(log).toEqual(['init-ctrl2', 'destroy-ctrl2']);
-
-                    expect($rootScope.$$childHead).toBeNull();
-                    expect($rootScope.$$childTail).toBeNull();
-                });
-            });
-
-
-        it('should $destroy scope after update and reload', function () {
-            // this is a regression of bug, where $route doesn't copy scope when only updating
-
-            var log = [];
-
-            function logger(msg) {
-                return function () {
-                    log.push(msg);
-                };
-            }
-
-            function createController(name) {
-                return function ($scope) {
-                    log.push('init-' + name);
-                    $scope.$on('$destroy', logger('destroy-' + name));
-                    $scope.$on('$routeUpdate', logger('route-update'));
-                };
-            }
-
-            module(function ($routeProvider) {
-                $routeProvider.when('/bar', {templateUrl: 'tpl.html', controller: createController('bar')});
-                $routeProvider.when('/foo', {
-                    templateUrl: 'tpl.html', controller: createController('foo'), reloadOnSearch: false});
-            });
-
-            inject(function ($templateCache, $location, $rootScope) {
-                $templateCache.put('tpl.html', [200, 'partial', {}]);
-
-                $location.url('/foo');
-                $rootScope.$digest();
-                expect(log).toEqual(['init-foo']);
-
-                $location.search({q: 'some'});
-                $rootScope.$digest();
-                expect(log).toEqual(['init-foo', 'route-update']);
-
-                $location.url('/bar');
-                $rootScope.$digest();
-                expect(log).toEqual(['init-foo', 'route-update', 'destroy-foo', 'init-bar']);
             });
         });
 
@@ -599,7 +512,7 @@ describe('ngCachingView', function () {
                 expect(element.text()).toEqual('WORKS');
 
                 var div = element.find('div');
-                expect(nodeName_(div.parent())).toEqual('NG:VIEW');
+                expect(nodeName_(div.parent())).toEqual('DIV');
 
                 expect(div.scope()).toBe($route.current.scope);
                 expect(div.scope().hasOwnProperty('state')).toBe(true);
@@ -672,7 +585,7 @@ describe('ngCachingView', function () {
 
             it('should fire off the enter animation + add and remove the css classes',
                 inject(function ($compile, $rootScope, $sniffer, $location, $templateCache) {
-                    element = $compile(appendHtml('<div ng-view ng-animate="{enter: \'custom-enter\'}"></div>'))($rootScope);
+                    element = $compile(appendHtml('<div jqm-caching-view ng-animate="{enter: \'custom-enter\'}"></div>'))($rootScope);
 
                     $location.path('/foo');
                     $rootScope.$digest();
@@ -697,7 +610,7 @@ describe('ngCachingView', function () {
             it('should fire off the leave animation + add and remove the css classes',
                 inject(function ($compile, $rootScope, $sniffer, $location, $templateCache) {
                     $templateCache.put('/foo.html', [200, '<div>foo</div>', {}]);
-                    element = $compile(appendHtml('<div ng-view ng-animate="{leave: \'custom-leave\'}"></div>'))($rootScope);
+                    element = $compile(appendHtml('<div jqm-caching-view ng-animate="{leave: \'custom-leave\'}"></div>'))($rootScope);
 
                     $location.path('/foo');
                     $rootScope.$digest();
@@ -728,7 +641,7 @@ describe('ngCachingView', function () {
                     $templateCache.put('/foo.html', [200, '<div>foo</div>', {}]);
                     element = $compile(appendHtml(
                         '<div ' +
-                            'ng-view ' +
+                            'jqm-caching-view ' +
                             'ng-animate="{enter: \'customEnter\'}">' +
                             '</div>'
                     ))($rootScope);
@@ -763,7 +676,7 @@ describe('ngCachingView', function () {
                 });
 
                 inject(function ($rootScope, $compile, $location, $route, $window, $rootElement, $sniffer) {
-                    element = $compile(appendHtml('<ng:view onload="load()" ng-animate="\'my-animation\'"></ng:view>'))($rootScope);
+                    element = $compile(appendHtml('<div jqm-caching-view onload="load()" ng-animate="\'my-animation\'"></div'))($rootScope);
 
                     $location.path('/foo');
                     $rootScope.$digest();

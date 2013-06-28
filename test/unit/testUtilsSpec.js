@@ -119,7 +119,7 @@ describe('testutils', function () {
         var api, emptyPageStr;
         beforeEach(function () {
             api = testutils[apiName];
-            emptyPageStr = '<div ' + api.pageAttr + '></div>';
+            emptyPageStr = '<div ' + api.pageAttr + '><div jqm-content data-role="content"></div>';
         });
         describe('tick', function () {
             it('controls timeouts in the corresponding window', function () {
@@ -142,7 +142,7 @@ describe('testutils', function () {
                 var el = api.init('<div id="test"></div>');
                 expect(el.attr("id")).toBe("test");
                 expect(api.activePage().hasClass("ui-page")).toBe(true);
-                expect(api.activePage().children()[0]).toBe(el[0]);
+                expect(api.activePage().children().children()[0]).toBe(el[0]);
             });
             it('compiles pages and returns them', function () {
                 var el = api.init(emptyPageStr);
@@ -152,10 +152,10 @@ describe('testutils', function () {
             it('compiles multiple pages and returns the viewPort', function () {
                 var viewPort = api.init({
                     '': {
-                        template: '<div ' + api.pageAttr + '>firstPage</div>'
+                        template: '<div ' + api.pageAttr + '><div jqm-content data-role="content">firstPage</div></div>'
                     },
                     '/page2': {
-                        template: '<div ' + api.pageAttr + '>secondPage</div>',
+                        template: '<div ' + api.pageAttr + '><div jqm-content data-role="content">secondPage</div></div>',
                         transition: 'none'
                     }
                 });
@@ -168,10 +168,10 @@ describe('testutils', function () {
             it('switches between pages if transition is none', function () {
                 var viewPort = api.init({
                     '': {
-                        template: '<div ' + api.pageAttr + '>firstPage</div>'
+                        template: '<div ' + api.pageAttr + '><div jqm-content data-role="content">firstPage</div></div>'
                     },
                     '/page2': {
-                        template: '<div ' + api.pageAttr + '>secondPage</div>',
+                        template: '<div ' + api.pageAttr + '><div jqm-content data-role="content">secondPage</div></div>',
                         transition: 'none'
                     }
                 });
