@@ -32,6 +32,18 @@ describe('ngClick enhanced directive', function() {
         expect(el).not.toHaveClass('ui-btn-down-s');
     });
 
+    it('should set ui-btn-up-<theme> and ui-btn-down-<theme> classes for elements with jqm-active-toggle', function() {
+        var el = setup('class="jqm-active-toggle" jqm-theme="s"','');
+        expect(el).toHaveClass('ui-btn-up-s');
+        expect(el).not.toHaveClass('ui-btn-down-s');
+        el.triggerHandler('mousedown');
+        expect(el).not.toHaveClass('ui-btn-up-s');
+        expect(el).toHaveClass('ui-btn-down-s');
+        el.triggerHandler('mouseup');
+        expect(el).toHaveClass('ui-btn-up-s');
+        expect(el).not.toHaveClass('ui-btn-down-s');
+    });
+
     it('should evaluate the given expression', function() {
         var el = setup('', 'x=1');
         expect(scope.x).toBeUndefined();

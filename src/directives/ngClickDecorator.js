@@ -1,8 +1,9 @@
 // set the initial `ui-btn-up-<theme>` class for buttons
 jqmModule.directive('ngClick', [function () {
-    return function (scope, element) {
-        if (element.hasClass("ui-btn")) {
+    return function (scope, element, attr) {
+        if (element.hasClass('ui-btn') || element.hasClass('jqm-active-toggle')) {
             element.addClass("ui-btn-up-" + scope.$theme);
+            element.data('$$jqmActiveToggle', true);
         }
     };
 }]);
@@ -15,7 +16,7 @@ jqmModule.run([function () {
     jqLiteProto._removeClass = jqLiteProto._removeClass || jqLiteProto.removeClass;
     jqLiteProto.addClass = function (className) {
         var theme;
-        if (className === 'ng-click-active' && this.hasClass("ui-btn")) {
+        if (className === 'ng-click-active' && this.data('$$jqmActiveToggle')) {
             theme = this.scope().$theme;
             this._removeClass("ui-btn-up-" + theme);
             className += " ui-btn-down-" + theme;
@@ -24,7 +25,7 @@ jqmModule.run([function () {
     };
     jqLiteProto.removeClass = function (className) {
         var theme;
-        if (className === 'ng-click-active' && this.hasClass("ui-btn")) {
+        if (className === 'ng-click-active' && this.data('$$jqmActiveToggle')) {
             theme = this.scope().$theme;
             this._addClass("ui-btn-up-" + theme);
             className += " ui-btn-down-" + theme;
