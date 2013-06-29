@@ -1,4 +1,4 @@
-/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-06-27
+/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-07-02
  * https://github.com/opitzconsulting/angular-jqm
  * Copyright (c) 2013 OPITZ CONSULTING GmbH; Licensed MIT */
 (function(window, angular) {
@@ -312,9 +312,10 @@ jqmModule.directive('html', function() {
 
 // set the initial `ui-btn-up-<theme>` class for buttons
 jqmModule.directive('ngClick', [function () {
-    return function (scope, element) {
-        if (element.hasClass("ui-btn")) {
+    return function (scope, element, attr) {
+        if (element.hasClass('ui-btn') || element.hasClass('jqm-active-toggle')) {
             element.addClass("ui-btn-up-" + scope.$theme);
+            element.data('$$jqmActiveToggle', true);
         }
     };
 }]);
@@ -327,7 +328,7 @@ jqmModule.run([function () {
     jqLiteProto._removeClass = jqLiteProto._removeClass || jqLiteProto.removeClass;
     jqLiteProto.addClass = function (className) {
         var theme;
-        if (className === 'ng-click-active' && this.hasClass("ui-btn")) {
+        if (className === 'ng-click-active' && this.data('$$jqmActiveToggle')) {
             theme = this.scope().$theme;
             this._removeClass("ui-btn-up-" + theme);
             className += " ui-btn-down-" + theme;
@@ -336,7 +337,7 @@ jqmModule.run([function () {
     };
     jqLiteProto.removeClass = function (className) {
         var theme;
-        if (className === 'ng-click-active' && this.hasClass("ui-btn")) {
+        if (className === 'ng-click-active' && this.data('$$jqmActiveToggle')) {
             theme = this.scope().$theme;
             this._addClass("ui-btn-up-" + theme);
             className += " ui-btn-down-" + theme;
@@ -344,6 +345,7 @@ jqmModule.run([function () {
         return this._removeClass(className);
     };
 }]);
+
 /**
  * This directive is very similar to ngViewDirective.
  * However, it allows to cache views including their scopes using the `jqmViewCache`.
@@ -581,6 +583,73 @@ jqmModule.directive('jqmControlgroup', function() {
         this.$scope = $scope;
     }
 });
+jqmModule.directive('jqmLiLink', [function() {
+    var isdef = angular.isDefined;
+    return {
+        restrict: 'A',
+        transclude: true,
+        replace: true,
+        templateUrl: 'templates/jqmLiLink.html',
+        controller: ['$scope', JqmLiController],
+        scope: {
+            icon: '@',
+            iconpos: '@',
+            iconShadow: '@',
+            hasThumb: '@',
+            link: '@jqmLiLink'
+        },
+        compile: function(element, attr) {
+            attr.icon = isdef(attr.icon) ? attr.icon : 'arrow-r';
+            attr.iconpos = isdef(attr.iconpos) ? attr.iconpos : 'right';
+            attr.iconShadow = isdef(attr.iconShadow) ? attr.iconShadow : true;
+        }
+    };
+    function JqmLiController($scope) {
+    }
+}]);
+
+
+jqmModule.directive({
+    jqmLiEntry: jqmLiEntryDirective(false),
+    jqmLiDivider: jqmLiEntryDirective(true)
+});
+function jqmLiEntryDirective(isDivider) {
+    return function() {
+        return {
+            restrict: 'A',
+            replace: true,
+            transclude: true,
+            scope: {},
+            templateUrl: 'templates/jqmLiEntry.html',
+            link: function(scope) {
+                if (isDivider) {
+                    scope.divider = true;
+                }
+            }
+        };
+    };
+}
+
+
+jqmModule.directive('jqmListview', [function() {
+    var isdef = angular.isDefined;
+    return {
+        restrict: 'A',
+        replace: true,
+        transclude: true,
+        templateUrl: 'templates/jqmListview.html',
+        scope: {
+            inset: '@'
+        },
+        link: function(scope, element, attr) {
+            //We do this instead of '@' binding because "false" is actually truthy
+            //And these default to true
+            scope.shadow = isdef(attr.shadow) ? (attr.shadow==='true') : true;
+            scope.corners = isdef(attr.corners) ? (attr.corners==='true') : true;
+        }
+    };
+}]);
+
 
 /**
  * Sets the given class string once, with no watching.
@@ -1130,7 +1199,7 @@ jqmModule.config(['$provide', function ($provide) {
 
     }]);
 }]);
-angular.module('jqm-templates', ['templates/jqmCheckbox.html', 'templates/jqmControlgroup.html']);
+angular.module('jqm-templates', ['templates/jqmCheckbox.html', 'templates/jqmControlgroup.html', 'templates/jqmLiEntry.html', 'templates/jqmLiLink.html', 'templates/jqmListview.html']);
 
 angular.module("templates/jqmCheckbox.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/jqmCheckbox.html",
@@ -1163,5 +1232,43 @@ angular.module("templates/jqmControlgroup.html", []).run(["$templateCache", func
     "    </div>\n" +
     "    <div class=\"ui-controlgroup-controls\" ng-transclude jqm-position-anchor></div>\n" +
     "</fieldset>");
+}]);
+
+angular.module("templates/jqmLiEntry.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("templates/jqmLiEntry.html",
+    "<li class=\"ui-li\"\n" +
+    "  jqm-once-class=\"{{divider ? 'ui-li-divider ui-bar-'+$theme : 'ui-li-static jqm-active-toggle'}}\"\n" +
+    "  ng-class=\"{'ui-first-child': $position.first, 'ui-last-child': $position.last}\"\n" +
+    "  ng-click\n" +
+    "  ng-transclude>\n" +
+    "</li>\n" +
+    "");
+}]);
+
+angular.module("templates/jqmLiLink.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("templates/jqmLiLink.html",
+    "<li class=\"ui-li ui-btn\"\n" +
+    "  jqm-once-class=\"{{icon ? 'ui-li-has-arrow ui-btn-icon-'+iconpos : ''}}\"\n" +
+    "  ng-class=\"{'ui-first-child': $position.first, 'ui-last-child': $position.last,\n" +
+    "    'ui-li-has-thumb': hasThumb}\"\n" +
+    "  ng-click>\n" +
+    "  <div class=\"ui-btn-inner ui-li\">\n" +
+    "    <div class=\"ui-btn-text\">\n" +
+    "      <a ng-href=\"{{link}}\" class=\"ui-link-inherit\" ng-transclude>\n" +
+    "      </a>\n" +
+    "    </div>\n" +
+    "    <span ng-if=\"icon\" class=\"ui-icon ui-icon-{{icon}}\" ng-class=\"{'ui-icon-shadow': iconShadow}\">&nbsp;</span>\n" +
+    "  </div>\n" +
+    "</li>\n" +
+    "");
+}]);
+
+angular.module("templates/jqmListview.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("templates/jqmListview.html",
+    "<ul class=\"ui-listview\"\n" +
+    "  ng-class=\"{'ui-listview-inset': inset, 'ui-corner-all': inset && corners, 'ui-shadow': inset && shadow}\"\n" +
+    "  ng-transclude jqm-position-anchor>\n" +
+    "</ul>\n" +
+    "");
 }]);
 })(window, angular);

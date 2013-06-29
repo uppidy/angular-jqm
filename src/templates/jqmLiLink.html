@@ -1,0 +1,13 @@
+<li class="ui-li ui-btn"
+  jqm-once-class="{{icon ? 'ui-li-has-arrow ui-btn-icon-'+iconpos : ''}}"
+  ng-class="{'ui-first-child': $position.first, 'ui-last-child': $position.last,
+    'ui-li-has-thumb': hasThumb}"
+  ng-click>
+  <div class="ui-btn-inner ui-li">
+    <div class="ui-btn-text">
+      <a ng-href="{{link}}" class="ui-link-inherit" ng-transclude>
+      </a>
+    </div>
+    <span ng-if="icon" class="ui-icon ui-icon-{{icon}}" ng-class="{'ui-icon-shadow': iconShadow}">&nbsp;</span>
+  </div>
+</li>
