@@ -26,7 +26,7 @@ describe('jqmLi directives', function() {
                 '<li data-role="list-divider" data-theme="c"><h4>Woah!</h4></li>'
             );
         });
-        iit('should work for links', function() {
+        it('should work for links', function() {
             compileAndCompare(
                 '<li jqm-li-link="hello"><i>Whattt</i></li>',
                 '<li><a href="hello"><i>Whattt</i></a></li>'

@@ -143,10 +143,54 @@ module.exports = function(grunt) {
     },
     changelog: {
       dest: 'CHANGELOG.md'
+    },
+    ngdocs: {
+      options: {
+        dest: 'dist/docs/',
+        scripts: [
+          'docs/scripts/jquery.mobile.css.js',
+          'angular.js',
+          'http://code.angularjs.org/1.1.5/angular-mobile.js',
+          '<%= concat.all.dest %>',
+        ],
+        styles: [
+          /* TODO css stylesheets are not put into jsfiddles,
+             so we use a javascript that adds the style (jquery.mobile.css.js)
+          'http://cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.3.1/jquery.mobile.css'
+          */
+        ],
+        navTemplate: 'docs/template/nav.html',
+        html5Mode: false,
+        startPage: '/api',
+        title: '<%= pkg.name %>'
+      },
+      guide: {
+        src: ['docs/content/guide/**/*.ngdoc'],
+        title: 'Guide'
+      },
+      api: {
+        src: ['src/**/*.js', 'docs/content/api/**/*.ngdoc'],
+        title: 'API Documentation'
+      }
     }
   });
 
-  grunt.registerTask('install', 'Prepare development environment', function() {
+  grunt.registerTask('install', 'Prepare development environment', install); 
+  grunt.registerTask('build', ['html2js', 'concat']);
+  grunt.registerTask('dev', ['connect','karma:dev','watch']);
+  grunt.registerTask('default', ['install','build','jshint','karma:localBuild','ngdocs']);
+  grunt.registerTask('travis', ['build','jshint','karma:travis']);
+
+  grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-html2js');
+  grunt.loadNpmTasks('grunt-conventional-changelog');
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-ngdocs');
+
+  function install() {
       if (!grunt.file.exists('.git/hooks/commit-msg')) {
           grunt.file.copy('build/validate-commit-msg.js', '.git/hooks/commit-msg');
           require('fs').chmodSync('.git/hooks/commit-msg', '0755');
@@ -157,18 +201,5 @@ module.exports = function(grunt) {
 
           grunt.log.writeln('Installing commit enforce hook, dist merge hook.');
       }
-  });
-
-  grunt.registerTask('build', ['html2js', 'concat']);
-  grunt.registerTask('dev', ['connect','karma:dev','watch']);
-  grunt.registerTask('default', ['install', 'build','jshint','karma:localBuild']);
-  grunt.registerTask('travis', ['build','jshint','karma:travis']);
-
-  grunt.loadNpmTasks('grunt-karma');
-  grunt.loadNpmTasks('grunt-html2js');
-  grunt.loadNpmTasks('grunt-conventional-changelog');
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
+  }
 };

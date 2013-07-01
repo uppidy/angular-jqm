@@ -3,6 +3,13 @@
  * Copyright (c) 2013 OPITZ CONSULTING GmbH; Licensed MIT */
 (function(window, angular) {
     "use strict";
+/**
+ * @ngdoc overview
+ * @name jqm
+ * @description
+ *
+ * 'jqm' is the one module that contains all jqm code.
+ */
 var jqmModule = angular.module("jqm", ["jqm-templates", "ngMobile"]);
 
 var PAGE_ANIMATION_DEFS = {
@@ -492,6 +499,39 @@ jqmModule.directive('jqmCachingView', ['$jqmViewCache', '$templateCache', '$rout
             }
         };
     }]);
+/**
+ * @ngdoc directive
+ * @name jqm.directive:jqmCheckbox
+ * @restrict A
+ *
+ * @description 
+ * Creates a jquery mobile checkbox on the given element.
+ * 
+ * Anything inside the `jqm-checkbox` tag will be a label.
+ *
+ * @param {string=} ngModel Assignable angular expression to data-bind to.
+ * @param {string=} disabled Whether this checkbox is disabled.
+ * @param {string=} mini Whether this checkbox is mini.
+ * @param {string=} iconpos The position of the icon for this element. "left" or "right".
+ * @param {string=} ngTrueValue The value to which the expression should be set when selected.
+ * @param {string=} ngFalseValue The value to which the expression should be set when not selected.
+ *
+ * @example
+<example module="jqm">
+  <file name="index.html">
+    <div jqm-checkbox ng-model="checky">
+      My value is: {{checky}}
+    </div>
+    <div jqm-checkbox mini="true" iconpos="right" ng-model="isDisabled">
+      I've got some options. Toggle me to disable the guy below.
+    </div>
+    <div jqm-checkbox disabled="{{isDisabled ? 'disabled' : ''}}" 
+      ng-model="disably" ng-true-value="YES" ng-false-value="NO">
+      I can be disabled! My value is: {{disably}}
+    </div>
+  </file>
+</example>
+ */
 jqmModule.directive('jqmCheckbox', [function () {
     return {
         restrict: 'A',

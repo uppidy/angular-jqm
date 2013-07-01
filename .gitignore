@@ -13,3 +13,6 @@ components
 *.iml
 *.ipr
 *.iws
+
+# Generated doc files
+dist/docs/
