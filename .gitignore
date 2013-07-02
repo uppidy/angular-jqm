@@ -14,5 +14,3 @@ components
 *.ipr
 *.iws
 
-# Generated doc files
-dist/docs/

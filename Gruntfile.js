@@ -150,13 +150,13 @@ module.exports = function(grunt) {
         scripts: [
           'docs/scripts/jquery.mobile.css.js',
           'angular.js',
-          'http://code.angularjs.org/1.1.5/angular-mobile.js',
+          '//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-mobile.js',
           '<%= concat.all.dest %>',
         ],
         styles: [
           /* TODO css stylesheets are not put into jsfiddles,
              so we use a javascript that adds the style (jquery.mobile.css.js)
-          'http://cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.3.1/jquery.mobile.css'
+          '//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.3.1/jquery.mobile.css'
           */
         ],
         navTemplate: 'docs/template/nav.html',
