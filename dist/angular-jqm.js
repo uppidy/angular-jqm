@@ -596,6 +596,7 @@ jqmModule.directive('jqmCheckbox', [function () {
             scope.toggleChecked = toggleChecked;
             scope.isMini = isMini;
             scope.getIconPos = getIconPos;
+            scope.isActive = isActive;
 
             if (ngModelCtrl) {
                 enableNgModelCollaboration();
@@ -607,6 +608,10 @@ jqmModule.directive('jqmCheckbox', [function () {
 
             function getIconPos() {
                 return scope.iconpos || (jqmControlGroupCtrl && jqmControlGroupCtrl.$scope.iconpos);
+            }
+
+            function isActive() {
+                return (jqmControlGroupCtrl && jqmControlGroupCtrl.$scope.type === "horizontal") && scope.checked;
             }
 
             function toggleChecked() {
@@ -1777,6 +1782,7 @@ angular.module("templates/jqmCheckbox.html", []).run(["$templateCache", function
     "    <label ng-class=\"{'ui-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-checkbox-off': !$scopeAs.jqmCheckbox.checked,\n" +
     "           'ui-first-child': $scopeAs.jqmCheckbox.$position.first, 'ui-last-child': $scopeAs.jqmCheckbox.$position.last,\n" +
     "           'ui-mini':$scopeAs.jqmCheckbox.isMini(), 'ui-fullsize':!$scopeAs.jqmCheckbox.isMini(),\n" +
+    "           'ui-btn-active':$scopeAs.jqmCheckbox.isActive(),\n" +
     "           'ui-btn-icon-left': $scopeAs.jqmCheckbox.getIconPos()!='right', 'ui-btn-icon-right': $scopeAs.jqmCheckbox.getIconPos()=='right'}\"\n" +
     "           ng-click=\"$scopeAs.jqmCheckbox.toggleChecked()\"\n" +
     "           class=\"ui-btn ui-btn-corner-all\">\n" +

@@ -15,6 +15,14 @@ describe("jqmCheckbox", function () {
         jqmElement.find("label").trigger(event);
     }
 
+    function triggerNgFirstLabel(event) {
+        ngElement.find("label").eq(0).triggerHandler(event);
+    }
+
+    function triggerJqmFirstLabel(event) {
+        jqmElement.find("label").eq(0).trigger(event);
+    }
+
     describe('markup compared to jqm', function () {
         function compile(ngAttrs, jqmAttrs) {
             ngElement = ng.init('<div jqm-checkbox '+ngAttrs+'>someLabel</div>');
@@ -22,6 +30,37 @@ describe("jqmCheckbox", function () {
                 '<input id="someChk" type="checkbox" '+jqmAttrs+'>');
         }
 
+        function compileGroupHorizontal(ngAttrs, jqmAttrs) {
+            ngElement = ng.init('<div jqm-controlgroup type="horizontal">'+
+                         '<div jqm-checkbox '+ngAttrs+'>One</div>'+
+                         '<div jqm-checkbox '+ngAttrs+'>Two</div>'+
+                         '<div jqm-checkbox '+ngAttrs+'>Three</div>'+
+                         '</div>');
+            jqmElement = jqm.init('<fieldset data-role="controlgroup" data-type="horizontal">'+
+                         '<label for="checkbox-h-2a" id="One">One</label>'+
+                         '<input type="checkbox" '+jqmAttrs+' id="checkbox-h-2a">'+
+                         '<label for="checkbox-h-2b">Two</label>'+
+                         '<input type="checkbox" '+jqmAttrs+' id="checkbox-h-2b">'+
+                         '<label for="checkbox-h-2c">Three</label>'+
+                         '<input type="checkbox" '+jqmAttrs+' id="checkbox-h-2c">'+
+                         '</fieldset>');
+        }
+
+        function compileGroupVertical(ngAttrs, jqmAttrs) {
+            ngElement = ng.init('<div jqm-controlgroup>'+
+                         '<div jqm-checkbox '+ngAttrs+'>One</div>'+
+                         '<div jqm-checkbox '+ngAttrs+'>Two</div>'+
+                         '<div jqm-checkbox '+ngAttrs+'>Three</div>'+
+                         '</div>');
+            jqmElement = jqm.init('<fieldset data-role="controlgroup">'+
+                         '<label for="checkbox-h-2a" id="One">One</label>'+
+                         '<input type="checkbox" '+jqmAttrs+' id="checkbox-h-2a">'+
+                         '<label for="checkbox-h-2b">Two</label>'+
+                         '<input type="checkbox" '+jqmAttrs+' id="checkbox-h-2b">'+
+                         '<label for="checkbox-h-2c">Three</label>'+
+                         '<input type="checkbox" '+jqmAttrs+' id="checkbox-h-2c">'+
+                         '</fieldset>');
+        }
 
         it("has same markup if unchecked", function () {
             compile('','');
@@ -53,6 +92,70 @@ describe("jqmCheckbox", function () {
         });
         it("has same markup with iconpos option", function () {
             compile('data-iconpos="right"','data-iconpos="right"');
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup if unchecked (with controlgroup horizontal)", function () {
+            compileGroupHorizontal('','');
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup if checked (with controlgroup horizontal)", function () {
+            compileGroupHorizontal('','');
+            triggerNgFirstLabel("click");
+            triggerJqmFirstLabel("click");
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup if pressed (with controlgroup horizontal)", function () {
+            compileGroupHorizontal('','');
+            triggerNgFirstLabel("mousedown");
+            triggerJqmFirstLabel("mousedown");
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup when disabled (with controlgroup horizontal)", function() {
+            compileGroupHorizontal('disabled="disabled"','disabled="disabled"');
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup with custom theme (with controlgroup horizontal)", function () {
+            compileGroupHorizontal('jqm-theme="someTheme"','data-theme="someTheme"');
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup with mini option (with controlgroup horizontal)", function () {
+            compileGroupHorizontal('data-mini="true"','data-mini="true"');
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup with iconpos option (with controlgroup horizontal)", function () {
+            compileGroupHorizontal('data-iconpos="right"','data-iconpos="right"');
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup if unchecked (with controlgroup vertical)", function () {
+            compileGroupVertical('','');
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup if checked (with controlgroup vertical)", function () {
+            compileGroupVertical('','');
+            triggerNgFirstLabel("click");
+            triggerJqmFirstLabel("click");
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup if pressed (with controlgroup vertical)", function () {
+            compileGroupVertical('','');
+            triggerNgFirstLabel("mousedown");
+            triggerJqmFirstLabel("mousedown");
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup when disabled (with controlgroup vertical)", function() {
+            compileGroupVertical('disabled="disabled"','disabled="disabled"');
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup with custom theme (with controlgroup vertical)", function () {
+            compileGroupVertical('jqm-theme="someTheme"','data-theme="someTheme"');
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup with mini option (with controlgroup vertical)", function () {
+            compileGroupVertical('data-mini="true"','data-mini="true"');
+            testutils.compareElementRecursive(ngElement, jqmElement);
+        });
+        it("has same markup with iconpos option (with controlgroup vertical)", function () {
+            compileGroupVertical('data-iconpos="right"','data-iconpos="right"');
             testutils.compareElementRecursive(ngElement, jqmElement);
         });
     });

@@ -49,6 +49,7 @@ jqmModule.directive('jqmCheckbox', [function () {
             scope.toggleChecked = toggleChecked;
             scope.isMini = isMini;
             scope.getIconPos = getIconPos;
+            scope.isActive = isActive;
 
             if (ngModelCtrl) {
                 enableNgModelCollaboration();
@@ -60,6 +61,10 @@ jqmModule.directive('jqmCheckbox', [function () {
 
             function getIconPos() {
                 return scope.iconpos || (jqmControlGroupCtrl && jqmControlGroupCtrl.$scope.iconpos);
+            }
+
+            function isActive() {
+                return (jqmControlGroupCtrl && jqmControlGroupCtrl.$scope.type === "horizontal") && scope.checked;
             }
 
             function toggleChecked() {
