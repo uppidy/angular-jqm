@@ -671,6 +671,87 @@ jqmModule.directive('jqmControlgroup', function() {
 });
 /**
  * @ngdoc directive
+ * @name jqm.directive:jqmFlip
+ * @restrict A
+ *
+ * @description
+ * Creates a jquery mobile flip switch on the given element.
+ *
+ * Anything inside the `jqm-flip` tag will be a label.
+ *
+ * @param {expression=} ngModel Assignable angular expression to data-bind to.
+ * @param {string=} disabled Whether this flip switch is disabled.
+ * @param {string=} ngOnLabel The label which should be shown when fliped on.
+ * @param {string=} ngOnValue The value to which the expression should be set when fliped on.
+ * @param {string=} ngOffLabel The label which should be shown when fliped off.
+ * @param {string=} ngOffValue The value to which the expression should be set when fliped off.
+ *
+ * @example
+<example module="jqm">
+  <file name="index.html">
+    <div jqm-flip ng-model="flip" on-label="On" on-value="1" off-label="Off" off-value="0">
+      My value is: {{flip}}
+    </div>
+  </file>
+</example>
+ */
+jqmModule.directive('jqmFlip', [function () {
+    return {
+        restrict: 'A',
+        transclude: true,
+        replace: true,
+        templateUrl: 'templates/jqmFlip.html',
+        scope: {
+            onLabel: '@',
+            onValue: '@',
+            offLabel: '@',
+            offValue: '@',
+            mini: '@',
+            disabled: '@'
+        },
+        require: ['?ngModel', '^?jqmControlgroup'],
+        link: function (scope, element, attr, ctrls) {
+            var ngModelCtrl = ctrls[0];
+            var jqmControlGroupCtrl = ctrls[1];
+
+            scope.theme = scope.$theme || 'c';
+            scope.isMini = isMini;
+
+            initToggleState();
+            bindClick();
+
+            function initToggleState () {
+                ngModelCtrl.$render = updateToggleStyle;
+                ngModelCtrl.$viewChangeListeners.push(updateToggleStyle);
+            }
+
+            function updateToggleStyle () {
+                var toggled = isToggled();
+                scope.toggleLabel = toggled ? scope.onLabel : scope.offLabel;
+                scope.onStyle = toggled ? 100 : 0;
+                scope.offStyle = toggled ? 0 : 100;
+            }
+
+            function bindClick () {
+                scope.toggle = function () {
+                    ngModelCtrl.$setViewValue(isToggled() ? scope.offValue : scope.onValue);
+                };
+            }
+
+            function isToggled () {
+                return ngModelCtrl.$viewValue === scope.onValue;
+            }
+
+            function isMini() {
+                return scope.mini || (jqmControlGroupCtrl && jqmControlGroupCtrl.$scope.mini);
+            }
+
+        }
+    };
+}]);
+
+/**
+ * @ngdoc directive
  * @name jqm.directive:jqmHeader
  * @restrict A
  *
@@ -1687,7 +1768,7 @@ jqmModule.config(['$provide', function ($provide) {
 
     }]);
 }]);
-angular.module('jqm-templates', ['templates/jqmCheckbox.html', 'templates/jqmControlgroup.html', 'templates/jqmLiEntry.html', 'templates/jqmLiLink.html', 'templates/jqmListview.html']);
+angular.module('jqm-templates', ['templates/jqmCheckbox.html', 'templates/jqmControlgroup.html', 'templates/jqmFlip.html', 'templates/jqmLiEntry.html', 'templates/jqmLiLink.html', 'templates/jqmListview.html']);
 
 angular.module("templates/jqmCheckbox.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/jqmCheckbox.html",
@@ -1720,6 +1801,28 @@ angular.module("templates/jqmControlgroup.html", []).run(["$templateCache", func
     "    </div>\n" +
     "    <div class=\"ui-controlgroup-controls\" ng-transclude jqm-position-anchor></div>\n" +
     "</fieldset>");
+}]);
+
+angular.module("templates/jqmFlip.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("templates/jqmFlip.html",
+    "<div jqm-scope-as=\"jqmFlip\">\n" +
+    "        <label class=\"ui-slider\" ng-transclude></label>\n" +
+    "        <div class=\"ui-slider ui-slider-switch ui-btn-down-{{$scopeAs.jqmFlip.theme}} ui-btn-corner-all\"\n" +
+    "             ng-class=\"{'ui-disabled': $scopeAs.jqmFlip.disabled,\n" +
+    "                        'ui-mini': $scopeAs.jqmFlip.isMini()}\"\n" +
+    "             ng-click=\"$scopeAs.jqmFlip.toggle()\">\n" +
+    "                <span class=\"ui-slider-label ui-slider-label-a ui-btn-active ui-btn-corner-all\" style=\"width: {{$scopeAs.jqmFlip.onStyle}}%;\">{{$scopeAs.jqmFlip.onLabel}}</span>\n" +
+    "                <span class=\"ui-slider-label ui-slider-label-b ui-btn-down-{{$scopeAs.jqmFlip.theme}} ui-btn-corner-all\" style=\"width: {{$scopeAs.jqmFlip.offStyle}}%;\">{{$scopeAs.jqmFlip.offLabel}}</span>\n" +
+    "                <div class=\"ui-slider-inneroffset\">\n" +
+    "                  <a class=\"ui-slider-handle ui-slider-handle-snapping ui-btn ui-btn-corner-all ui-btn-up-{{$scopeAs.jqmFlip.theme}} ui-shadow\"\n" +
+    "                     title=\"{{$scopeAs.jqmFlip.toggleLabel}}\"\n" +
+    "                     style=\"left: {{$scopeAs.jqmFlip.onStyle}}%;\">\n" +
+    "                    <span class=\"ui-btn-inner\"><span class=\"ui-btn-text\"></span></span>\n" +
+    "                  </a>\n" +
+    "                </div>\n" +
+    "        </div>\n" +
+    "</div>\n" +
+    "");
 }]);
 
 angular.module("templates/jqmLiEntry.html", []).run(["$templateCache", function($templateCache) {

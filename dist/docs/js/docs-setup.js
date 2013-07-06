@@ -62,6 +62,13 @@ NG_DOCS={
     },
     {
       "section": "api",
+      "id": "jqm.directive:jqmFlip",
+      "shortName": "jqmFlip",
+      "type": "directive",
+      "keywords": "angular anything api assignable be creates data-bind directive disabled element expression flip fliped given html index inside is jqm jqm-flip jquery label mobile module my name ng-model ngmodel ngofflabel ngoffvalue ngonlabel ngonvalue off off-label off-value on on-label on-value set should shown switch tag the this to value when whether which will"
+    },
+    {
+      "section": "api",
       "id": "jqm.directive:jqmFooter",
       "shortName": "jqmFooter",
       "type": "directive",
