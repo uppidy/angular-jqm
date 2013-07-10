@@ -1,13 +1,22 @@
+--- 
 language: node_js
-node_js:
-  - 0.8
+node_js: 
+- 0.8
+env:
+  global:
+    secure: |-
+      gcXdCLe0qFfwMzIdy7+ChGcRQDYleeMiEJPAOkhQKEchjTgPJbViZNyoI8ZB
+      ZDqegLYlI67NFIfP4jY42dpKxIod+FOjL0LbYhu3qwJ2WvvN3RA7mBlduDkM
+      8bE6c+Kl0wgkjm/X9NPKa5ZVi9SVurqqC3UggeND8kszv5d8D/I=
 
 before_script:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-  - npm link
-  - npm install -g grunt-cli
-  - ./node_modules/.bin/bower install
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+- npm link
+- npm install -g grunt-cli
+- ./node_modules/.bin/bower install
 
 script:
-  - grunt travis
+- grunt travis
+
+after_success: ./build/update-gh-pages.sh

@@ -113,6 +113,5 @@ For this, first do a `grunt dev`. Then visit one of the following pages:
 * [http://localhost:9000/test/ngSnippet.html](http://localhost:9000/test/ngSnippet.html): Html page that includes angular and the `angular-jqm`.
 
 
-
 ## Docs
-The docs can be found here: [dist/docs/index.html](https://rawgithub.com/opitzconsulting/angular-jqm/master/dist/docs/index.html).
+The docs can be found here: [http://opitzconsulting.github.io/angular-jqm/docs](http://opitzconsulting.github.io/angular-jqm/docs).

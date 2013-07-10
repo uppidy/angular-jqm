@@ -1,3 +1,0 @@
-[merge "keepmine"]
-  name = dont_merge_selected_files
-  driver = echo %O %A %B

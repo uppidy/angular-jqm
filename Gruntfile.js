@@ -186,7 +186,7 @@ module.exports = function(grunt) {
   grunt.registerTask('build', ['html2js', 'css2js', 'concat']);
   grunt.registerTask('dev', ['connect','karma:dev','watch']);
   grunt.registerTask('default', ['install','build','jshint','karma:localBuild','ngdocs']);
-  grunt.registerTask('travis', ['build','jshint','karma:travis']);
+  grunt.registerTask('travis', ['build','jshint','karma:travis','ngdocs']);
 
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-html2js');
@@ -202,12 +202,7 @@ module.exports = function(grunt) {
       if (!grunt.file.exists('.git/hooks/commit-msg')) {
           grunt.file.copy('build/validate-commit-msg.js', '.git/hooks/commit-msg');
           require('fs').chmodSync('.git/hooks/commit-msg', '0755');
-
-          var gitconfig = grunt.file.read('.git/config');
-          gitconfig += '\n' + grunt.file.read('build/git-config');
-          grunt.file.write('.git/config', gitconfig);
-
-          grunt.log.writeln('Installing commit enforce hook, dist merge hook.');
+          grunt.log.writeln('Installing commit enforce hook.');
       }
   }
 };
