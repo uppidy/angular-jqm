@@ -14,7 +14,7 @@ jqmModule.directive('jqmLiLink', [function() {
             link: '@jqmLiLink'
         },
         compile: function(element, attr) {
-            attr.icon = isdef(attr.icon) ? attr.icon : 'arrow-r';
+            attr.icon = isdef(attr.icon) ? attr.icon : 'ui-icon-arrow-r';
             attr.iconpos = isdef(attr.iconpos) ? attr.iconpos : 'right';
             attr.iconShadow = isdef(attr.iconShadow) ? attr.iconShadow : true;
         }
