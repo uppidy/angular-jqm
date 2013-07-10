@@ -868,7 +868,7 @@ jqmModule.directive('jqmLiLink', [function() {
             link: '@jqmLiLink'
         },
         compile: function(element, attr) {
-            attr.icon = isdef(attr.icon) ? attr.icon : 'arrow-r';
+            attr.icon = isdef(attr.icon) ? attr.icon : 'ui-icon-arrow-r';
             attr.iconpos = isdef(attr.iconpos) ? attr.iconpos : 'right';
             attr.iconShadow = isdef(attr.iconShadow) ? attr.iconShadow : true;
         }
@@ -1854,7 +1854,7 @@ angular.module("templates/jqmLiLink.html", []).run(["$templateCache", function($
     "      <a ng-href=\"{{link}}\" class=\"ui-link-inherit\" ng-transclude>\n" +
     "      </a>\n" +
     "    </div>\n" +
-    "    <span ng-if=\"icon\" class=\"ui-icon ui-icon-{{icon}}\" ng-class=\"{'ui-icon-shadow': iconShadow}\">&nbsp;</span>\n" +
+    "    <span ng-if=\"icon\" class=\"ui-icon {{icon}}\" ng-class=\"{'ui-icon-shadow': iconShadow}\">&nbsp;</span>\n" +
     "  </div>\n" +
     "</li>\n" +
     "");
