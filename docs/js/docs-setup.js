@@ -23,7 +23,7 @@ NG_DOCS={
       "id": "index",
       "shortName": "API Documentation",
       "type": "overview",
-      "keywords": "about angular-jqm api check come cool documentation get hello here is more out overview some started text the this to"
+      "keywords": "angular-jqm api check documentation get hello is out overview started the this to"
     },
     {
       "section": "api",
