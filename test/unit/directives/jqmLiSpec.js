@@ -43,4 +43,9 @@ describe('jqmLi directives', function() {
             );
         });
     });
+
+    it('should allow any icon class', function() {
+        var el = ng.init('<ul jqm-listview><li jqm-li-link icon="icon-custom"></li></ul>');
+        expect(angular.element(el[0].querySelector('.icon-custom')).length).toBe(1);
+    });
 });
