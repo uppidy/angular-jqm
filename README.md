@@ -114,4 +114,4 @@ For this, first do a `grunt dev`. Then visit one of the following pages:
 
 
 ## Docs
-The docs can be found here: [http://opitzconsulting.github.io/angular-jqm/docs](http://opitzconsulting.github.io/angular-jqm/docs).
+The docs can be found here: [http://opitzconsulting.github.io/angular-jqm](http://opitzconsulting.github.io/angular-jqm).
