@@ -11,6 +11,7 @@ jqmModule.directive('jqmLiLink', [function() {
             iconpos: '@',
             iconShadow: '@',
             hasThumb: '@',
+            hasCount: '@',
             link: '@jqmLiLink'
         },
         compile: function(element, attr) {
