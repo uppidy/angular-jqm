@@ -376,20 +376,20 @@
         }
     }
 
-    function compareElementRecursive(el1, el2) {
+    function compareElementRecursive(el1, el2, ignoreClassRegex) {
         var res,
             counters = [0, 0],
             children,
             child1, child2;
         el1 = normalizeNode(el1);
         el2 = normalizeNode(el2);
-        compareElement(el1, el2);
+        compareElement(el1, el2, ignoreClassRegex);
         children = [el1.contents(), el2.contents()];
         do {
             child1 = nextChild(0);
             child2 = nextChild(1);
             if (child1 || child2) {
-                compareElementRecursive(child1, child2);
+                compareElementRecursive(child1, child2, ignoreClassRegex);
             }
         } while (child1 || child2);
 
@@ -417,7 +417,8 @@
         }
     }
 
-    function compareElement(el1, el2) {
+    function compareElement(el1, el2, ignoreClassRegex) {
+
         var el1Empty = (!el1 || !el1[0]),
             el2Empty = (!el2 || !el2[0]);
         if (el1Empty ^ el2Empty) {
@@ -445,7 +446,10 @@
         function containsAllClasses(el1Classes, el2Classes) {
             var prop;
             for (prop in el2Classes) {
-                if (prop && !IGNORE_CSS_CLASSES.test(prop) && !(prop in el1Classes)) {
+                if (prop && 
+                    !IGNORE_CSS_CLASSES.test(prop) && 
+                    !(prop in el1Classes) &&
+                    !(ignoreClassRegex && ignoreClassRegex.test(prop))) {
                     error("classes differ: " + prop, el1, el2);
                 }
             }

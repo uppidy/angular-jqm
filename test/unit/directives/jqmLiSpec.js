@@ -12,7 +12,7 @@ describe('jqmLi directives', function() {
         function compileAndCompare(one, two) {
             ngElement = ng.init('<ul jqm-listview>'+one+'</ul>');
             jqmElement = jqm.init('<ul data-role="listview">'+two+'</ul>');
-            testutils.compareElementRecursive(ngElement, jqmElement);
+            testutils.compareElementRecursive(ngElement, jqmElement, /ui-btn-/);
         }
         it('should work for entries', function() {
             compileAndCompare(
@@ -39,6 +39,16 @@ describe('jqmLi directives', function() {
                 '</li>',
                 '<li><a href="stuff">' +
                     '<img src="src"><h2>Title</h2><p>Content</p>' +
+                '</a></li>'
+            );
+        });
+        it('should add count for has-count', function() {
+            compileAndCompare(
+                '<li jqm-li-link="stuff" has-count="true">' +
+                    '<span class="ui-li-count">4</span>' +
+                '</li>',
+                '<li><a href="stuff">' +
+                    '<span class="ui-li-count">4</span>' +
                 '</a></li>'
             );
         });
