@@ -7,6 +7,7 @@
 "src/directives/ngClickDecorator.js",
 "src/directives/jqmCachingView.js",
 "src/directives/jqmCheckbox.js",
+"src/directives/jqmClass.js",
 "src/directives/jqmControlgroup.js",
 "src/directives/jqmFlip.js",
 "src/directives/jqmHeader.js",
