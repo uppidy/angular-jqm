@@ -1,4 +1,4 @@
-/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-07-10
+/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-07-17
  * https://github.com/opitzconsulting/angular-jqm
  * Copyright (c) 2013 OPITZ CONSULTING GmbH; Licensed MIT */
 (function(window, angular) {
@@ -865,6 +865,7 @@ jqmModule.directive('jqmLiLink', [function() {
             iconpos: '@',
             iconShadow: '@',
             hasThumb: '@',
+            hasCount: '@',
             link: '@jqmLiLink'
         },
         compile: function(element, attr) {
@@ -1836,7 +1837,6 @@ angular.module("templates/jqmLiEntry.html", []).run(["$templateCache", function(
     "<li class=\"ui-li\"\n" +
     "  jqm-once-class=\"{{divider ? 'ui-li-divider ui-bar-'+$theme : 'ui-li-static jqm-active-toggle'}}\"\n" +
     "  ng-class=\"{'ui-first-child': $position.first, 'ui-last-child': $position.last}\"\n" +
-    "  ng-click\n" +
     "  ng-transclude>\n" +
     "</li>\n" +
     "");
@@ -1846,9 +1846,8 @@ angular.module("templates/jqmLiLink.html", []).run(["$templateCache", function($
   $templateCache.put("templates/jqmLiLink.html",
     "<li class=\"ui-li ui-btn\"\n" +
     "  jqm-once-class=\"{{icon ? 'ui-li-has-arrow ui-btn-icon-'+iconpos : ''}}\"\n" +
-    "  ng-class=\"{'ui-first-child': $position.first, 'ui-last-child': $position.last,\n" +
-    "    'ui-li-has-thumb': hasThumb}\"\n" +
-    "  ng-click>\n" +
+    "  ng-class=\"{'ui-first-child': $position.first, 'ui-last-child': $position.last, \n" +
+    "    'ui-li-has-thumb': hasThumb, 'ui-li-has-count': hasCount}\">\n" +
     "  <div class=\"ui-btn-inner ui-li\">\n" +
     "    <div class=\"ui-btn-text\">\n" +
     "      <a ng-href=\"{{link}}\" class=\"ui-link-inherit\" ng-transclude>\n" +
