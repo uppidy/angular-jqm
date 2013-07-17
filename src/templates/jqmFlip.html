@@ -1,7 +1,7 @@
 <div jqm-scope-as="jqmFlip">
         <label class="ui-slider" ng-transclude></label>
         <div class="ui-slider ui-slider-switch ui-btn-down-{{$scopeAs.jqmFlip.theme}} ui-btn-corner-all"
-             ng-class="{'ui-disabled': $scopeAs.jqmFlip.disabled,
+             jqm-class="{'ui-disabled': $scopeAs.jqmFlip.disabled,
                         'ui-mini': $scopeAs.jqmFlip.isMini()}"
              ng-click="$scopeAs.jqmFlip.toggle()">
                 <span class="ui-slider-label ui-slider-label-a ui-btn-active ui-btn-corner-all" style="width: {{$scopeAs.jqmFlip.onStyle}}%;">{{$scopeAs.jqmFlip.onLabel}}</span>
