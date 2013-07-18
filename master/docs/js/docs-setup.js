@@ -97,6 +97,13 @@ NG_DOCS={
     },
     {
       "section": "api",
+      "id": "jqm.directive:jqmPanel",
+      "shortName": "jqmPanel",
+      "type": "directive",
+      "keywords": "$panel and angular api are assignable available be create created creates current currently data data-bind data-bound default demo directive display expression flips following has hello html if in index is jqm jqm-flip jqm-header jqm-page jqm-panel jqm-viewport jquery left mobile module must name ng-model object objects of on open opened outside overlay panel placed populated position properties push reveal right saying scope state that the this to toggle type value what whether will with"
+    },
+    {
+      "section": "api",
       "id": "jqm.directive:jqmPositionAnchor",
       "shortName": "jqmPositionAnchor",
       "type": "directive",
