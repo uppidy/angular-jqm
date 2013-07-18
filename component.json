@@ -3,7 +3,8 @@
     "version": "0.0.1-SNAPSHOT",
     "main": ["dist/jqm-adapter.js"],
     "dependencies": {
-        "angular": "http://code.angularjs.org/1.1.5/angular-1.1.5.zip"
+        "angular": "http://code.angularjs.org/1.1.5/angular-1.1.5.zip",
+        "angular-scrolly": "ajoslin/angular-scrolly"
     },
     "devDependencies": {
         "jquery": "1.9.1",

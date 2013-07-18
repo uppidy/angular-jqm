@@ -25,7 +25,7 @@
  </file>
  </example>
  */
-jqmModule.directive('jqmPage', [function () {
+jqmModule.directive('jqmPage', ['$scroller', function ($scroller) {
     return {
         restrict: 'A',
         require: 'jqmPage',
@@ -33,12 +33,12 @@ jqmModule.directive('jqmPage', [function () {
         // Note: We are not using a template here by purpose,
         // so that other directives like dialog may reuse this directive in a template themselves.
         compile: function(cElement, cAttr) {
-            var content = angular.element('<div class="ui-content" jqm-scrollable></div>');
+            var content = angular.element('<div class="ui-content"></div>');
             content.append(cElement.contents());
             cElement.append(content);
             cElement.addClass("ui-page");
             return function(scope, lElement, lAttr, jqmPageCtrl) {
-                cElement.addClass("ui-body-"+scope.$theme);
+                lElement.addClass("ui-body-"+scope.$theme);
                 var content = lElement.children();
                 if (jqmPageCtrl.header) {
                     content.addClass('jqm-content-with-header');
@@ -48,6 +48,10 @@ jqmModule.directive('jqmPage', [function () {
                     content.addClass('jqm-content-with-footer');
                     lElement.append(jqmPageCtrl.footer);
                 }
+                // Don't use scrolly-scroll directive here by purpose,
+                // as it is swallowing all mousemove events, which prevents
+                // the address bar to be shown using a scroll on the page header.
+                $scroller(content);
             };
         }
     };

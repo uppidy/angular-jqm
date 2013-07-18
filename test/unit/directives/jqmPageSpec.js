@@ -45,20 +45,14 @@ describe('jqmPage', function() {
             compile('<div jqm-footer>someFooter</div>');
             expect(jqm.$(ngElement).children(".ui-footer").text()).toBe('someFooter');
         });
-        it('adds the jqm-scrollable directive', function() {
-            var testClass = 'test-scrollable';
-            module(function($compileProvider) {
-                $compileProvider.directive('jqmScrollable', function() {
-                    return {
-                        restrict: 'A',
-                        compile: function (element) {
-                            element.addClass(testClass);
-                        }
-                    };
-                });
+        it('calls the $scroller service for the content', function() {
+            var $scroller = jasmine.createSpy('$scroller');
+            module(function($provide) {
+                $provide.value('$scroller', $scroller);
             });
             compile('');
-            expect(jqmContent).toHaveClass(testClass);
+            expect($scroller).toHaveBeenCalled();
+            expect($scroller.mostRecentCall.args[0][0]).toBe(jqmContent[0]);
         });
     });
 });

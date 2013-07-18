@@ -1,19 +1,25 @@
 module.exports = function(grunt) {
-  var srcFiles = grunt.file.readJSON('./build/files.js'),
-      pkg = grunt.file.readJSON('./package.json');
+  var pkg = grunt.file.readJSON('./package.json');
   // needed for karma to locate phantomjs correctly.
   process.env.PHANTOMJS_BIN = './node_modules/.bin/phantomjs';
   grunt.initConfig({
     pkg: pkg,
     concat: {
-      all: {
-        options: {
-          banner: grunt.file.read('build/header.js'),
-          footer: grunt.file.read('build/footer.js')
+        nodeps: {
+            options: {
+              banner: grunt.file.read('build/header.js'),
+              footer: grunt.file.read('build/footer.js')
+          },
+          src: ['src/module.js',
+                  'src/**/*.js']
+              .concat('<%= html2js.all.dest %>').concat('<%= css2js.all.dest %>'),
+          dest: 'dist/<%= pkg.name %>-nodeps.js'
         },
-        src: srcFiles.concat('<%= html2js.all.dest %>').concat('<%= css2js.all.dest %>'),
-        dest: 'dist/<%= pkg.name %>.js'
-      }
+        all: {
+            src: ['<%= concat.nodeps.dest %>',
+                'components/angular-scrolly/angular-scrolly.js'],
+            dest: 'dist/<%= pkg.name %>.js'
+        }
     },
     html2js: {
       options: {
@@ -63,7 +69,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          src: ['dist/<%= pkg.name %>.js']
+          src: ['<%= concat.nodeps.dest %>']
         },
         options: {
           globals: {
@@ -121,8 +127,8 @@ module.exports = function(grunt) {
                 'components/angular/angular-mocks.js',
                 'test/lib/testutils.js',
                 'test/lib/matchers.js'].
+                concat(['src/module.js', 'src/**/*.js','components/angular-scrolly/angular-scrolly.js']).
                 concat('<%= html2js.all.dest %>').
-                concat(srcFiles).
                 concat(['test/**/*Spec.js']).
                 concat([{pattern: 'test/**/*', watched: true, included: false, served: true},
                         {pattern: 'components/**/*', watched: true, included: false, served: true}])

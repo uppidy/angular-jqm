@@ -29,6 +29,7 @@ Dependencies
 - angular
 - angular-mobile
 - jquery-mobile css
+- (included: [angular-scrolly](https://github.com/ajoslin/angular-scrolly))
 
 Directory structure
 
@@ -48,11 +49,6 @@ Commands:
 - Auto-Run tests when file change: `grunt dev`
 
 (this needs grunt-cli installed globally: `npm install grunt-cli -g`)
-
-Add source files:
-
-1. add the file to the `src` folder
-2. add an entry in `build/files.js` at the right position.
 
 Tests:
 

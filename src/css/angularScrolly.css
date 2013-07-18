@@ -1,0 +1,6 @@
+* {
+    -webkit-backface-visibility-hidden;
+}
+html, body {
+    -webkit-user-select: none;
+}
