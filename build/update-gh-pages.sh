@@ -21,9 +21,13 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   # update root folder index.html with all existing versions
   echo "" > tmp_versionlinks
   LINK_TEMPLATE='<a href="%1/docs/index.html">%1</a>'
-  for DIR in */
+  for REMOTE_BRANCH in `git ls-remote --heads | grep refs/heads/.* -o`
   do
-      echo ${LINK_TEMPLATE//%1/${DIR%?}} >> tmp_versionlinks
+      DIR=${REMOTE_BRANCH##*/}
+      if [ "$DIR" != "gh-pages" ]; then
+          echo Found branch $DIR
+          echo ${LINK_TEMPLATE//%1/$DIR} >> tmp_versionlinks
+      fi
   done
   sed -e '/<!--VERSION_LINKS-->/r tmp_versionlinks' < index.html.template > index.html
   rm tmp_versionlinks
