@@ -334,15 +334,6 @@ function registerPageAnimation(transitionType, reverse, direction) {
 }
 
 
-jqmModule.directive('html', function() {
-    return {
-        restrict: 'E',
-        compile: function(cElement) {
-            cElement.addClass("ui-mobile");
-        }
-    };
-});
-
 /**
  * This directive is very similar to ngViewDirective.
  * However, it allows to cache views including their scopes using the `jqmViewCache`.
@@ -1770,6 +1761,12 @@ jqmModule.config(['$provide', function ($provide) {
             }
         };
     }
+}]);
+
+// Note: We don't create a directive for the html element,
+// as sometimes people add the ng-app to the body element.
+jqmModule.run(['$window', function($window) {
+    angular.element($window.document.documentElement).addClass("ui-mobile");
 }]);
 
 jqmModule.config(['$provide', function ($provide) {
