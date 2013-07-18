@@ -111,13 +111,6 @@ NG_DOCS={
     },
     {
       "section": "api",
-      "id": "jqm.directive:jqmScrollable",
-      "shortName": "jqmScrollable",
-      "type": "directive",
-      "keywords": "adds an api directive element height html index jqm jqm-scrollable line module name overflow scrolling style to world"
-    },
-    {
-      "section": "api",
       "id": "jqm.directive:jqmTheme",
       "shortName": "jqmTheme",
       "type": "directive",
