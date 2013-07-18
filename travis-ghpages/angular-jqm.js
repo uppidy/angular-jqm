@@ -653,6 +653,38 @@ jqmModule.directive('jqmCheckbox', [function () {
     };
 }]);
 
+jqmModule.directive('jqmClass', [function() {
+    return function(scope, element, attr) {
+        var oldVal;
+
+        scope.$watch(attr.jqmClass, jqmClassWatchAction, true);
+
+        attr.$observe('class', function(value) {
+            var jqmClass = scope.$eval(attr.jqmClass);
+            jqmClassWatchAction(jqmClass);
+        });
+
+        function jqmClassWatchAction(newVal) {
+            if (oldVal && !angular.equals(newVal,oldVal)) {
+                changeClass('removeClass', oldVal);
+            }
+            changeClass('addClass', newVal);
+            oldVal = angular.copy(newVal);
+        }
+
+        function changeClass(fn, classVal) {
+            if (angular.isObject(classVal) && !angular.isArray(classVal)) {
+                var classes = [];
+                angular.forEach(classVal, function(v, k) {
+                    if (v) { classes.push(k); }
+                });
+                classVal = classes;
+            }
+            element[fn](angular.isArray(classVal) ? classVal.join(' ') : classVal);
+        }
+    };
+}]);
+
 jqmModule.directive('jqmControlgroup', function() {
     return {
         restrict: 'A',
@@ -865,10 +897,11 @@ jqmModule.directive('jqmLiLink', [function() {
             iconpos: '@',
             iconShadow: '@',
             hasThumb: '@',
+            hasCount: '@',
             link: '@jqmLiLink'
         },
         compile: function(element, attr) {
-            attr.icon = isdef(attr.icon) ? attr.icon : 'arrow-r';
+            attr.icon = isdef(attr.icon) ? attr.icon : 'ui-icon-arrow-r';
             attr.iconpos = isdef(attr.iconpos) ? attr.iconpos : 'right';
             attr.iconShadow = isdef(attr.iconShadow) ? attr.iconShadow : true;
         }
@@ -1778,8 +1811,8 @@ angular.module('jqm-templates', ['templates/jqmCheckbox.html', 'templates/jqmCon
 angular.module("templates/jqmCheckbox.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/jqmCheckbox.html",
     "<div jqm-scope-as=\"jqmCheckbox\"\n" +
-    "     class=\"ui-checkbox\" ng-class=\"{'ui-disabled': $scopeAs.jqmCheckbox.disabled}\">\n" +
-    "    <label ng-class=\"{'ui-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-checkbox-off': !$scopeAs.jqmCheckbox.checked,\n" +
+    "     class=\"ui-checkbox\" jqm-class=\"{'ui-disabled': $scopeAs.jqmCheckbox.disabled}\">\n" +
+    "    <label jqm-class=\"{'ui-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-checkbox-off': !$scopeAs.jqmCheckbox.checked,\n" +
     "           'ui-first-child': $scopeAs.jqmCheckbox.$position.first, 'ui-last-child': $scopeAs.jqmCheckbox.$position.last,\n" +
     "           'ui-mini':$scopeAs.jqmCheckbox.isMini(), 'ui-fullsize':!$scopeAs.jqmCheckbox.isMini(),\n" +
     "           'ui-btn-active':$scopeAs.jqmCheckbox.isActive(),\n" +
@@ -1788,7 +1821,7 @@ angular.module("templates/jqmCheckbox.html", []).run(["$templateCache", function
     "           class=\"ui-btn ui-btn-corner-all\">\n" +
     "        <span class=\"ui-btn-inner\">\n" +
     "            <span class=\"ui-btn-text\" ng-transclude></span>\n" +
-    "            <span ng-class=\"{'ui-icon-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-icon-checkbox-off': !$scopeAs.jqmCheckbox.checked}\"\n" +
+    "            <span jqm-class=\"{'ui-icon-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-icon-checkbox-off': !$scopeAs.jqmCheckbox.checked}\"\n" +
     "                  class=\"ui-icon ui-icon-shadow\"></span>\n" +
     "        </span>\n" +
     "    </label>\n" +
@@ -1800,13 +1833,14 @@ angular.module("templates/jqmCheckbox.html", []).run(["$templateCache", function
 angular.module("templates/jqmControlgroup.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/jqmControlgroup.html",
     "<fieldset class=\"ui-controlgroup\"\n" +
-    "     ng-class=\"{'ui-mini': mini, 'ui-shadow': shadow, 'ui-corner-all': corners!='false',\n" +
+    "     jqm-class=\"{'ui-mini': mini, 'ui-shadow': shadow, 'ui-corner-all': corners!='false',\n" +
     "     'ui-controlgroup-vertical': type!='horizontal', 'ui-controlgroup-horizontal': type=='horizontal'}\">\n" +
     "    <div ng-if=\"legend\" class=\"ui-controlgroup-label\">\n" +
     "        <legend>{{legend}}</legend>\n" +
     "    </div>\n" +
     "    <div class=\"ui-controlgroup-controls\" ng-transclude jqm-position-anchor></div>\n" +
-    "</fieldset>");
+    "</fieldset>\n" +
+    "");
 }]);
 
 angular.module("templates/jqmFlip.html", []).run(["$templateCache", function($templateCache) {
@@ -1814,7 +1848,7 @@ angular.module("templates/jqmFlip.html", []).run(["$templateCache", function($te
     "<div jqm-scope-as=\"jqmFlip\">\n" +
     "        <label class=\"ui-slider\" ng-transclude></label>\n" +
     "        <div class=\"ui-slider ui-slider-switch ui-btn-down-{{$scopeAs.jqmFlip.theme}} ui-btn-corner-all\"\n" +
-    "             ng-class=\"{'ui-disabled': $scopeAs.jqmFlip.disabled,\n" +
+    "             jqm-class=\"{'ui-disabled': $scopeAs.jqmFlip.disabled,\n" +
     "                        'ui-mini': $scopeAs.jqmFlip.isMini()}\"\n" +
     "             ng-click=\"$scopeAs.jqmFlip.toggle()\">\n" +
     "                <span class=\"ui-slider-label ui-slider-label-a ui-btn-active ui-btn-corner-all\" style=\"width: {{$scopeAs.jqmFlip.onStyle}}%;\">{{$scopeAs.jqmFlip.onLabel}}</span>\n" +
@@ -1835,8 +1869,7 @@ angular.module("templates/jqmLiEntry.html", []).run(["$templateCache", function(
   $templateCache.put("templates/jqmLiEntry.html",
     "<li class=\"ui-li\"\n" +
     "  jqm-once-class=\"{{divider ? 'ui-li-divider ui-bar-'+$theme : 'ui-li-static jqm-active-toggle'}}\"\n" +
-    "  ng-class=\"{'ui-first-child': $position.first, 'ui-last-child': $position.last}\"\n" +
-    "  ng-click\n" +
+    "  jqm-class=\"{'ui-first-child': $position.first, 'ui-last-child': $position.last}\"\n" +
     "  ng-transclude>\n" +
     "</li>\n" +
     "");
@@ -1846,15 +1879,14 @@ angular.module("templates/jqmLiLink.html", []).run(["$templateCache", function($
   $templateCache.put("templates/jqmLiLink.html",
     "<li class=\"ui-li ui-btn\"\n" +
     "  jqm-once-class=\"{{icon ? 'ui-li-has-arrow ui-btn-icon-'+iconpos : ''}}\"\n" +
-    "  ng-class=\"{'ui-first-child': $position.first, 'ui-last-child': $position.last,\n" +
-    "    'ui-li-has-thumb': hasThumb}\"\n" +
-    "  ng-click>\n" +
+    "  jqm-class=\"{'ui-first-child': $position.first, 'ui-last-child': $position.last, \n" +
+    "    'ui-li-has-thumb': hasThumb, 'ui-li-has-count': hasCount}\">\n" +
     "  <div class=\"ui-btn-inner ui-li\">\n" +
     "    <div class=\"ui-btn-text\">\n" +
     "      <a ng-href=\"{{link}}\" class=\"ui-link-inherit\" ng-transclude>\n" +
     "      </a>\n" +
     "    </div>\n" +
-    "    <span ng-if=\"icon\" class=\"ui-icon ui-icon-{{icon}}\" ng-class=\"{'ui-icon-shadow': iconShadow}\">&nbsp;</span>\n" +
+    "    <span ng-if=\"icon\" class=\"ui-icon {{icon}}\" jqm-class=\"{'ui-icon-shadow': iconShadow}\">&nbsp;</span>\n" +
     "  </div>\n" +
     "</li>\n" +
     "");
@@ -1863,7 +1895,7 @@ angular.module("templates/jqmLiLink.html", []).run(["$templateCache", function($
 angular.module("templates/jqmListview.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/jqmListview.html",
     "<ul class=\"ui-listview\"\n" +
-    "  ng-class=\"{'ui-listview-inset': inset, 'ui-corner-all': inset && corners, 'ui-shadow': inset && shadow}\"\n" +
+    "  jqm-class=\"{'ui-listview-inset': inset, 'ui-corner-all': inset && corners, 'ui-shadow': inset && shadow}\"\n" +
     "  ng-transclude jqm-position-anchor>\n" +
     "</ul>\n" +
     "");
