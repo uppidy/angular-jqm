@@ -155,17 +155,51 @@ describe('jqmViewport', function () {
             ng.scope.$emit("$routeChangeStart", newRoute);
             expect(ng.viewPort.attr("ng-animate")).toBe("'jqmPage-none'");
         }));
-        it("allows a function as transition on routes and calls it with the route params", inject(function () {
+        it("allows a function as transition on routes and injects it with locals $routeParams and $scope", inject(function () {
             var ng = testutils.ng,
                 newRoute = {
                     params: { someParam: 'someTransition'},
-                    transition: function(params) {
-                        return params.someParam;
+                    transition: function($routeParams, $scope) {
+                        return $routeParams.someParam + $scope.someValue;
                     }
                 };
             ng.init('<div jqm-page></div>');
+            ng.scope.$apply('someValue="Thing"');
             ng.scope.$emit("$routeChangeStart", newRoute);
-            expect(ng.viewPort.attr("ng-animate")).toBe("'jqmPage-someTransition'");
+            expect(ng.viewPort.attr("ng-animate")).toBe("'jqmPage-someTransitionThing'");
+        }));
+        //Describe is just so we can do the beforeEach and make a factory
+        describe('', function() {
+            beforeEach(module(function($provide) {
+                $provide.factory('TestService', function() {
+                    return {};
+                });
+            }));
+            it("allows a function as transition on routes and injects it with injectable things", inject(function (TestService) {
+                var ng = testutils.ng,
+                    newRoute = {
+                        transition: function(TestService) {
+                            return TestService.someValue;
+                        }
+                    };
+                TestService.someValue = 'banana';
+                ng.init('<div jqm-page></div>');
+                ng.scope.$emit("$routeChangeStart", newRoute);
+                expect(ng.viewPort.attr("ng-animate")).toBe("'jqmPage-banana'");
+            }));
+        });
+        it("allows a function as transition on routes and injects it with the viewport $scope", inject(function () {
+            var ng = testutils.ng,
+                newRoute = {
+                    transition: function($scope) {
+                        return $scope.superman;
+                    }
+                };
+            ng.init('<div jqm-page></div>');
+            ng.scope.superman = 'kryptonite';
+            ng.scope.$apply();
+            ng.scope.$emit("$routeChangeStart", newRoute);
+            expect(ng.viewPort.attr("ng-animate")).toBe("'jqmPage-kryptonite'");
         }));
         it("saves the current route's transition into the history entry", inject(function ($history) {
             var ng = testutils.ng,
