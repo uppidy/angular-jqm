@@ -1012,7 +1012,7 @@ jqmModule.directive('jqmPage', ['$scroller', function ($scroller) {
  * </ul>
  * ### $panel Scope
  *
- * The jqm-panel directive will create a `$panel` object on the current scope. 
+ * The jqm-panel directive will create a `$panel` object on the current scope.
  *
  * If a `position="left"` jqm-panel is created, `scope.$panel.left` will be populated with that panel's data. If a `position="right"` jqm-panel is created, `scope.$panel.right` will be populated.  scope.$panel.left and scope.$panel.right are objects with the following properties:
  *
@@ -1086,11 +1086,11 @@ jqmModule.directive('jqmPanel', ['$transitionComplete', '$window', function(tran
                         element.removeClass('ui-panel-closed');
                         $window.setTimeout(function() {
                             element.addClass('ui-panel-open');
-                            transitionEnd(onChangeDone);
+                            transitionComplete(transitionEls(), onChangeDone, true);
                         }, 1);
                     } else {
                         element.removeClass('ui-panel-open ui-panel-opened');
-                        transitionEnd(onChangeDone);
+                        transitionComplete(transitionEls(), onChangeDone, true);
                     }
                 }
                 function onChangeDone() {
@@ -1103,12 +1103,14 @@ jqmModule.directive('jqmPanel', ['$transitionComplete', '$window', function(tran
                 function otherPanel() {
                     return $panel[scope.position === 'left' ? 'right' : 'left'];
                 }
-                function transitionEnd(cb) {
+                function transitionEls() {
                     //We need to listen for transition complete event on either the panel
-                    //element OR the panel content wrapper element. Some panel display
-                    //types (overlay) only animate the panel, and some (reveal) only 
+                    //element or the panel content wrapper element. Some panel display
+                    //types (overlay) only animate the panel, and some (reveal) only
                     //animate the content wrapper.
-                    transitionComplete(angular.element([element[0], $panel.$contentWrapNode]), cb, true);
+                    return $panel.$contentWrapNode ?
+                        angular.element([element[0], $panel.$contentWrapNode]) :
+                        element;
                 }
                 function toggle() {
                     scope.opened = !scope.opened;
