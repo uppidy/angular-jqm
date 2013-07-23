@@ -1,4 +1,4 @@
-/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-07-22
+/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-07-23
  * https://github.com/opitzconsulting/angular-jqm
  * Copyright (c) 2013 OPITZ CONSULTING GmbH; Licensed MIT */
 (function(window, angular) {
@@ -2030,9 +2030,9 @@ angular.module("templates/jqmFlip.html", []).run(["$templateCache", function($te
 
 angular.module("templates/jqmLiEntry.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/jqmLiEntry.html",
-    "<li class=\"ui-li\"\n" +
-    "  jqm-once-class=\"{{divider ? 'ui-li-divider ui-bar-'+$theme : 'ui-li-static jqm-active-toggle'}}\"\n" +
-    "  jqm-class=\"{'ui-first-child': $position.first, 'ui-last-child': $position.last}\"\n" +
+    "<li class=\"ui-li\" jqm-scope-as=\"jqmLi\"\n" +
+    "  jqm-once-class=\"{{$scopeAs.jqmLi.divider ? 'ui-li-divider ui-bar-'+$theme : 'ui-li-static jqm-active-toggle'}}\"\n" +
+    "  jqm-class=\"{'ui-first-child': $scopeAs.jqmLi.$position.first, 'ui-last-child': $scopeAs.jqmLi.$position.last}\"\n" +
     "  ng-transclude>\n" +
     "</li>\n" +
     "");
@@ -2040,16 +2040,22 @@ angular.module("templates/jqmLiEntry.html", []).run(["$templateCache", function(
 
 angular.module("templates/jqmLiLink.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/jqmLiLink.html",
-    "<li class=\"ui-li ui-btn\"\n" +
-    "  jqm-once-class=\"{{icon ? 'ui-li-has-arrow ui-btn-icon-'+iconpos : ''}}\"\n" +
-    "  jqm-class=\"{'ui-first-child': $position.first, 'ui-last-child': $position.last, \n" +
-    "    'ui-li-has-thumb': hasThumb, 'ui-li-has-count': hasCount}\">\n" +
+    "<li class=\"ui-li ui-btn\" jqm-scope-as=\"jqmLiLink\"\n" +
+    "  jqm-once-class=\"{{$scopeAs.jqmLiLink.icon ? 'ui-li-has-arrow ui-btn-icon-'+$scopeAs.jqmLiLink.iconpos : ''}}\"\n" +
+    "  jqm-class=\"{'ui-first-child': $scopeAs.jqmLiLink.$position.first, \n" +
+    "    'ui-last-child': $scopeAs.jqmLiLink.$position.last, \n" +
+    "    'ui-li-has-thumb': $scopeAs.jqmLiLink.hasThumb, \n" +
+    "    'ui-li-has-count': $scopeAs.jqmLiLink.hasCount}\">\n" +
     "  <div class=\"ui-btn-inner ui-li\">\n" +
-    "    <div class=\"ui-btn-text\">\n" +
-    "      <a ng-href=\"{{link}}\" class=\"ui-link-inherit\" ng-transclude>\n" +
+    "      <div class=\"ui-btn-text\">\n" +
+    "      <a ng-href=\"{{$scopeAs.jqmLiLink.link}}\" class=\"ui-link-inherit\" ng-transclude>\n" +
     "      </a>\n" +
     "    </div>\n" +
-    "    <span ng-if=\"icon\" class=\"ui-icon {{icon}}\" jqm-class=\"{'ui-icon-shadow': iconShadow}\">&nbsp;</span>\n" +
+    "    <span ng-show=\"$scopeAs.jqmLiLink.icon\" \n" +
+    "      class=\"ui-icon {{$scopeAs.jqmLiLink.icon}}\" \n" +
+    "      jqm-class=\"{'ui-icon-shadow': $scopeAs.jqmLiLink.iconShadow}\">\n" +
+    "      &nbsp;\n" +
+    "    </span>\n" +
     "  </div>\n" +
     "</li>\n" +
     "");
@@ -2057,8 +2063,10 @@ angular.module("templates/jqmLiLink.html", []).run(["$templateCache", function($
 
 angular.module("templates/jqmListview.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/jqmListview.html",
-    "<ul class=\"ui-listview\"\n" +
-    "  jqm-class=\"{'ui-listview-inset': inset, 'ui-corner-all': inset && corners, 'ui-shadow': inset && shadow}\"\n" +
+    "<ul class=\"ui-listview\" jqm-scope-as=\"jqmListview\"\n" +
+    "  jqm-class=\"{'ui-listview-inset': $scopeAs.jqmListview.inset,\n" +
+    "    'ui-corner-all': $scopeAs.jqmListview.inset && $scopeAs.jqmListview.corners, \n" +
+    "    'ui-shadow': $scopeAs.jqmListview.inset && $scopeAs.jqmListview.shadow}\"\n" +
     "  ng-transclude jqm-position-anchor>\n" +
     "</ul>\n" +
     "");
