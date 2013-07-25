@@ -1,4 +1,4 @@
-/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-07-23
+/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-07-25
  * https://github.com/opitzconsulting/angular-jqm
  * Copyright (c) 2013 OPITZ CONSULTING GmbH; Licensed MIT */
 (function(window, angular) {
@@ -1851,11 +1851,11 @@ jqmModule.config(['$provide', function ($provide) {
     /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas. Dual MIT/BSD license */
     window.matchMedia = window.matchMedia || (function (doc) {
         var bool,
-            docElem = doc.documentElement,
-            refNode = docElem.firstElementChild || docElem.firstChild,
+        docElem = doc.documentElement,
+        refNode = docElem.firstElementChild || docElem.firstChild,
         // fakeBody required for <FF4 when executed in <head>
-            fakeBody = doc.createElement("body"),
-            div = doc.createElement("div");
+        fakeBody = doc.createElement("body"),
+        div = doc.createElement("div");
 
         div.id = "mq-test-1";
         div.style.cssText = "position:absolute;top:-100em";
@@ -1881,13 +1881,16 @@ jqmModule.config(['$provide', function ($provide) {
 })();
 
 jqmModule.config(['$provide', function ($provide) {
-    $provide.decorator('$sniffer', ['$delegate', '$window', function ($sniffer, $window) {
+    $provide.decorator('$sniffer', ['$delegate', '$window', '$document', function ($sniffer, $window, $document) {
         var fakeBody = angular.element("<body>");
         angular.element($window).prepend(fakeBody);
 
         $sniffer.cssTransform3d = transform3dTest();
 
+        android2Transitions();
+
         fakeBody.remove();
+
         return $sniffer;
 
         function media(q) {
@@ -1897,20 +1900,20 @@ jqmModule.config(['$provide', function ($provide) {
         // This is a copy of jquery mobile 1.3.1 detection for transform3dTest
         function transform3dTest() {
             var mqProp = "transform-3d",
-                vendors = [ "Webkit", "Moz", "O" ],
+            vendors = [ "Webkit", "Moz", "O" ],
             // Because the `translate3d` test below throws false positives in Android:
-                ret = media("(-" + vendors.join("-" + mqProp + "),(-") + "-" + mqProp + "),(" + mqProp + ")");
+            ret = media("(-" + vendors.join("-" + mqProp + "),(-") + "-" + mqProp + "),(" + mqProp + ")");
 
             if (ret) {
                 return !!ret;
             }
 
             var el = $window.document.createElement("div"),
-                transforms = {
-                    // We’re omitting Opera for the time being; MS uses unprefixed.
-                    'MozTransform': '-moz-transform',
-                    'transform': 'transform'
-                };
+            transforms = {
+                // We’re omitting Opera for the time being; MS uses unprefixed.
+                'MozTransform': '-moz-transform',
+                'transform': 'transform'
+            };
 
             fakeBody.append(el);
 
@@ -1923,9 +1926,22 @@ jqmModule.config(['$provide', function ($provide) {
             return ( !!ret && ret !== "none" );
         }
 
+        //Fix android 2 not reading transitions correct.
+        //https://github.com/angular/angular.js/pull/3086
+        //https://github.com/opitzconsulting/angular-jqm/issues/89
+        function android2Transitions() {
+            if (!$sniffer.transitions || !$sniffer.animations) {
+                $sniffer.transitions = angular.isString($document[0].body.style.webkitTransition);
+                $sniffer.animations = angular.isString($document[0].body.style.webkitAnimation);
+                if ($sniffer.animations || $sniffer.transitions) {
+                    $sniffer.vendorPrefix = 'webkit';
+                    $sniffer.cssTransform3d = true;
+                }
+            }
+        }
+
     }]);
 }]);
-
 
 jqmModule.config(['$provide', function ($provide) {
     /**
