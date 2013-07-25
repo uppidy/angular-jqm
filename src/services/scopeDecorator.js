@@ -1,3 +1,16 @@
+/**
+ * In the docs, an embedded angular app is used. However, due to a bug,
+ * the docs don't disconnect the embedded $rootScope from the real $rootScope.
+ * By this, our embedded app will never get freed and it's watchers will still fire.
+ */
+jqmModule.run(['$rootElement', '$rootScope', function clearRootScopeOnRootElementDestroy($rootElement, $rootScope) {
+    $rootElement.bind('$destroy', function() {
+        $rootScope.$destroy();
+        $rootScope.$$watchers = [];
+        $rootScope.$$listeners = [];
+    });
+}]);
+
 jqmModule.config(['$provide', function ($provide) {
     $provide.decorator('$rootScope', ['$delegate', scopeReconnectDecorator]);
     $provide.decorator('$rootScope', ['$delegate', 'jqmConfig', inheritThemeDecorator]);

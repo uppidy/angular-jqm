@@ -1,3 +1,61 @@
+jqmModule.config(['$provide', function ($provide) {
+    $provide.decorator('$animator', ['$delegate', function ($animator) {
+
+        patchedAnimator.enabled = $animator.enabled;
+        return patchedAnimator;
+
+        function patchedAnimator(scope, attr) {
+            var animation = $animator(scope, attr),
+                _leave = animation.leave,
+                _enter = animation.enter;
+            animation.enter = patchedEnter;
+            animation.leave = patchedLeave;
+            return animation;
+
+            // if animations are disabled or we have none
+            // add the "ui-page-active" css class manually.
+            // E.g. needed for the initial page.
+            function patchedEnter(elements) {
+                var i, el;
+                if (!$animator.enabled() || !animationName("enter")) {
+                    forEachPage(elements, function(element) {
+                        angular.element(element).addClass("ui-page-active");
+                    });
+                }
+                /*jshint -W040:true*/
+                return _enter.apply(this, arguments);
+            }
+
+            function patchedLeave(elements) {
+                if (!$animator.enabled() || !animationName("leave")) {
+                    forEachPage(elements, function(element) {
+                        angular.element(element).removeClass("ui-page-active");
+                    });
+                }
+                /*jshint -W040:true*/
+                return _leave.apply(this, arguments);
+            }
+
+            function forEachPage(elements, callback) {
+                angular.forEach(elements, function(element) {
+                    if (element.className && ~element.className.indexOf('ui-page')) {
+                        callback(element);
+                    }
+                });
+            }
+
+            function animationName(type) {
+                // Copied from AnimationProvider.
+                var ngAnimateValue = scope.$eval(attr.ngAnimate);
+                var className = ngAnimateValue ?
+                    angular.isObject(ngAnimateValue) ? ngAnimateValue[type] : ngAnimateValue + '-' + type
+                    : '';
+                return className;
+            }
+        }
+    }]);
+}]);
+
 var PAGE_ANIMATION_DEFS = {
     none: {
         sequential: true,
@@ -53,8 +111,8 @@ function registerPageAnimations(animations) {
     }
 }
 
-function registerPageAnimation(transitionType, reverse, direction) {
-    var ngName = "jqmPage-" + transitionType;
+function registerPageAnimation(animationType, reverse, direction) {
+    var ngName = "page-" + animationType;
 
     if (reverse) {
         ngName += "-reverse";
@@ -62,15 +120,15 @@ function registerPageAnimation(transitionType, reverse, direction) {
     ngName += "-" + direction;
 
     jqmModule.animation(ngName, ['$animationComplete', '$sniffer', function (animationComplete, $sniffer) {
-        var degradedTransitionType = maybeDegradeTransition(transitionType),
+        var degradedAnimationType = maybeDegradeAnimation(animationType),
             activePageClass = "ui-page-active",
             toPreClass = "ui-page-pre-in",
-            addClasses = degradedTransitionType + (reverse ? " reverse" : ""),
-            removeClasses = "out in reverse " + degradedTransitionType,
-            viewPortClasses = "ui-mobile-viewport-transitioning viewport-" + degradedTransitionType,
-            transitionDef = PAGE_ANIMATION_DEFS[degradedTransitionType];
+            addClasses = degradedAnimationType + (reverse ? " reverse" : ""),
+            removeClasses = "out in reverse " + degradedAnimationType,
+            viewPortClasses = "ui-mobile-viewport-transitioning viewport-" + degradedAnimationType,
+            animationDef = PAGE_ANIMATION_DEFS[degradedAnimationType];
 
-        if (degradedTransitionType === 'none') {
+        if (degradedAnimationType === 'none') {
             return {
                 setup: setupNone,
                 start: startNone
@@ -111,11 +169,11 @@ function registerPageAnimation(transitionType, reverse, direction) {
             var synchronization;
             element = firstElement(element);
             synchronization = createSynchronizationIfNeeded(element);
-            if (!transitionDef.sequential) {
+            if (!animationDef.sequential) {
                 synchronization.bindStart(addStartClasses);
             }
             synchronization.enter(function (done) {
-                if (transitionDef.sequential) {
+                if (animationDef.sequential) {
                     addStartClasses();
                 }
                 element.css("z-index", -10);
@@ -129,7 +187,7 @@ function registerPageAnimation(transitionType, reverse, direction) {
                 animationComplete(element, function () {
                     element.removeClass(removeClasses);
                     done();
-                });
+                }, true);
             });
             return synchronization;
 
@@ -151,7 +209,7 @@ function registerPageAnimation(transitionType, reverse, direction) {
                 animationComplete(element, function () {
                     element.removeClass(removeClasses);
                     done();
-                });
+                }, true);
             });
             return synchronization;
         }
@@ -164,7 +222,7 @@ function registerPageAnimation(transitionType, reverse, direction) {
             var parent = el.parent(),
                 sync = parent.data("animationSync");
             if (!sync) {
-                if (transitionDef.sequential) {
+                if (animationDef.sequential) {
                     sync = sequentialSynchronization();
                 } else {
                     sync = parallelSynchronization();
@@ -191,16 +249,16 @@ function registerPageAnimation(transitionType, reverse, direction) {
             return angular.element();
         }
 
-        function maybeDegradeTransition(transition) {
+        function maybeDegradeAnimation(animation) {
             if (!$sniffer.cssTransform3d) {
-                // Fall back to simple transition in browsers that don't support
+                // Fall back to simple animation in browsers that don't support
                 // complex 3d animations.
-                transition = PAGE_ANIMATION_DEFS[transition].fallback;
+                animation = PAGE_ANIMATION_DEFS[animation].fallback;
             }
             if (!$sniffer.animations) {
-                transition = "none";
+                animation = "none";
             }
-            return transition;
+            return animation;
         }
     }]);
 
@@ -209,15 +267,15 @@ function registerPageAnimation(transitionType, reverse, direction) {
             startAsync = latch(),
             end = latch(),
             runningCount = 0;
-        start.listen(function() {
+        start.listen(function () {
             // setTimeout to allow
             // the browser to settle after the new page
             // has been set to display:block and before the css animation starts.
-            // Without this transitions are sometimes not shown,
+            // Without this animations are sometimes not shown,
             // unless you call window.scrollTo or click on a link (weired dependency...)
-            window.setTimeout(function() {
+            window.setTimeout(function () {
                 startAsync.notify();
-            },0);
+            }, 0);
         });
 
         return {
@@ -238,7 +296,7 @@ function registerPageAnimation(transitionType, reverse, direction) {
         function setup(delegate) {
             runningCount++;
             start.notify();
-            startAsync.listen(function() {
+            startAsync.listen(function () {
                 delegate(function () {
                     runningCount--;
                     if (runningCount === 0) {

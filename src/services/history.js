@@ -1,14 +1,47 @@
-jqmModule.factory('$history', function $historyFactory() {
-    var $history;
-    return $history = {
+jqmModule.config(['$provide', function($provide) {
+    var lastLocationChangeByProgram = false;
+    $provide.decorator('$location', ['$delegate', '$browser', '$history', '$rootScope', function($location, $browser, $history, $rootScope) {
+        instrumentBrowser();
+
+        $rootScope.$on('$locationChangeSuccess', function () {
+            if (!lastLocationChangeByProgram) {
+                $history.onUrlChangeBrowser($location.url());
+            }
+        });
+
+        $history.onUrlChangeProgrammatically($location.url() || '/', false);
+
+        return $location;
+
+        function instrumentBrowser() {
+            var _url = $browser.url;
+            $browser.url = function (url, replace) {
+                if (url) {
+                    // setter
+                    $history.onUrlChangeProgrammatically($location.url(), replace);
+                    lastLocationChangeByProgram = true;
+                    $rootScope.$evalAsync(function () {
+                        lastLocationChangeByProgram = false;
+                    });
+                }
+                return _url.apply(this, arguments);
+            };
+        }
+    }]);
+}]);
+
+jqmModule.factory('$history', ['$window', '$timeout', function $historyFactory($window, $timeout) {
+    var $history = {
         go: go,
         urlStack: [],
         indexOf: indexOf,
         activeIndex: -1,
         previousIndex: -1,
-        onUrlChangeProgrammatically: onUrlChangeProgrammatically,
-        onUrlChangeBrowser: onUrlChangeBrowser
+        onUrlChangeBrowser: onUrlChangeBrowser,
+        onUrlChangeProgrammatically: onUrlChangeProgrammatically
     };
+
+    return $history;
 
     function go(relativeIndex) {
         // Always execute history.go asynchronously.
@@ -18,9 +51,9 @@ jqmModule.factory('$history', function $historyFactory() {
         // Note that we need at least 20ms to ensure that
         // the hashchange/popstate event for the current page
         // as been delivered (in IE this can take some time...).
-        window.setTimeout(function () {
-            window.history.go(relativeIndex);
-        }, 20);
+        $timeout(function () {
+            $window.history.go(relativeIndex);
+        }, 20, false);
     }
 
     function indexOf(url) {
@@ -32,14 +65,6 @@ jqmModule.factory('$history', function $historyFactory() {
             }
         }
         return -1;
-    }
-
-    function findInPast(url) {
-        var index = $history.activeIndex - 1;
-        while (index >= 0 && $history.urlStack[index].url !== url) {
-            index--;
-        }
-        return index;
     }
 
     function onUrlChangeBrowser(url) {
@@ -63,4 +88,4 @@ jqmModule.factory('$history', function $historyFactory() {
             $history.urlStack.push({url: url});
         }
     }
-});
+}]);

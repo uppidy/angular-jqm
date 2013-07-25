@@ -4,7 +4,7 @@
  * @restrict A
  *
  * @description
- * Defines the footer of a `jqm-page`.
+ * Defines the footer of a `jqm-page`. For a persistent footer, put the footer directly below `jqmView` / `jqmCachingView`.
  *
  * @example
  <example module="jqm">
@@ -24,10 +24,9 @@ jqmModule.directive('jqmFooter', function () {
         // Own scope as we have a different default theme
         // than the page.
         scope: true,
-        require: '^jqmPage',
         controller: angular.noop,
-        link: function (scope, element, attr, jqmPageCtrl) {
-            jqmPageCtrl.footer = element;
+        link: function (scope, element, attr) {
+            element.parent().data('jqmFooter', element);
             var hasExplicitTheme = scope.hasOwnProperty('$theme');
             if (!hasExplicitTheme) {
                 scope.$theme = 'a';

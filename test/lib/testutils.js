@@ -21,8 +21,6 @@
         jqm: null // is filled in #initIfNeeded with an instanceof of CommonApi
     };
 
-    fixAngularMocks$BrowserPoll();
-
     // ---------
     function initIfNeeded() {
         if (exports.jqm) {
@@ -65,7 +63,7 @@
         beginTransitionTo: notImplemented,
         historyGo: notImplemented,
         // needs to be called before init.
-        enableTransitions: notImplemented,
+        enableAnimations: notImplemented,
         fireAnimationEndEvents: function () {
             fireAnimationEndEventsInWindow(this.viewPort[0]);
         },
@@ -167,7 +165,7 @@
                     initFirstPage(page);
                     firstPage = page;
                 }
-                page.transition = page.transition || 'none';
+                page.animation = page.animation || 'none';
                 self.templateCache[pageUrl] = page;
             }
             if (!firstPage) {
@@ -213,7 +211,7 @@
     JqmUtils.prototype.beginTransitionTo = function (url) {
         var templateEntry = this.templateCache[url];
         this.$.mobile.changePage(url, {
-            transition: templateEntry.transition
+            transition: templateEntry.animation
         });
     };
 
@@ -232,7 +230,7 @@
         // $.event.special.navigate.hashchange(jqmEvent);
     };
 
-    JqmUtils.prototype.enableTransitions = function (enable) {
+    JqmUtils.prototype.enableAnimations = function (enable) {
         var $ = this.$;
         $.support.cssTransitions = !!enable;
         $.support.cssTransform3d = enable !== ONLY_BASIC_TRANSITIONS;
@@ -279,7 +277,7 @@
         }
         inject(function ($rootElement, $compile, $rootScope, $location, $templateCache, $animator) {
             addPages(pages);
-            self.viewPort = $("<div jqm-viewport></div>");
+            self.viewPort = $("<div jqm-caching-view></div>");
             $($rootElement).append(self.viewPort);
             document.body.appendChild($rootElement[0]);
             self.scope = $rootScope.$new();
@@ -301,7 +299,7 @@
                     $templateCache.put(pageUrl, page.template);
                     self.$routeProvider.when(pageUrl, {
                         templateUrl: pageUrl,
-                        transition: page.transition || 'none'
+                        animation: page.animation
                     });
                 }
                 if (!firstPage) {
@@ -348,16 +346,17 @@
                 throw new Error("new history index " + newIndex + " is out of range");
             }
 
-            $browser.$$url = $history.urlStack[newIndex].url;
+            $browser.$$url = 'http://server/#'+$history.urlStack[newIndex].url;
             $browser.poll();
         });
         this.tick(1);
     };
 
-    NgUtils.prototype.enableTransitions = function (enable) {
+    NgUtils.prototype.enableAnimations = function (enable) {
         module("jqm", function ($provide) {
             $provide.decorator("$sniffer", function ($delegate) {
                 $delegate.animations = !!enable;
+                $delegate.transitions = !!enable;
                 $delegate.cssTransform3d = enable !== ONLY_BASIC_TRANSITIONS;
                 return $delegate;
             });
@@ -503,34 +502,4 @@
             el.dispatchEvent(evt);
         }
     }
-
-    // The original angular.mock.$Browser.onUrlChange / poll
-    // did not work correctly when there were more than 1
-    // listeners registered via onUrlChange:
-    // Only the first one used to be called.
-    function fixAngularMocks$BrowserPoll() {
-        var _$Browser = angular.mock.$Browser;
-        angular.mock.$Browser = function () {
-            _$Browser.call(this);
-            var self = this;
-            self.onUrlChange = function (listener) {
-                self.pollFns.push(
-                    function () {
-                        listener(self.$$url);
-                    }
-                );
-                return listener;
-            };
-            self.poll = function poll() {
-                if (self.$$lastUrl != self.$$url) {
-                    self.$$lastUrl = self.$$url;
-                    angular.forEach(self.pollFns, function (pollFn) {
-                        pollFn();
-                    });
-                }
-            };
-        };
-        angular.mock.$Browser.prototype = _$Browser.prototype;
-    }
-
 })(window, document);

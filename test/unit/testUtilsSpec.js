@@ -155,8 +155,7 @@ describe('testutils', function () {
                         template: '<div ' + api.pageAttr + '><div jqm-content data-role="content">firstPage</div></div>'
                     },
                     '/page2': {
-                        template: '<div ' + api.pageAttr + '><div jqm-content data-role="content">secondPage</div></div>',
-                        transition: 'none'
+                        template: '<div ' + api.pageAttr + '><div jqm-content data-role="content">secondPage</div></div>'
                     }
                 });
                 expect(viewPort.hasClass('ui-viewport'));
@@ -165,14 +164,13 @@ describe('testutils', function () {
             });
         });
         describe('beginTransitionTo', function () {
-            it('switches between pages if transition is none', function () {
+            it('switches between pages if there are no animations', function () {
                 var viewPort = api.init({
                     '': {
                         template: '<div ' + api.pageAttr + '><div jqm-content data-role="content">firstPage</div></div>'
                     },
                     '/page2': {
-                        template: '<div ' + api.pageAttr + '><div jqm-content data-role="content">secondPage</div></div>',
-                        transition: 'none'
+                        template: '<div ' + api.pageAttr + '><div jqm-content data-role="content">secondPage</div></div>'
                     }
                 });
                 expect(api.activePage().text()).toBe('firstPage');

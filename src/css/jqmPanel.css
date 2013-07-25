@@ -13,3 +13,11 @@
   z-index: 1000; /* lower than ui-panel */
 }
 
+.ui-panel-content-wrap {
+    height: 100%
+}
+
+.jqm-panel-container {
+    position: relative
+}
+
