@@ -1,0 +1,47 @@
+<h1><code ng:non-bindable="">jqmFlip</code>
+<span class="hint">(directive in module <code ng:non-bindable="">jqm</code>
+)</span>
+</h1>
+<div><h2 id="Description">Description</h2>
+<div class="description"><p>Creates a jquery mobile flip switch on the given element.</p>
+
+<p>Anything inside the <code>jqm-flip</code> tag will be a label.</p></div>
+<h2 id="Usage">Usage</h2>
+<div class="usage">as attribute<pre class="prettyprint linenums">&lt;ANY jqm-flip
+     [ngModel="{expression}"]
+     [disabled]
+     [ngOnLabel="{string}"]
+     [ngOnValue="{string}"]
+     [ngOffLabel="{string}"]
+     [ngOffValue="{string}"]&gt;
+   ...
+&lt;/ANY&gt;</pre>
+<h3 id="Parameters">Parameters</h3>
+<ul class="parameters"><li><code ng:non-bindable="">ngModel<i>(optional)</i> – {expression=} – </code>
+<p>Assignable angular expression to data-bind to.</p></li>
+<li><code ng:non-bindable="">disabled<i>(optional)</i> – {string=} – </code>
+<p>Whether this flip switch is disabled.</p></li>
+<li><code ng:non-bindable="">ngOnLabel<i>(optional)</i> – {string=} – </code>
+<p>The label which should be shown when fliped on.</p></li>
+<li><code ng:non-bindable="">ngOnValue<i>(optional)</i> – {string=} – </code>
+<p>The value to which the expression should be set when fliped on.</p></li>
+<li><code ng:non-bindable="">ngOffLabel<i>(optional)</i> – {string=} – </code>
+<p>The label which should be shown when fliped off.</p></li>
+<li><code ng:non-bindable="">ngOffValue<i>(optional)</i> – {string=} – </code>
+<p>The value to which the expression should be set when fliped off.</p></li>
+</ul>
+</div>
+<h2 id="Example">Example</h2>
+<div class="example"><h4>Source</h4>
+<div source-edit="jqm" source-edit-deps="angular.js" source-edit-html="index.html-0" source-edit-css="" source-edit-js="" source-edit-unit="" source-edit-scenario=""></div>
+<div class="tabbable"><div class="tab-pane" title="index.html">
+<pre class="prettyprint linenums" ng-set-text="index.html-0" ng-html-wrap-loaded="jqm angular.js"></pre>
+<script type="text/ng-template" id="index.html-0">
+  <div jqm-flip ng-model="flip" on-label="On" on-value="1" off-label="Off" off-value="0">
+    My value is: {{flip}}
+  </div>
+</script>
+</div>
+</div><h4>Demo</h4>
+<div class="well doc-example-live animator-container" ng-embed-app="jqm" ng-set-html="index.html-0" ng-eval-javascript=""></div></div>
+</div>
