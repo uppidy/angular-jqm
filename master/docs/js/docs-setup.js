@@ -55,13 +55,6 @@ NG_DOCS={
     },
     {
       "section": "api",
-      "id": "jqm.directive:jqmCachingView",
-      "shortName": "jqmCachingView",
-      "type": "directive",
-      "keywords": "$routeparams $routeprovider add after allow-same-view-animation and angular animation animations api are attribute background between book bookcntl bookid both by ch1 ch4 change changes chapter chaptercntl chapterid choose cleared click compiled contain contains controller controlleras controllers create details directive directly dom eca effects evaluating every example expression extends fast following for function gatsby get has height href html in index instances instantiated internally is jqm jqm-caching-view jqm-header jqm-page jqmcachingview jqmview jqmviewcache js left letter moby module multiple name nodes of on once only overview page-slide params reused root route routes same scope script see side still stored style template templateurl that the their then therefore this to two use very view views way when will with your"
-    },
-    {
-      "section": "api",
       "id": "jqm.directive:jqmCheckbox",
       "shortName": "jqmCheckbox",
       "type": "directive",
@@ -72,21 +65,21 @@ NG_DOCS={
       "id": "jqm.directive:jqmFlip",
       "shortName": "jqmFlip",
       "type": "directive",
-      "keywords": "angular anything api assignable be creates data-bind directive disabled element expression flip fliped given html index inside is jqm jqm-flip jquery label mobile module my name ng-model ngmodel ngofflabel ngoffvalue ngonlabel ngonvalue off off-label off-value on on-label on-value set should shown switch tag the this to value when whether which will"
+      "keywords": "and angular anything api are assignable be bound can creates data-bind default directive disabled displayed element expression extend false flip flip2 flip3 fliped flipstyle for given html if index inside is jqm jqm-flip jqm-theme jquery label labels long mini minified mobile module my name necessary ng-model ng-style ngmodel ngofflabel ngoffvalue ngonlabel ngonvalue no of off off-label off-value omitted on on-label on-value parameter set should shown specific specified state styles switch tag the theme this to true value values when whether which width will with"
     },
     {
       "section": "api",
       "id": "jqm.directive:jqmFooter",
       "shortName": "jqmFooter",
       "type": "directive",
-      "keywords": "api below class defines directive directly footer for height hello html index jqm jqm-footer jqm-page jqm-standalone-page jqmcachingview jqmview module name of page1 persistent put style the world"
+      "keywords": "api class defines directive footer height hello html index jqm jqm-footer jqm-page jqm-standalone-page module name of page1 style the world"
     },
     {
       "section": "api",
       "id": "jqm.directive:jqmHeader",
       "shortName": "jqmHeader",
       "type": "directive",
-      "keywords": "api below class defines directive directly for header height hello html index jqm jqm-header jqm-page jqm-standalone-page jqmcachingview jqmview module name of page1 persistent put style the world"
+      "keywords": "api class defines directive header height hello html index jqm jqm-header jqm-page jqm-standalone-page module name of page1 style the world"
     },
     {
       "section": "api",
@@ -107,14 +100,7 @@ NG_DOCS={
       "id": "jqm.directive:jqmPanel",
       "shortName": "jqmPanel",
       "type": "directive",
-      "keywords": "angular api assignable available be creates data-bind default directive display expression has in inside is jqm jqm-panel-container jqmpanelcontainer jquery left mobile must of open opened overlay panel placed position push reveal right state the to type what"
-    },
-    {
-      "section": "api",
-      "id": "jqm.directive:jqmPanelContainer",
-      "shortName": "jqmPanelContainer",
-      "type": "directive",
-      "keywords": "angular api assignable background container data-bind directive display either expression for height hello html index is jqm jqm-panel jqm-panel-container jqmpanelcontainer jquery left mobile module name ng-click ng-init null open opened openpanel or overlay panel panels position right state style the this to white"
+      "keywords": "$panel and angular api are assignable available be create created creates current currently data data-bind data-bound default demo directive display expression flips following has hello html if in index is jqm jqm-flip jqm-header jqm-page jqm-panel jqm-viewport jquery left mobile module must name ng-model object objects of on open opened outside overlay panel placed populated position properties push reveal right saying scope state that the this to toggle type value what whether will with"
     },
     {
       "section": "api",
@@ -125,24 +111,10 @@ NG_DOCS={
     },
     {
       "section": "api",
-      "id": "jqm.directive:jqmScrollable",
-      "shortName": "jqmScrollable",
-      "type": "directive",
-      "keywords": "angular-scrolly api directive eca element enables fake for given height html index jqm jqm-scrollable jqmscrollable module name overview scrolling style the using"
-    },
-    {
-      "section": "api",
       "id": "jqm.directive:jqmTheme",
       "shortName": "jqmTheme",
       "type": "directive",
       "keywords": "$theme adding and api by children directive directives element evaluate for html index it jqm jqm-checkbox jqm-theme jqmcheckbox like module name other property scope sets that the theme this to"
-    },
-    {
-      "section": "api",
-      "id": "jqm.directive:jqmView",
-      "shortName": "jqmView",
-      "type": "directive",
-      "keywords": "$injector $route $routeparams $routeprovider $scope accordingly also an and angular animation animations api as attribute back be been below book bookcntl bookid button called can ch1 ch4 changes chapter chaptercntl chapterid choose contains content controller controlleras current declared directive dynamically eca element evaluating executed expression extends extra fixed following for function has height hits href html if in index inside instantiating instead interpreted is it jqm jqm-header jqm-page jqm-view jqmview js last letter loaded locals mix module name ngview object of on overview page-slide params properties property reverse root route routes same scope script should so specified stays style suffix template templateurl that the there this to updates url use used user using value view-animation way when whenever whether will with you"
     }
   ],
   "apis": {
