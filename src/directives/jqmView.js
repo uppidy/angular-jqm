@@ -199,6 +199,10 @@ jqmModule.directive('jqmView', ['$templateCache', '$route', '$anchorScroll', '$c
                     reverse = route.back,
                     routeAnimationName,
                     animationName;
+                if (attr.ngAnimate) {
+                    animateAttr.ngAnimate = attr.ngAnimate;
+                    return;
+                }
                 animation = route.animation;
                 if (angular.isFunction(animation) || angular.isArray(animation)) {
                     routeAnimationName = $injector.invoke(route.animation, null, {
@@ -213,9 +217,6 @@ jqmModule.directive('jqmView', ['$templateCache', '$route', '$anchorScroll', '$c
                         var el = angular.element(element);
                         routeAnimationName = routeAnimationName || el.attr('view-animation') || el.attr('data-view-animation');
                     });
-                }
-                if (!routeAnimationName) {
-                    routeAnimationName = scope.$eval(attr.ngAnimate);
                 }
                 if (reverse) {
                     animationName = lastAnimationName;
