@@ -76,7 +76,7 @@ Your main html file should look like this:
         <script src="app.js"></script>
     </head>
 
-    <body jqm-viewport>
+    <body jqm-caching-view>
 
     </body>
 
@@ -93,7 +93,7 @@ for all pages that you want to display. E.g.:
         });
         // A route for all pages in one folder
         $routeProvider.when("/:page", {
-            transition: 'slide',
+            animation: 'page-slide',
             templateUrl: function(params) {
                 return params.page;
             }
