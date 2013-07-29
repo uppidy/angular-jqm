@@ -86,18 +86,38 @@ describe("jqmFlip", function () {
             var ngLabel = ngElement.find('label').eq(0).text();
             expect(ngLabel).toEqual(ng.scope.label);
         });
-        it("allows disabled interpolation", function() {
+        it('allows disabled interpolation', function() {
             ngElement = ng.init('<div jqm-flip ng-disabled="disabled" ng-model="model" on-label="on" on-value="onValue" off-label="off" off-value="offValue">label</div>');
             expect(ngElement.find('div').hasClass("ui-disabled")).toBe(false);
             ng.scope.disabled = true;
             ng.scope.$apply();
             expect(ngElement.find('div').hasClass("ui-disabled")).toBe(true);
         });
-        it("works with ng-model without using $parent", function() {
+        it('works with ng-model without using $parent', function() {
             ngElement = ng.init('<div ng-init="model=\'onValue\';"><div jqm-flip ng-model="model" on-label="on" on-value="onValue" off-label="off" off-value="offValue">label</div></div>');
             expect(ngElement.scope().model).toEqual('onValue');
             ngElement.children('div').find('div').triggerHandler('click');
             expect(ngElement.scope().model).toEqual('offValue');
+        });
+        it('sets model value in scope if not defined', function() {
+            ngElement = ng.init('<div ng-init=""><div jqm-flip ng-model="model" on-label="on" on-value="onValue" off-label="off" off-value="offValue"></div></div>');
+            expect(ngElement.scope().model).toBe('offValue');
+        });
+        it('handles boolean values', function() {
+            ngElement = ng.init('<div ng-init="model=true;"><div jqm-flip ng-model="model" on-label="on" on-value="true" off-label="off" off-value="false">label</div></div>');
+            expect(ngElement.scope().model).toEqual(true);
+            ngElement.children('div').find('div').triggerHandler('click');
+            expect(ngElement.scope().model).toEqual(false);
+        });
+        it('has default values', function() {
+            ngElement = ng.init('<div ng-init=""><div jqm-flip ng-model="model"/></div>');
+            expect(ngElement.scope().model).toEqual(false);
+            ngElement.children('div').find('div').triggerHandler('click');
+            expect(ngElement.scope().model).toEqual(true);
+        });
+        it('allows to pass styles to the flip', function () {
+            ngElement = ng.init('<div jqm-flip ng-model="model" flip-style="width: 10em;"/>');
+            expect(ngElement.find('div').attr('style').trim()).toBe('width: 10em;');
         });
     });
 });
