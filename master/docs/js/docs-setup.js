@@ -132,6 +132,20 @@ NG_DOCS={
     },
     {
       "section": "api",
+      "id": "jqm.directive:jqmTextarea",
+      "shortName": "jqmTextarea",
+      "type": "directive",
+      "keywords": "an angular api assignable creates data-bind data-disabled directive disabled elemen expression given html index input is jqm jqm-textarea jquery mobile model module name ng-model ngmodel on textarea the this to value whether with world"
+    },
+    {
+      "section": "api",
+      "id": "jqm.directive:jqmTextinput",
+      "shortName": "jqmTextinput",
+      "type": "directive",
+      "keywords": "an angular api assignable attribute button clear clear-btn clearbtn clearbtntext creates data-bind default defines directive disabled element expression for given html index input is jqm jqm-textinput jquery mini mobile module name ng-model ngmodel on placeholder placholder resulting search should show text the this to tooltip true type value whether"
+    },
+    {
+      "section": "api",
       "id": "jqm.directive:jqmTheme",
       "shortName": "jqmTheme",
       "type": "directive",
