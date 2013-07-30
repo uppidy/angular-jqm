@@ -8,15 +8,18 @@ beforeEach(function() {
                 return "Expected '" + angular.mock.dump(this.actual) + "' " + not + "to have class '" + cls + "'.";
             };
 
-            var res = true;
             var self = this;
-            if (angular.isArray(cls)) {
-                angular.forEach(cls, function(cls) {
-                    res = res && self.actual.hasClass(cls);
-                });
-            } else {
-                res = this.actual.hasClass(cls);
+            if (!angular.isArray(cls)) {
+                cls = cls.split(" ");
             }
+            var res = not?false:true;
+            angular.forEach(cls, function(cls) {
+                if (not) {
+                    res = res || self.actual.hasClass(cls);
+                } else {
+                    res = res && self.actual.hasClass(cls);
+                }
+            });
             return res;
         }
     });

@@ -47,4 +47,20 @@ describe('transitionComplete', function() {
         el.triggerHandler('transitionend');
         expect(spy).not.toHaveBeenCalled();
     }));
+    it('returns a function to unbind', inject(function($transitionComplete, $sniffer) {
+        var el = angular.element('<div></div>');
+        var spy = jasmine.createSpy('callback');
+
+        $sniffer.animations = true;
+        $sniffer.vendorPrefix = 'Webkit';
+
+        spyOn(el, 'unbind').andCallThrough();
+        spyOn(el, 'bind').andCallThrough();
+
+        var removeCb = $transitionComplete(el, spy);
+        expect(el.unbind).not.toHaveBeenCalled();
+        removeCb();
+        expect(el.unbind).toHaveBeenCalledWith('transitionend', spy);
+        expect(el.unbind).toHaveBeenCalledWith('webkitTransitionEnd', spy);
+    }));
 });
