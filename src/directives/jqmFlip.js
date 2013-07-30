@@ -35,7 +35,6 @@
    <div jqm-flip ng-model="flip2" on-label="On" on-value="On" off-label="Off" off-value="Off">
      My value is {{flip2}}
    </div>
-   <div jqm-flip ng-model="flip3" on-label="Long On Label" off-label="Long Off Label" flipStyle="width: 11em;"/>
   </file>
 </example>
  */
@@ -51,8 +50,7 @@ jqmModule.directive('jqmFlip', [function () {
             offLabel: '@',
             offValue: '@',
             mini: '@',
-            disabled: '@',
-            flipStyle: '@'
+            disabled: '@'
         },
         require: ['?ngModel', '^?jqmControlgroup'],
         link: function (scope, element, attr, ctrls) {

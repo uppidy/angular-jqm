@@ -27,7 +27,8 @@ describe("jqmFlip", function () {
         var ngSlider = ngElement.find('div');
         var jqmSlider = jqmElement.find('div');
         testutils.compareElementRecursive(ngSlider, jqmSlider);
-        expect(ngSlider.find('span').attr('style').trim()).toBe(jqmSlider.find('span').attr('style').trim());
+        expect((ngSlider.find('span').attr('style') || '').trim())
+          .toBe((jqmSlider.find('span').attr('style') || '').trim());
     }
 
     function flip () {
@@ -114,10 +115,6 @@ describe("jqmFlip", function () {
             expect(ngElement.scope().model).toEqual(false);
             ngElement.children('div').find('div').triggerHandler('click');
             expect(ngElement.scope().model).toEqual(true);
-        });
-        it('allows to pass styles to the flip', function () {
-            ngElement = ng.init('<div jqm-flip ng-model="model" flip-style="width: 10em;"/>');
-            expect(ngElement.find('div').attr('style').trim()).toBe('width: 10em;');
         });
     });
 });

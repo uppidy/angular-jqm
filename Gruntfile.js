@@ -119,10 +119,8 @@ module.exports = function(grunt) {
     },
     karma: {
       options: {
-        configFile: 'test/config/karma.conf.js',
-        files: ['node_modules/grunt-karma/node_modules/karma/adapter/lib/jasmine.js',
-                'node_modules/grunt-karma/node_modules/karma/adapter/jasmine.js',
-                'components/angular/angular.js',
+        configFile: 'test/config/karma-shared.conf.js',
+        files: ['components/angular/angular.js',
                 'components/angular/angular-mobile.js',
                 'components/angular/angular-mocks.js',
                 'test/lib/testutils.js',
@@ -140,11 +138,15 @@ module.exports = function(grunt) {
         },
         background: true
       },
-      travis: {
-        options: {
-          singleRun: true,
-          browsers: ['PhantomJS']
-        }
+      //We're only allowed two concurrent browsers on saucelabs
+      sauce1: {
+        configFile: 'test/config/karma-saucelabs.conf.js',
+        browsers: ['sauce_ie', 'sauce_firefox'],
+      },
+      sauce2: {
+        configFile: 'test/config/karma-saucelabs.conf.js',
+        //Boot up both mobile browsers at once, since they take alot longer to start
+        browsers: ['sauce_ios', 'sauce_android'],
       },
       localBuild: {
         options: {
@@ -192,7 +194,6 @@ module.exports = function(grunt) {
   grunt.registerTask('build', ['html2js', 'css2js', 'concat']);
   grunt.registerTask('dev', ['connect','karma:dev','watch']);
   grunt.registerTask('default', ['install','build','jshint','karma:localBuild','ngdocs']);
-  grunt.registerTask('travis', ['build','jshint','karma:travis','ngdocs']);
 
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-html2js');

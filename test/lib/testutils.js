@@ -1,3 +1,6 @@
+//ie10 & mobile safari need a long time sometimes to load the iframe
+jasmine.getEnv().defaultTimeoutInterval = 25000;
+
 (function (window, document) {
     var exports,
         IGNORE_CSS_CLASSES = /(ng-.*)|(jqm.*)/,
@@ -32,11 +35,12 @@
             iframe.src = "/base/test/lib/jqmPage.html";
             // Cross browser way for onload iframe handler
             if (iframe.attachEvent) {
-                iframe.attachEvent('onload', setIframeLoaded);
+                iframe.attachEvent('onload', iframeDone);
             } else {
-                iframe.onload = function () {
+                iframe.onload = iframeDone;
+            }
+            function iframeDone() {
                     jqmWin = iframe.contentWindow;
-                };
             }
             document.body.appendChild(iframe);
         });

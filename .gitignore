@@ -17,3 +17,5 @@ dist
 *.ipr
 *.iws
 
+# Log files
+*.log

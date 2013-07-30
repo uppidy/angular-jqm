@@ -35,7 +35,8 @@ describe('jqmClass directive', function() {
             scope.two = true;
             var el1 = $compile('<div ng-class="{\'one-true\': one}" jqm-class="{\'two-true\': two}"></div>')(scope);
             scope.$apply();
-            expect(el1).toHaveClass('one-true two-true');
+            expect(el1[0].className).toMatch('one-true');
+            expect(el1[0].className).toMatch('two-true');
         });
     });
 
