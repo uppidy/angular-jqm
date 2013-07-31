@@ -72,7 +72,7 @@ NG_DOCS={
       "id": "jqm.directive:jqmFlip",
       "shortName": "jqmFlip",
       "type": "directive",
-      "keywords": "and angular anything api are assignable be bound can creates data-bind default directive disabled displayed element expression extend false flip flip2 flip3 fliped flipstyle for given html if index inside is jqm jqm-flip jqm-theme jquery label labels long mini minified mobile module my name necessary ng-model ng-style ngmodel ngofflabel ngoffvalue ngonlabel ngonvalue no of off off-label off-value omitted on on-label on-value parameter set should shown specific specified state styles switch tag the theme this to true value values when whether which width will with"
+      "keywords": "and angular anything api are assignable be bound can creates data-bind default directive disabled displayed element expression extend false flip flip2 fliped for given html if index inside is jqm jqm-flip jqm-theme jquery label labels long mini minified mobile module my name necessary ng-model ng-style ngmodel ngofflabel ngoffvalue ngonlabel ngonvalue no of off off-label off-value omitted on on-label on-value parameter set should shown specific specified state styles switch tag the theme this to true value values when whether which width will with"
     },
     {
       "section": "api",
@@ -157,6 +157,20 @@ NG_DOCS={
       "shortName": "jqmView",
       "type": "directive",
       "keywords": "$injector $route $routeparams $routeprovider $scope accordingly also an and angular animation animations api as attribute back be been below book bookcntl bookid button called can ch1 ch4 changes chapter chaptercntl chapterid choose contains content controller controlleras current declared directive dynamically eca element evaluating executed expression extends extra fixed following for function has height hits href html if in index inside instantiating instead interpreted is it jqm jqm-header jqm-page jqm-view jqmview js last letter loaded locals mix module name ngview object of on overview page-slide params properties property reverse root route routes same scope script should so specified stays style suffix template templateurl that the there this to updates url use used user using value view-animation way when whenever whether will with you"
+    },
+    {
+      "section": "api",
+      "id": "jqm.jqmConfig",
+      "shortName": "jqmConfig",
+      "type": "object",
+      "keywords": "and api current default jqm jqmconfig jqmconfigprovider object primary primarytheme property secondary secondarytheme see service tell the theme to used"
+    },
+    {
+      "section": "api",
+      "id": "jqm.jqmConfigProvider",
+      "shortName": "jqmConfigProvider",
+      "type": "object",
+      "keywords": "api configure current default element etc footers headers if is jqm jqm-theme jqmconfigprovider method new newtheme not object on primary primarytheme secondary secondarytheme set sets the theme to used"
     }
   ],
   "apis": {

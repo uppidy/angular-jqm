@@ -1,4 +1,4 @@
-/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-07-30
+/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-07-31
  * https://github.com/opitzconsulting/angular-jqm
  * Copyright (c) 2013 OPITZ CONSULTING GmbH; Licensed MIT */
 (function(window, angular) {
@@ -755,7 +755,6 @@ jqmModule.directive('jqmControlgroup', function() {
    <div jqm-flip ng-model="flip2" on-label="On" on-value="On" off-label="Off" off-value="Off">
      My value is {{flip2}}
    </div>
-   <div jqm-flip ng-model="flip3" on-label="Long On Label" off-label="Long Off Label" flipStyle="width: 11em;"/>
   </file>
 </example>
  */
@@ -771,8 +770,7 @@ jqmModule.directive('jqmFlip', [function () {
             offLabel: '@',
             offValue: '@',
             mini: '@',
-            disabled: '@',
-            flipStyle: '@'
+            disabled: '@'
         },
         require: ['?ngModel', '^?jqmControlgroup'],
         link: function (scope, element, attr, ctrls) {
@@ -876,6 +874,7 @@ jqmModule.directive('jqmFooter', function () {
         }
     };
 });
+
 /**
  * @ngdoc directive
  * @name jqm.directive:jqmHeader
@@ -896,7 +895,7 @@ jqmModule.directive('jqmFooter', function () {
  </file>
  </example>
  */
-jqmModule.directive('jqmHeader', function () {
+jqmModule.directive('jqmHeader', ['jqmConfig', function (jqmConfig) {
     return {
         restrict: 'A',
         // Own scope as we have a different default theme
@@ -907,12 +906,12 @@ jqmModule.directive('jqmHeader', function () {
             element.parent().data("jqmHeader", element);
             var hasExplicitTheme = scope.hasOwnProperty('$theme');
             if (!hasExplicitTheme) {
-                scope.$theme = 'a';
+                scope.$theme = jqmConfig.secondaryTheme;
             }
             element.addClass("ui-header ui-bar-"+scope.$theme);
         }
     };
-});
+}]);
 
 angular.forEach(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7'], function (headerName) {
     jqmModule.directive(headerName, hxDirective);
@@ -934,6 +933,7 @@ function hxDirective() {
         }
     };
 }
+
 
 jqmModule.directive({
     jqmLiEntry: jqmLiEntryDirective(false),
@@ -2172,23 +2172,78 @@ jqmModule.factory('$history', ['$window', '$timeout', function $historyFactory($
     }
 }]);
 
+/**
+ * @ngdoc object
+ * @name jqm.jqmConfigProvider
+ *
+ * @description Used to configure the default theme.
+ */
+
 jqmModule.provider('jqmConfig', function() {
-    var _defaultTheme = 'c';
+    /**
+     * @ngdoc method
+     * @name jqm.jqmConfigProvider#primaryTheme
+     * @methodOf jqm.jqmConfigProvider
+     *
+     * @description Sets/gets the default primary theme (used if jqm-theme is
+     * not set on the element). Default: 'c'
+     *
+     * @param {string=} newTheme The new primary theme to set.
+     * @returns {string} The current primary theme.
+     */
+    /**
+     * @ngdoc method
+     * @name jqm.jqmConfigProvider#secondaryTheme
+     * @methodOf jqm.jqmConfigProvider
+     * 
+     * @description Sets/gets the secondary theme (used on footers, headers, etc 
+     * if not theme is set on the element). Default: 'a'
+     *
+     * @param {string=} newTheme The new secondary theme to set.
+     * @returns {string} The current secondary theme.
+     */
+
+    var _primaryTheme = 'c';
+    var _secondaryTheme = 'a';
     return {
-        defaultTheme: defaultTheme,
+        primaryTheme: primaryTheme,
+        secondaryTheme: secondaryTheme,
         $get: serviceFactory
     };
 
-    function defaultTheme(value) {
-        if (value) {
-            _defaultTheme = value;
-        }
-        return _defaultTheme;
+    function primaryTheme(value) {
+        if (value) { _primaryTheme = value; }
+        return _primaryTheme;
+    }
+    function secondaryTheme(value) {
+        if (value) { _secondaryTheme = value; }
+        return _secondaryTheme;
     }
 
+    /**
+     * @ngdoc object
+     * @name jqm.jqmConfig
+     * @description
+     * A service used to tell the default primary and secondary theme. 
+     */
+    /**
+     * @ngdoc property
+     * @name jqm.jqmConfig#primaryTheme
+     * @propertyOf jqm.jqmConfig
+     *
+     * @description {string} The current primary theme.  See {@link jqm.jqmConfigProvider#primaryTheme}.
+     */
+    /**
+     * @ngdoc property
+     * @name jqm.jqmConfig#secondaryTheme
+     * @propertyOf jqm.jqmConfig
+     *
+     * @description {string} The current secondary theme.  See {@link jqm.jqmConfigProvider#secondaryTheme}.
+     */
     function serviceFactory() {
         return {
-            defaultTheme: _defaultTheme
+            primaryTheme: _primaryTheme,
+            secondaryTheme: _secondaryTheme
         };
     }
 
@@ -2497,7 +2552,7 @@ jqmModule.config(['$provide', function ($provide) {
     }
 
     function inheritThemeDecorator($rootScope, jqmConfig) {
-        instrumentScope($rootScope, jqmConfig.defaultTheme);
+        instrumentScope($rootScope, jqmConfig.primaryTheme);
         return $rootScope;
 
         function instrumentScope(scope, theme) {
@@ -2685,16 +2740,15 @@ angular.module("templates/jqmFlip.html", []).run(["$templateCache", function($te
     "<div jqm-scope-as=\"jqmFlip\">\n" +
     "        <label class=\"ui-slider\" ng-transclude></label>\n" +
     "        <div class=\"ui-slider ui-slider-switch ui-btn-down-{{$scopeAs.jqmFlip.theme}} ui-btn-corner-all\"\n" +
-    "             style=\"{{$scopeAs.jqmFlip.flipStyle}}\"\n" +
     "             jqm-class=\"{'ui-disabled': $scopeAs.jqmFlip.disabled,\n" +
     "                        'ui-mini': $scopeAs.jqmFlip.isMini()}\"\n" +
     "             ng-click=\"$scopeAs.jqmFlip.toggle()\">\n" +
-    "                <span class=\"ui-slider-label ui-slider-label-a ui-btn-active ui-btn-corner-all\" style=\"width: {{$scopeAs.jqmFlip.onStyle}}%;\">{{$scopeAs.jqmFlip.onLabel}}</span>\n" +
-    "                <span class=\"ui-slider-label ui-slider-label-b ui-btn-down-{{$scopeAs.jqmFlip.theme}} ui-btn-corner-all\" style=\"width: {{$scopeAs.jqmFlip.offStyle}}%;\">{{$scopeAs.jqmFlip.offLabel}}</span>\n" +
+    "             <span class=\"ui-slider-label ui-slider-label-a ui-btn-active ui-btn-corner-all\" ng-style=\"{width: $scopeAs.jqmFlip.onStyle + '%'}\">{{$scopeAs.jqmFlip.onLabel}}</span>\n" +
+    "             <span class=\"ui-slider-label ui-slider-label-b ui-btn-down-{{$scopeAs.jqmFlip.theme}} ui-btn-corner-all\" ng-style=\"{width: $scopeAs.jqmFlip.offStyle + '%'}\">{{$scopeAs.jqmFlip.offLabel}}</span>\n" +
     "                <div class=\"ui-slider-inneroffset\">\n" +
     "                  <a class=\"ui-slider-handle ui-slider-handle-snapping ui-btn ui-btn-corner-all ui-btn-up-{{$scopeAs.jqmFlip.theme}} ui-shadow\"\n" +
     "                     title=\"{{$scopeAs.jqmFlip.toggleLabel}}\"\n" +
-    "                     style=\"left: {{$scopeAs.jqmFlip.onStyle}}%;\">\n" +
+    "                     ng-style=\"{left: $scopeAs.jqmFlip.onStyle + '%'}\">\n" +
     "                    <span class=\"ui-btn-inner\"><span class=\"ui-btn-text\"></span></span>\n" +
     "                  </a>\n" +
     "                </div>\n" +
