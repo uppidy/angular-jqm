@@ -3,7 +3,16 @@
 )</span>
 </h1>
 <div><h2 id="Description">Description</h2>
-<div class="description"><p>A container for jquery mobile panels.</p></div>
+<div class="description"><p>A container for jquery mobile panels.</p>
+
+<p>If you wish to use this with a view, you want the jqm-panel-container as the
+parent of your view and your panels. For example:
+<pre class="prettyprint linenums">
+&lt;div jqm-panel-container="myPanel"&gt;
+  &lt;div jqm-panel&gt;My Panel!&lt;/div&gt;
+  &lt;div jqm-view&gt;&lt;/div&gt;
+&lt;/div&gt;
+</pre></div>
 <h2 id="Usage">Usage</h2>
 <div class="usage">as attribute<pre class="prettyprint linenums">&lt;ANY jqm-panel-container="{expression}"&gt;
    ...

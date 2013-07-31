@@ -1171,6 +1171,15 @@ jqmModule.directive('jqmPanel', function() {
  * @description
  * A container for jquery mobile panels.
  *
+ * If you wish to use this with a view, you want the jqm-panel-container as the
+ * parent of your view and your panels. For example:
+ * <pre>
+ * <div jqm-panel-container="myPanel">
+ *   <div jqm-panel>My Panel!</div>
+ *   <div jqm-view></div>
+ * </div>
+ * </pre>
+ *
  * @param {expression=} jqmPanelContainer Assignable angular expression to data-bind the panel's open state to.
  *                      This is either `left` (show left panel), `right` (show right panel) or null.
  *
@@ -1302,6 +1311,7 @@ jqmModule.directive('jqmPanelContainer', ['$timeout', '$transitionComplete', '$s
         }
     }
 }]);
+
 /**
  * @ngdoc directive
  * @name jqm.directive:jqmPositionAnchor

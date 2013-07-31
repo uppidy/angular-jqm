@@ -114,7 +114,7 @@ NG_DOCS={
       "id": "jqm.directive:jqmPanelContainer",
       "shortName": "jqmPanelContainer",
       "type": "directive",
-      "keywords": "angular api assignable background container data-bind directive display either expression for height hello html index is jqm jqm-panel jqm-panel-container jqmpanelcontainer jquery left mobile module name ng-click ng-init null open opened openpanel or overlay panel panels position right state style the this to white"
+      "keywords": "and angular api as assignable background container data-bind directive display either example expression for height hello html if index is jqm jqm-panel jqm-panel-container jqm-view jqmpanelcontainer jquery left mobile module mypanel name ng-click ng-init null of open opened openpanel or overlay panel panels parent position right state style the this to use view want white wish with you your"
     },
     {
       "section": "api",
