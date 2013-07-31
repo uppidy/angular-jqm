@@ -18,7 +18,7 @@
  </file>
  </example>
  */
-jqmModule.directive('jqmFooter', function () {
+jqmModule.directive('jqmFooter', ['jqmConfig', function (jqmConfig) {
     return {
         restrict: 'A',
         // Own scope as we have a different default theme
@@ -29,9 +29,9 @@ jqmModule.directive('jqmFooter', function () {
             element.parent().data('jqmFooter', element);
             var hasExplicitTheme = scope.hasOwnProperty('$theme');
             if (!hasExplicitTheme) {
-                scope.$theme = 'a';
+                scope.$theme = jqmConfig.secondaryTheme;
             }
             element.addClass("ui-footer ui-bar-"+scope.$theme);
         }
     };
-});
+}]);
