@@ -19,7 +19,7 @@ before_script:
 # Saucelabs only allows two concurrent browsers, so we do two seperate grunt
 # tasks, each with two of the browsers running
 script:
-- grunt build jshint ngdocs
+- grunt 
 - grunt karma:sauce1
 - grunt karma:sauce2
 
