@@ -4,7 +4,7 @@ describe('scopeDecorator', function() {
         it('sets the default theme to $rootScope', function() {
             var someTheme = "someTheme";
             module(function(jqmConfigProvider) {
-                jqmConfigProvider.defaultTheme(someTheme);
+                jqmConfigProvider.primaryTheme(someTheme);
             });
             inject(function($rootScope) {
                 expect($rootScope.$theme).toBe(someTheme);
@@ -14,7 +14,7 @@ describe('scopeDecorator', function() {
         it('inherits the $theme for normal and isolated child scopes', function() {
             var someTheme = "someTheme";
             module(function(jqmConfigProvider) {
-                jqmConfigProvider.defaultTheme(someTheme);
+                jqmConfigProvider.primaryTheme(someTheme);
             });
             inject(function($rootScope) {
                 expect($rootScope.$new().$theme).toBe(someTheme);

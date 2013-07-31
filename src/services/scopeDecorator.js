@@ -61,7 +61,7 @@ jqmModule.config(['$provide', function ($provide) {
     }
 
     function inheritThemeDecorator($rootScope, jqmConfig) {
-        instrumentScope($rootScope, jqmConfig.defaultTheme);
+        instrumentScope($rootScope, jqmConfig.primaryTheme);
         return $rootScope;
 
         function instrumentScope(scope, theme) {
