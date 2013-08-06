@@ -44,7 +44,7 @@ Commits:
 
 Commands:
 
-- Install the dependencies: `npm install` and then `./node_modules/.bin/bower install`.
+- Install the dependencies: `npm install` and then `grunt install`
 - Build it: `grunt`
 - Auto-Run tests when file change: `grunt dev`
 
