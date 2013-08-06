@@ -186,22 +186,46 @@ module.exports = function(grunt) {
       api: {
         src: ['src/**/*.js', 'docs/content/api/**/*.ngdoc'],
         title: 'API Documentation'
-      }
+      },
+
+    },
+
+    //After lots of bower problems, we switched to grunt-curl
+    'curl-dir': {
+      'components/angular': [
+        'http://code.angularjs.org/1.1.5/angular.js',
+        'http://code.angularjs.org/1.1.5/angular-mocks.js',
+        'http://code.angularjs.org/1.1.5/angular-mobile.js'
+      ],
+      'components/jquery-mobile': [
+        'http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.js',
+        'http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css'
+      ],
+      'components/jquery': [
+        'http://code.jquery.com/jquery-1.10.2.js'
+      ],
+      'components/angular-scrolly': [
+        'https://raw.github.com/ajoslin/angular-scrolly/master/angular-scrolly.js'
+      ]
     }
   });
 
-  grunt.registerTask('install', 'Prepare development environment', install); 
   grunt.registerTask('build', ['html2js', 'css2js', 'concat']);
   grunt.registerTask('dev', ['connect','karma:dev','watch']);
   grunt.registerTask('default', ['install','build','jshint','karma:localBuild','ngdocs']);
+  grunt.registerTask('install', 'Prepare development environment', function() {
+    grunt.task.run('curl-dir');
+    install();
+  });
 
-  grunt.loadNpmTasks('grunt-karma');
-  grunt.loadNpmTasks('grunt-html2js');
-  grunt.loadNpmTasks('grunt-conventional-changelog');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-conventional-changelog');
+  grunt.loadNpmTasks('grunt-curl');
+  grunt.loadNpmTasks('grunt-html2js');
+  grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-ngdocs');
   grunt.loadTasks('build/grunt');
 

@@ -14,12 +14,12 @@ before_script:
 - sh -e /etc/init.d/xvfb start
 - npm link
 - npm install -g grunt-cli
-- ./node_modules/.bin/bower install
 
 # Saucelabs only allows two concurrent browsers, so we do two seperate grunt
 # tasks, each with two of the browsers running
 script:
-- grunt 
+- grunt install
+- grunt
 - grunt karma:sauce1
 - grunt karma:sauce2
 
