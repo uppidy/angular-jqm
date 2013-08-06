@@ -48,6 +48,13 @@ NG_DOCS={
     },
     {
       "section": "api",
+      "id": "jqm.$loadDialog",
+      "shortName": "$loadDialog",
+      "type": "function",
+      "keywords": "$loaddialog $q $rootelement $rootscope $scope $timeout and api as back be before but callback called can cancel canceldata change clicked clicks currently defer deferred defined democtrl dialog dialogtext displayed even executed existing for function given hide html if index indicate is it jqm jqm-textinput js last long message method module name ng-click ng-controller ng-model object on opens placeholder promise reject rejects resolve restores revert running runs same script show showforpromise showing shown shows some state text that the then this to user var wait waitfor waitforwithcancel was when will with work"
+    },
+    {
+      "section": "api",
       "id": "jqm.$orientation",
       "shortName": "$orientation",
       "type": "function",
