@@ -62,6 +62,13 @@ NG_DOCS={
     },
     {
       "section": "api",
+      "id": "jqm.directive:jqmButton",
+      "shortName": "jqmButton",
+      "type": "directive",
+      "keywords": "$root action an anchor api as away banana be button com corners created creates data-mini default defines directive element foobar3030 for get give given group home horizontal href html http icon iconpos if index inline input is it its jqm jqm-button jqm-controlgroup jqm-textinput jqmbutton jquery just layout left link make method mini mobile module name ng-click ng-init ng-model normal not of on or otherwise position reset right search shadow shadows some specified stuff submit tag the to treated true type ui-icon-check ui-icon-home ui-icon-minus ui-icon-search use value vertical whether will with"
+    },
+    {
+      "section": "api",
       "id": "jqm.directive:jqmCachingView",
       "shortName": "jqmCachingView",
       "type": "directive",
@@ -94,13 +101,6 @@ NG_DOCS={
       "shortName": "jqmHeader",
       "type": "directive",
       "keywords": "api below class defines directive directly for header height hello html index jqm jqm-header jqm-page jqm-standalone-page jqmcachingview jqmview module name of page1 persistent put style the world"
-    },
-    {
-      "section": "api",
-      "id": "jqm.directive:jqmOnceClass",
-      "shortName": "jqmOnceClass",
-      "type": "directive",
-      "keywords": "api class directive given html index jqm jqm-once-class module name ng-init ng-model no once sets someclass string text the type watching with"
     },
     {
       "section": "api",
