@@ -166,6 +166,7 @@ module.exports = function(grunt) {
           'angular.js',
           '//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-mobile.js',
           '<%= concat.all.dest %>',
+          'docs/scripts/angular-scrolly-docs.js'
         ],
         styles: [
           /* TODO css stylesheets are not put into jsfiddles,
