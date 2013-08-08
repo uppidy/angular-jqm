@@ -190,6 +190,7 @@ NG_DOCS={
     "jquery.mobile.css.js",
     "angular.min.js",
     "angular-mobile.js",
-    "angular-jqm.js"
+    "angular-jqm.js",
+    "angular-scrolly-docs.js"
   ]
 };
