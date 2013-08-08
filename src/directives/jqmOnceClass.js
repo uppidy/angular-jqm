@@ -1,19 +1,5 @@
-/**
- * @ngdoc directive
- * @name jqm.directive:jqmOnceClass
- * @restrict A
- *
- * @description
- * Sets the given class string once, with no watching.
- *
- * @example
- <example module="jqm">
- <file name="index.html">
-   <div ng-init="someClass='a'" jqm-once-class="{{someClass}}">
-       <input type="text" ng-model="someClass">
-   </div>
- </file>
- </example>
+/*
+ * This is intentionally not documented; internal use only
  */
 jqmModule.directive('jqmOnceClass', ['$interpolate', function($interpolate) {
     return {
