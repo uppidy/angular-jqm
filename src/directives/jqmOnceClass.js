@@ -3,14 +3,8 @@
  */
 jqmModule.directive('jqmOnceClass', ['$interpolate', function($interpolate) {
     return {
-        compile: function(element, iAttr) {
-            //We have to catch the attr value before angular tries to compile it
-            var classAttr = $interpolate(iAttr.jqmOnceClass);
-            if (classAttr) {
-                return function postLink(scope, element, attr) {
-                    element.addClass( classAttr(scope) );
-                };
-            }
+        link: function(scope, elm, attr) {
+            elm.addClass( $interpolate(attr.jqmOnceClass)(scope) );
         }
     };
 }]);
