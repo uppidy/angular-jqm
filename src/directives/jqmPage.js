@@ -25,11 +25,11 @@
  </file>
  </example>
  */
-jqmModule.directive('jqmPage', ['jqmScrollableDirective', '$rootScope', function (jqmScrollableDirectives, $rootScope) {
+jqmModule.directive('jqmPage', ['$rootScope', '$controller', '$scroller', function ($rootScope, $controller, $scroller) {
     return {
         restrict: 'A',
         require: 'jqmPage',
-        controller: angular.noop,
+        controller: ['$element', JqmPageController],
         // Note: We are not using a template here by purpose,
         // so that other directives like dialog may reuse this directive in a template themselves.
         compile: function (cElement, cAttr) {
@@ -37,6 +37,7 @@ jqmModule.directive('jqmPage', ['jqmScrollableDirective', '$rootScope', function
             content.append(cElement.contents());
             cElement.append(content);
             cElement.addClass("ui-page");
+
             return function (scope, lElement, lAttr, jqmPageCtrl) {
                 var content = lElement.children();
                 lElement.addClass("ui-body-" + scope.$theme);
@@ -49,12 +50,6 @@ jqmModule.directive('jqmPage', ['jqmScrollableDirective', '$rootScope', function
                     content.addClass('jqm-content-with-footer');
                     lElement.append(content.data("jqmFooter"));
                 }
-                // Don't use scrolly-scroll directive here by purpose,
-                // as it is swallowing all mousemove events, which prevents
-                // the address bar to be shown using a scroll on the page header.
-                angular.forEach(jqmScrollableDirectives, function (jqmScrollableDirective) {
-                    jqmScrollableDirective.link(scope, content, lAttr);
-                });
             };
 
             function addAndRemoveParentDependingClasses(scope, lElement, content) {
@@ -82,4 +77,21 @@ jqmModule.directive('jqmPage', ['jqmScrollableDirective', '$rootScope', function
             }
         }
     };
+    function JqmPageController(element) {
+        var scroller = $scroller(element.children());
+
+        this.scroll = function(newPos, easeTime) {
+            if (arguments.length) {
+                if (arguments.length === 2) {
+                    scroller.transformer.easeTo(newPos, easeTime);
+                } else {
+                    scroller.transformer.setTo(newPos);
+                }
+            }
+            return scroller.transformer.pos;
+        };
+        this.scrollHeight = function() {
+            return scroller.scrollHeight;
+        };
+    }
 }]);

@@ -80,3 +80,46 @@ describe('jqmPage', function () {
         });
     });
 });
+describe('jqmPage controller', function() {
+    var el, scope, pageCtrl, transformer;
+
+    function compile(html) {
+        inject(function($compile, $rootScope) {
+            scope = $rootScope.$new();
+            el = $compile(html)(scope);
+            $rootScope.$digest();
+        });
+    }
+    beforeEach(module(function($compileProvider) {
+        $compileProvider.directive('pageChild', function() {
+            return {
+                require: '^jqmPage',
+                link: function(scope, elm, attr, ctrl) {
+                    pageCtrl = ctrl;
+                }
+            };
+        });
+    }));
+
+    beforeEach(inject(function($transformer, $nextFrame) {
+        compile('<div jqm-page><div page-child></div></div>');
+        transformer = $transformer(angular.element(el[0].querySelector('.ui-content')));
+    }));
+
+    it('page method gives $transformer.pos with args',  function() {
+        expect(pageCtrl.scroll()).toEqual(transformer.pos);
+        transformer.setTo(-50);
+        expect(pageCtrl.scroll()).toEqual(-50);
+    });
+
+    it('page method calls setTo with one arg', function() {
+        pageCtrl.scroll(-50);
+        expect(transformer.pos).toBe(-50);
+    });
+
+    it('page method with two args calls easeTo', function() {
+        spyOn(transformer, 'easeTo').andCallThrough();
+        pageCtrl.scroll(-50, 50);
+        expect(transformer.easeTo).toHaveBeenCalledWith(-50, 50);
+    });
+});
