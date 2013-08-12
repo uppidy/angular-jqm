@@ -5,4 +5,4 @@
  *
  * 'jqm' is the one module that contains all jqm code.
  */
-var jqmModule = angular.module("jqm", ["jqm-templates", "ngMobile", "ajoslin.scrolly"]);
+var jqmModule = angular.module("jqm", ["jqm-templates", "ngMobile", "ajoslin.scrolly", "ui.bootstrap.position"]);

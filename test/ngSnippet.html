@@ -40,10 +40,37 @@
 <body ng-app="app">
 <script type="text/ng-template" id="main.html">
     <!-- the main page of your app -->
-    <div jqm-page>
+    <div jqm-page jqm-popup-target="$root.myPopup" jqm-popup-model="popIsShown">
+        <div jqm-popup="$root.myPopup" ng-animate="'pop'">
+          Hello, popup! What's poppin?! 
+        </div>
+
         <div jqm-header><h1>Page1</h1></div>
         <a href="#/page2.html">To page2</a>
 
+        <div jqm-button ng-click="popIsShown = !popIsShown">
+          Popup on the page
+        </div>
+        <div jqm-button jqm-popup-target="$root.myPopup" jqm-popup-model="buttonPopup" ng-click="buttonPopup = !buttonPopup">
+          Popup on the button
+        </div>
+
+        <p>hello</p>
+
+        <p>hello</p>
+
+        <p>hello</p>
+        <p>hello</p>
+
+        <p>hello</p>
+        <p>hello</p>
+
+        <p>hello</p>
+
+        <p>hello</p>
+        <p>hello</p>
+
+        <p>hello</p>
         <p>hello</p>
 
         <p>hello</p>

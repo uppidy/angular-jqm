@@ -17,7 +17,8 @@ module.exports = function(grunt) {
         },
         all: {
             src: ['<%= concat.nodeps.dest %>',
-                'components/angular-scrolly/angular-scrolly.js'],
+                'components/angular-scrolly/angular-scrolly.js',
+                'components/angular-bootstrap/position.js'],
             dest: 'dist/<%= pkg.name %>.js'
         }
     },
@@ -124,12 +125,15 @@ module.exports = function(grunt) {
                 'components/angular/angular-mobile.js',
                 'components/angular/angular-mocks.js',
                 'test/lib/testutils.js',
-                'test/lib/matchers.js'].
-                concat(['src/module.js', 'src/**/*.js','components/angular-scrolly/angular-scrolly.js']).
-                concat('<%= html2js.all.dest %>').
-                concat(['test/**/*Spec.js']).
-                concat([{pattern: 'test/**/*', watched: true, included: false, served: true},
-                        {pattern: 'components/**/*', watched: true, included: false, served: true}])
+                'test/lib/matchers.js',
+                'src/module.js', 
+                'src/**/*.js',
+                'components/angular-scrolly/angular-scrolly.js',
+                'components/angular-bootstrap/position.js',
+                '<%= html2js.all.dest %>',
+                'test/**/*Spec.js',
+                {pattern: 'test/**/*', watched: true, included: false, served: true},
+                {pattern: 'components/**/*', watched: true, included: false, served: true}]
       },
       dev: {
         options: {
@@ -192,6 +196,7 @@ module.exports = function(grunt) {
     },
 
     //After lots of bower problems, we switched to grunt-curl
+    //We will switch back to bower once bower-1.1.2 resolves its problems with zip files
     'curl-dir': {
       'components/angular': [
         'http://code.angularjs.org/1.1.5/angular.js',
@@ -207,6 +212,10 @@ module.exports = function(grunt) {
       ],
       'components/angular-scrolly': [
         'https://raw.github.com/ajoslin/angular-scrolly/master/angular-scrolly.js'
+      ],
+      //This is temporary until we have a way to download this easily (all of these will be put on bower in near future)
+      'components/angular-bootstrap': [
+        'https://rawgithub.com/angular-ui/bootstrap/master/src/position/position.js'
       ]
     }
   });
@@ -218,6 +227,7 @@ module.exports = function(grunt) {
     grunt.task.run('curl-dir');
     install();
   });
+  grunt.registerTask('curl', 'curl-dir'); //alias
 
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-connect');

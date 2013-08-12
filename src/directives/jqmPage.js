@@ -91,7 +91,11 @@ jqmModule.directive('jqmPage', ['$rootScope', '$controller', '$scroller', functi
             return scroller.transformer.pos;
         };
         this.scrollHeight = function() {
+            scroller.calculateHeight();
             return scroller.scrollHeight;
+        };
+        this.outOfBounds = function(pos) {
+            return scroller.outOfBounds(pos);
         };
     }
 }]);
