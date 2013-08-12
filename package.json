@@ -3,7 +3,7 @@
   "description": "Native AngularJS directives for jQuery Mobile. Small footprint, no 3rd party JS dependencies (jQuery, jQuery Mobile JS) required!",
   "version": "0.0.1-SNAPSHOT",
   "private": true,
-  "homepage": "https://github.com/opitzconsulting/angular-jqm",
+  "homepage": "https://github.com/angular-widgets/angular-jqm",
   "devDependencies": {
     "grunt": "0.4.x",
     "grunt-cli": "latest",
@@ -24,15 +24,15 @@
   "engine": "node 0.8.x",
   "repository": {
     "type": "git",
-    "url": "https://github.com/opitzconsulting/angular-jqm.git"
+    "url": "https://github.com/angular-widgets/angular-jqm.git"
   },
   "bugs": {
-    "url": "https://github.com/opitzconsulting/angular-jqm/issues"
+    "url": "https://github.com/angular-widgets/angular-jqm/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/opitzconsulting/angular-jqm/blob/master/LICENSE-MIT"
+      "url": "https://github.com/angular-widgets/angular-jqm/blob/master/LICENSE-MIT"
     }
   ],
   "keywords": [],

@@ -9,7 +9,7 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   git config --global user.name "Travis"
   #using token clone gh-pages branch
   rm -fr $HOME/gh-pages
-  git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/opitzconsulting/angular-jqm.git  gh-pages > /dev/null
+  git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/angular-widgets/angular-jqm.git  gh-pages > /dev/null
 
   #go into directory and copy data we're interested in to that directory
   cd gh-pages

@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/opitzconsulting/angular-jqm.png)](https://travis-ci.org/opitzconsulting/angular-jqm)
+[![Build Status](https://travis-ci.org/angular-widgets/angular-jqm.png)](https://travis-ci.org/angular-widgets/angular-jqm)
 #Angular-JQM
 
 ##Description
@@ -110,4 +110,4 @@ For this, first do a `grunt dev`. Then visit one of the following pages:
 
 
 ## Docs
-The docs can be found here: [http://opitzconsulting.github.io/angular-jqm](http://opitzconsulting.github.io/angular-jqm).
+The docs can be found here: [http://angular-widgets.github.io/angular-jqm](http://angular-widgets.github.io/angular-jqm).

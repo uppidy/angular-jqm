@@ -79,7 +79,7 @@ jqmModule.config(['$provide', function ($provide) {
 
         //Fix android 2 not reading transitions correct.
         //https://github.com/angular/angular.js/pull/3086
-        //https://github.com/opitzconsulting/angular-jqm/issues/89
+        //https://github.com/angular-widgets/angular-jqm/issues/89
         function android2Transitions() {
             if (!$sniffer.transitions || !$sniffer.animations) {
                 $sniffer.transitions = angular.isString($document[0].body.style.webkitTransition);
