@@ -135,7 +135,7 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
             //We can't do this for left/right because we don't have a 
             //way to tell screen width right now
             var scroll = pageCtrl ? pageCtrl.scroll() : 0;
-            var scrollHeight = pageCtrl ? pageCtrl.scrollHeight() : 0;
+            var scrollHeight = pageCtrl ? Math.abs(pageCtrl.scrollHeight()) : 0;
             var height = $rootElement.prop('offsetHeight');
 
             if (placement === 'top' && (pos.top - popHeight - height) < 0) {

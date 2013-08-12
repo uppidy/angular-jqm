@@ -19,7 +19,7 @@ jqmModule.directive('jqmPopupTarget', ['$parse', function($parse) {
     return {
         restrict: 'A',
         link: function(scope, elm, attr) {
-            var jqmPopup, popupStateChangedOff = angular.noop;
+            var jqmPopup;
             var popupModel = $parse(attr.jqmPopupModel || '$popup');
 
             var placement;
