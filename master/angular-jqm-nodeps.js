@@ -1,4 +1,4 @@
-/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-08-08
+/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-08-12
  * https://github.com/opitzconsulting/angular-jqm
  * Copyright (c) 2013 OPITZ CONSULTING GmbH; Licensed MIT */
 (function(window, angular) {
@@ -10,7 +10,8 @@
  *
  * 'jqm' is the one module that contains all jqm code.
  */
-var jqmModule = angular.module("jqm", ["jqm-templates", "ngMobile", "ajoslin.scrolly"]);
+var jqmModule = angular.module("jqm", ["jqm-templates", "ngMobile", "ajoslin.scrolly", "ui.bootstrap.position"]);
+
 jqmModule.config(['$provide', function ($provide) {
     $provide.decorator('$animator', ['$delegate', function ($animator) {
 
@@ -1169,11 +1170,11 @@ jqmModule.directive('jqmOnceClass', ['$interpolate', function($interpolate) {
  </file>
  </example>
  */
-jqmModule.directive('jqmPage', ['jqmScrollableDirective', '$rootScope', function (jqmScrollableDirectives, $rootScope) {
+jqmModule.directive('jqmPage', ['$rootScope', '$controller', '$scroller', function ($rootScope, $controller, $scroller) {
     return {
         restrict: 'A',
         require: 'jqmPage',
-        controller: angular.noop,
+        controller: ['$element', JqmPageController],
         // Note: We are not using a template here by purpose,
         // so that other directives like dialog may reuse this directive in a template themselves.
         compile: function (cElement, cAttr) {
@@ -1181,6 +1182,7 @@ jqmModule.directive('jqmPage', ['jqmScrollableDirective', '$rootScope', function
             content.append(cElement.contents());
             cElement.append(content);
             cElement.addClass("ui-page");
+
             return function (scope, lElement, lAttr, jqmPageCtrl) {
                 var content = lElement.children();
                 lElement.addClass("ui-body-" + scope.$theme);
@@ -1193,12 +1195,6 @@ jqmModule.directive('jqmPage', ['jqmScrollableDirective', '$rootScope', function
                     content.addClass('jqm-content-with-footer');
                     lElement.append(content.data("jqmFooter"));
                 }
-                // Don't use scrolly-scroll directive here by purpose,
-                // as it is swallowing all mousemove events, which prevents
-                // the address bar to be shown using a scroll on the page header.
-                angular.forEach(jqmScrollableDirectives, function (jqmScrollableDirective) {
-                    jqmScrollableDirective.link(scope, content, lAttr);
-                });
             };
 
             function addAndRemoveParentDependingClasses(scope, lElement, content) {
@@ -1226,7 +1222,29 @@ jqmModule.directive('jqmPage', ['jqmScrollableDirective', '$rootScope', function
             }
         }
     };
+    function JqmPageController(element) {
+        var scroller = $scroller(element.children());
+
+        this.scroll = function(newPos, easeTime) {
+            if (arguments.length) {
+                if (arguments.length === 2) {
+                    scroller.transformer.easeTo(newPos, easeTime);
+                } else {
+                    scroller.transformer.setTo(newPos);
+                }
+            }
+            return scroller.transformer.pos;
+        };
+        this.scrollHeight = function() {
+            scroller.calculateHeight();
+            return scroller.scrollHeight;
+        };
+        this.outOfBounds = function(pos) {
+            return scroller.outOfBounds(pos);
+        };
+    }
 }]);
+
 /**
  * @ngdoc directive
  * @name jqm.directive:jqmPanel
@@ -1423,6 +1441,267 @@ jqmModule.directive('jqmPanelContainer', ['$timeout', '$transitionComplete', '$s
 
 /**
  * @ngdoc directive
+ * @name jqm.directive:jqmPopup
+ * @restrict A
+ *
+ * @description
+ * Creates a popup with the given content.  The popup can be opened and closed on an element using {@link jqm.directive:jqmPopupTarget jqmPopupTarget}.
+ *
+ * Tip: put a {@link jqm.directive:jqmView jqmView} inside a popup to have full scrollable pages inside.
+ * <pre>
+ * <div jqm-popup="myPopup">
+ *   <div jqm-view="{ 
+ *     templateUrl: 'views/my-popup-content-page.html', 
+ *     controller: 'MyPopupController'
+ *   }"></div>
+ * </div>
+ * </pre>
+ *
+ * @param {expression} jqmPopup Assignable angular expression to bind this popup to.  jqmPopupTargets will point to this model.
+ * @param {expression=} animation jQuery Mobile animation to use to show/hide this popup.  Default 'fade'.
+ * @param {expression=} placement Where to put the popup relative to its target.  Available: 'left', 'right', 'top', 'bottom', 'inside'. Default: 'inside'.
+ * @param {expression=} overlay-theme The theme to use for the overlay behind the popup. Defaults to the popup's theme.
+ * @param {expression=} corners Whether the popup has corners. Default true.
+ * @param {expression=} shadow Whether the popup has shadows. Default true.
+ *
+ * @example
+<example module="jqm">
+  <file name="index.html">
+      <div jqm-popup="myPopup">
+        Hey guys, here's a popup!
+      </div>
+      <div style="padding: 50px;"
+         jqm-popup-target="myPopup" 
+         jqm-popup-model="pageCenterPop">
+         
+         <div jqm-button ng-click="pageCenterPop = true">
+            Open Page Center Popup
+         </div>
+         <div jqm-button
+           jqm-popup-target="myPopup" 
+           jqm-popup-model="buttonPop"
+           jqm-popup-placement="left"
+           ng-click="buttonPop = true">
+           Open popup left of this button!
+       </div>
+      </div>
+  </file>
+</example>
+ */
+jqmModule.directive('jqmPopup', ['$position', '$animationComplete', '$parse', '$rootElement', '$timeout', '$compile', '$rootScope',
+function($position, animationComplete, $parse, $rootElement, $timeout, $compile, $rootScope) {
+    var isDef = angular.isDefined;
+    var popupOverlayTemplate = '<div jqm-popup-overlay></div>';
+    var popupOverlay;
+
+    return {
+        restrict: 'A',
+        replace: true,
+        transclude: true,
+        templateUrl: 'templates/jqmPopup.html',
+        require: '^?jqmPage',
+        scope: {
+            corners: '@',
+            shadow: '@',
+            placement: '@',
+            animation: '@',
+            overlayTheme: '@'
+        },
+        compile: function(elm, attr) {
+            attr.animation = isDef(attr.animation) ? attr.animation : 'fade';
+            attr.corners = isDef(attr.corners) ? attr.corners==='true' : true;
+            attr.shadow = isDef(attr.shadow) ? attr.shadow==='true' : true;
+
+            if (!popupOverlay) {
+                popupOverlay = $compile(popupOverlayTemplate)($rootScope);
+                $rootElement.append(popupOverlay);
+            }
+
+            return postLink;
+        }
+    };
+    function postLink(scope, elm, attr, pageCtrl) {
+        animationComplete(elm, onAnimationComplete);
+
+        var popupModel = $parse(attr.jqmPopup);
+        if (!popupModel.assign) {
+            throw new Error("jqm-popup expected assignable expression for jqm-popup attribute, got '" + attr.jqmPopup + "'");
+        }
+        popupModel.assign(scope.$parent, scope);
+
+        //Publicly expose show, hide methods
+        scope.show = show;
+        scope.hideForElement = hideForElement;
+        scope.hide = hide;
+        scope.target = null;
+        scope.opened = false;
+
+        function show(target, placement) {
+            scope.target = target;
+            scope.opened = true;
+            placement = placement || scope.placement;
+
+            elm.css( getPosition(elm, target, placement) );
+            elm.addClass('in').removeClass('out');
+            scope.$root.$broadcast('$popupStateChanged', scope);
+        }
+        function hideForElement(target) {
+            if (scope.target && target && scope.target[0] === target[0]) {
+                scope.hide();
+            }
+        }
+        function hide() {
+            scope.target = null;
+            scope.opened = false;
+            elm.addClass('out').removeClass('in');
+
+            scope.$root.$broadcast('$popupStateChanged', scope);
+        }
+
+        function onAnimationComplete() {
+            elm.toggleClass('ui-popup-active', scope.opened);
+            elm.toggleClass('ui-popup-hidden', !scope.opened);
+            if (!scope.opened) {
+                elm.css('left', '');
+                elm.css('top', '');
+            }
+        }
+
+        function getPosition(elm, target, placement) {
+            var popWidth = elm.prop( 'offsetWidth' );
+            var popHeight = elm.prop( 'offsetHeight' );
+            var pos = $position.position(target);
+
+            //Flip top/bottom if they're out of bounds and we're in a page
+            //We can't do this for left/right because we don't have a 
+            //way to tell screen width right now
+            var scroll = pageCtrl ? pageCtrl.scroll() : 0;
+            var scrollHeight = pageCtrl ? pageCtrl.scrollHeight() : 0;
+            var height = $rootElement.prop('offsetHeight');
+
+            if (placement === 'top' && (pos.top - popHeight - height) < 0) {
+                placement = 'bottom';
+
+            } else if (placement === 'bottom' && (pos.top + popHeight - scroll) > (height - scrollHeight)) {
+                placement = 'top';
+            }
+
+            var newPosition = {};
+            switch (placement) {
+                case 'right':
+                    newPosition = {
+                    top: pos.top + pos.height / 2 - popHeight / 2,
+                    left: pos.left + pos.width
+                };
+                break;
+                case 'bottom':
+                    newPosition = {
+                    top: pos.top + pos.height,
+                    left: pos.left + pos.width / 2 - popWidth / 2
+                };
+                break;
+                case 'left':
+                    newPosition = {
+                    top: pos.top + pos.height / 2 - popHeight / 2,
+                    left: pos.left - popWidth
+                };
+                break;
+                case 'top':
+                    newPosition = {
+                    top: pos.top - popHeight,
+                    left: pos.left + pos.width / 2 - popWidth / 2
+                };
+                break;
+                default:
+                    newPosition = {
+                    top: pos.top + pos.height / 2 - popHeight / 2,
+                    left: pos.left + pos.width / 2 - popWidth / 2
+                };
+                break;
+            }
+            newPosition.top += 'px';
+            newPosition.left += 'px';
+            return newPosition;
+        }
+    }
+}]);
+
+jqmModule.directive('jqmPopupOverlay', function() {
+    return {
+        restrict: 'A',
+        replace: true,
+        templateUrl: 'templates/jqmPopupOverlay.html',
+        scope: {},
+        link: function(scope, elm, attr) {
+            scope.$on('$popupStateChanged', function($e, popup) {
+                scope.popup = popup;
+            });
+        }
+    };
+});
+
+
+/**
+ * @ngdoc directive
+ * @name jqm.directive:jqmPopupTarget
+ * @restrict A
+ *
+ * @description
+ * Marks an element as a target for a {@link jqm.directive:jqmPopup jqmPopup}, and assigns a model to toggle to show or hide that popup on the element.
+ *
+ * See {@link jqm.directive:jqmPopup jqmPopup} for an example.
+ *
+ * @param {expression} jqmPopupTarget Model of a jqmPopup that this element will be linked to.
+ * @param {expression=} jqm-popup-model Assignable angular boolean expression that will say whether the popup from jqmPopupTarget is opened on this element. Default '$popup'.
+ * @param {string=} jqm-popup-placement The placement for the popup to pop over this element.  Overrides jqmPopup's placement attribute.  See {@link jqm.directive:jqmPopup jqmPopup} for the available values.
+ *
+ * @require jqmPopup
+ */
+jqmModule.directive('jqmPopupTarget', ['$parse', function($parse) {
+    return {
+        restrict: 'A',
+        link: function(scope, elm, attr) {
+            var jqmPopup, popupStateChangedOff = angular.noop;
+            var popupModel = $parse(attr.jqmPopupModel || '$popup');
+
+            var placement;
+            attr.$observe('jqmPopupPlacement', function(p) {
+                placement = p;
+            });
+
+            scope.$watch(attr.jqmPopupTarget, setPopup);
+            scope.$watch(popupModel, popupModelWatch);
+            scope.$on('$popupStateChanged', popupStateChanged);
+
+            function setPopup(newPopup) {
+                jqmPopup = newPopup;
+                popupModelWatch( popupModel(scope) );
+            }
+            function popupModelWatch(isOpen) {
+                if (jqmPopup) {
+                    if (isOpen) {
+                        jqmPopup.show(elm, placement);
+                    } else if (jqmPopup.opened) {
+                        jqmPopup.hideForElement(elm);
+                    }
+                }
+            }
+            function popupStateChanged($e, popup) {
+                //We only care if we're getting change from our popupTarget
+                if (popup === jqmPopup) {
+                    popupModel.assign(
+                        scope,
+                        popup.opened && popup.target && popup.target[0] === elm[0]
+                    );
+                }
+            }
+
+        }
+    };
+}]);
+
+/**
+ * @ngdoc directive
  * @name jqm.directive:jqmPositionAnchor
  * @restrict A
  *
@@ -1508,45 +1787,6 @@ jqmModule.directive('jqmScopeAs', [function () {
     };
 }]);
 
-/**
- * @ngdoc directive
- * @name jqm.directive:jqmScrollable
- * @restrict ECA
- *
- * @description
- * # Overview
- * `jqmScrollable` enables fake scrolling for the given element using angular-scrolly.
- * @example
-    <example module="jqm">
-      <file name="index.html">
-         <div style="height:100px;overflow:hidden" jqm-scrollable>
-             <p>Hello</p>
-             <p>Hello</p>
-             <p>Hello</p>
-             <p>Hello</p>
-             <p>Hello</p>
-             <p>Hello</p>
-             <p>Hello</p>
-             <p>Hello</p>
-             <p>Hello</p>
-             <p>Hello</p>
-             <p>Hello</p>
-             <p>Hello</p>
-         </div>
-      </file>
-    </example>
-*/
-// Don't use scrolly-scroll directive here by purpose,
-// as it is swallowing all mousemove events, which prevents
-// the address bar to be shown using a scroll on the page header.
-jqmModule.directive('jqmScrollable', ['$scroller', function($scroller) {
-    return {
-        restrict: 'A',
-        link: function(scope, element) {
-            $scroller(element);
-        }
-    };
-}]);
 /**
  * @ngdoc directive
  * @name jqm.directive:jqmTextarea
@@ -2999,7 +3239,7 @@ jqmModule.factory('$transitionComplete', ['$sniffer', function ($sniffer) {
     };
 }]);
 
-angular.module('jqm-templates', ['templates/jqmButton.html', 'templates/jqmCheckbox.html', 'templates/jqmControlgroup.html', 'templates/jqmFlip.html', 'templates/jqmLiEntry.html', 'templates/jqmLiLink.html', 'templates/jqmListview.html', 'templates/jqmPanel.html', 'templates/jqmPanelContainer.html', 'templates/jqmTextarea.html', 'templates/jqmTextinput.html']);
+angular.module('jqm-templates', ['templates/jqmButton.html', 'templates/jqmCheckbox.html', 'templates/jqmControlgroup.html', 'templates/jqmFlip.html', 'templates/jqmLiEntry.html', 'templates/jqmLiLink.html', 'templates/jqmListview.html', 'templates/jqmPanel.html', 'templates/jqmPanelContainer.html', 'templates/jqmPopup.html', 'templates/jqmPopupOverlay.html', 'templates/jqmTextarea.html', 'templates/jqmTextinput.html']);
 
 angular.module("templates/jqmButton.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/jqmButton.html",
@@ -3129,6 +3369,26 @@ angular.module("templates/jqmPanelContainer.html", []).run(["$templateCache", fu
     "</div>");
 }]);
 
+angular.module("templates/jqmPopup.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("templates/jqmPopup.html",
+    "<div jqm-scope-as=\"jqmPopup\" class=\"ui-popup-container {{$scopeAs.jqmPopup.animation}}\" jqm-class=\"{'ui-popup-hidden': !$scopeAs.jqmPopup.opened}\">\n" +
+    "  <div jqm-scope-as=\"jqmPopup\" class=\"ui-popup ui-body-{{$theme}}\"\n" +
+    "    jqm-class=\"{'ui-overlay-shadow': $scopeAs.jqmPopup.shadow,\n" +
+    "    'ui-corner-all': $scopeAs.jqmPopup.corners}\"\n" +
+    "    ng-transclude>\n" +
+    "</div>\n" +
+    "");
+}]);
+
+angular.module("templates/jqmPopupOverlay.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("templates/jqmPopupOverlay.html",
+    "<div class=\"ui-popup-screen ui-overlay-{{popup.overlayTheme || popup.$theme}}\" \n" +
+    "  jqm-class=\"{'ui-screen-hidden': !popup.opened, 'in': popup.opened}\"\n" +
+    "  ng-click=\"popup.hide()\">\n" +
+    "</div>\n" +
+    "");
+}]);
+
 angular.module("templates/jqmTextarea.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/jqmTextarea.html",
     "<textarea\n" +
@@ -3163,4 +3423,4 @@ angular.module("templates/jqmTextinput.html", []).run(["$templateCache", functio
     "</div>");
 }]);
 
-angular.element(window.document).find('head').append('<style type="text/css">* {\n    -webkit-backface-visibility-hidden;\n}\nhtml, body {\n    -webkit-user-select: none;\n}\n\n/* browser resets */\n.ui-mobile, .ui-mobile html, .ui-mobile body {\n    height: 100%;\n    margin: 0\n}\n\n.ui-footer {\n    position: absolute;\n    bottom: 0;\n    width: 100%;\n    z-index: 1\n}\n\n.ui-header {\n    position: absolute;\n    top: 0;\n    width: 100%;\n    z-index: 1\n}\n\n.ui-mobile .ui-page {\n    height: 100%;\n    min-height: 0;\n    overflow: hidden;\n}\n.ui-content {\n    position: relative;\n    margin: 0;\n    padding: 0;\n}\n.ui-content.jqm-content-with-header {\n    margin-top: 42px\n}\n\n.ui-content.jqm-content-with-footer {\n    margin-bottom: 43px\n}\n.jqm-standalone-page {\n    display: block;\n    position: relative;\n}\n.ui-panel {\n  position: absolute;\n}\n\n.ui-panel-closed {\n  display: none;\n}\n\n.ui-panel.ui-panel-opened {\n  z-index: 1001;\n}\n.ui-panel-dismiss {\n  z-index: 1000; /* lower than ui-panel */\n}\n\n.ui-panel-content-wrap {\n    height: 100%\n}\n\n.jqm-panel-container {\n    position: relative;\n    width: 100%;\n    height: 100%;\n}\n\n\n.ui-mobile-viewport {\n    /* needed to allow multiple viewports */\n    position: relative;\n    height:100%\n}\n</style>');})(window, angular);
+angular.element(window.document).find('head').append('<style type="text/css">* {\n    -webkit-backface-visibility-hidden;\n}\nhtml, body {\n    -webkit-user-select: none;\n}\n\n/* browser resets */\n.ui-mobile, .ui-mobile html, .ui-mobile body {\n    height: 100%;\n    margin: 0\n}\n\n.ui-footer {\n    position: absolute;\n    bottom: 0;\n    width: 100%;\n    z-index: 1\n}\n\n.ui-header {\n    position: absolute;\n    top: 0;\n    width: 100%;\n    z-index: 1\n}\n\n.ui-mobile .ui-page {\n    height: 100%;\n    min-height: 0;\n    overflow: hidden;\n}\n.ui-content {\n    position: relative;\n    margin: 0;\n    padding: 0;\n}\n.ui-content.jqm-content-with-header {\n    margin-top: 42px\n}\n\n.ui-content.jqm-content-with-footer {\n    margin-bottom: 43px\n}\n.jqm-standalone-page {\n    display: block;\n    position: relative;\n}\n\n.ui-panel {\n  position: absolute;\n}\n\n.ui-panel-closed {\n  display: none;\n}\n\n.ui-panel.ui-panel-opened {\n  z-index: 1001;\n}\n.ui-panel-dismiss {\n  z-index: 1000; /* lower than ui-panel */\n}\n\n.ui-panel-content-wrap {\n    height: 100%\n}\n\n.jqm-panel-container {\n    position: relative;\n    width: 100%;\n    height: 100%;\n}\n\n\n.ui-mobile-viewport {\n    /* needed to allow multiple viewports */\n    position: relative;\n    height:100%\n}\n</style>');})(window, angular);

@@ -4,3 +4,6 @@ h1, h2, h3, h4, h5, h6 {
 .ui-page {
     font-size: 16px
 }
+.ui-popup-screen {
+  position: fixed !important;
+}

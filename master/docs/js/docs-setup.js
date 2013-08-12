@@ -125,17 +125,24 @@ NG_DOCS={
     },
     {
       "section": "api",
+      "id": "jqm.directive:jqmPopup",
+      "shortName": "jqmPopup",
+      "type": "directive",
+      "keywords": "an and angular animation api assignable available be behind bind bottom button buttonpop can center closed content controller corners creates default defaults directive element expression fade for full given guys has have here hey html index inside its jqm jqm-button jqm-popup jqm-popup-model jqm-popup-placement jqm-popup-target jqm-view jqmpopup jqmpopuptarget jqmpopuptargets jqmview jquery left mobile model module mypopup mypopupcontroller name ng-click of on open opened overlay overlay-theme padding page pagecenterpop pages placement point popup put relative right scrollable shadow shadows show style target templateurl the theme this tip to top true use using views where whether will with"
+    },
+    {
+      "section": "api",
+      "id": "jqm.directive:jqmPopupTarget",
+      "shortName": "jqmPopupTarget",
+      "type": "directive",
+      "keywords": "$popup an and angular api as assignable assigns attribute available be boolean default directive element example expression for from hide is jqm jqm-popup-model jqm-popup-placement jqmpopup jqmpopuptarget linked marks model of on opened or over overrides placement pop popup say see show target that the this to toggle values whether will"
+    },
+    {
+      "section": "api",
       "id": "jqm.directive:jqmPositionAnchor",
       "shortName": "jqmPositionAnchor",
       "type": "directive",
       "keywords": "$position added an and angular api are child directive element elements every for from has html in index jqm jqm-position-anchor keep module moved name ng-controller noop or own property removed scope set that the this updated value whenever will"
-    },
-    {
-      "section": "api",
-      "id": "jqm.directive:jqmScrollable",
-      "shortName": "jqmScrollable",
-      "type": "directive",
-      "keywords": "angular-scrolly api directive eca element enables fake for given height html index jqm jqm-scrollable jqmscrollable module name overview scrolling style the using"
     },
     {
       "section": "api",

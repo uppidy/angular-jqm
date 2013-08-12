@@ -1,0 +1,24 @@
+<h1><code ng:non-bindable="">jqmPopupTarget</code>
+<span class="hint">(directive in module <code ng:non-bindable="">jqm</code>
+)</span>
+</h1>
+<div><h2 id="Description">Description</h2>
+<div class="description"><p>Marks an element as a target for a <a href="#/api/jqm.directive:jqmPopup">jqmPopup</a>, and assigns a model to toggle to show or hide that popup on the element.</p>
+
+<p>See <a href="#/api/jqm.directive:jqmPopup">jqmPopup</a> for an example.</p></div>
+<h2 id="Usage">Usage</h2>
+<div class="usage">as attribute<pre class="prettyprint linenums">&lt;ANY jqm-popup-target="{expression}"
+     [jqm-popup-model="{expression}"]
+     [jqm-popup-placement="{string}"]&gt;
+   ...
+&lt;/ANY&gt;</pre>
+<h3 id="Parameters">Parameters</h3>
+<ul class="parameters"><li><code ng:non-bindable="">jqmPopupTarget – {expression} – </code>
+<p>Model of a jqmPopup that this element will be linked to.</p></li>
+<li><code ng:non-bindable="">jqm-popup-model<i>(optional)</i> – {expression=} – </code>
+<p>Assignable angular boolean expression that will say whether the popup from jqmPopupTarget is opened on this element. Default '$popup'.</p></li>
+<li><code ng:non-bindable="">jqm-popup-placement<i>(optional)</i> – {string=} – </code>
+<p>The placement for the popup to pop over this element.  Overrides jqmPopup's placement attribute.  See <a href="#/api/jqm.directive:jqmPopup">jqmPopup</a> for the available values.</p></li>
+</ul>
+</div>
+</div>
