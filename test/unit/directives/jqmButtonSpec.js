@@ -54,6 +54,10 @@ describe("jqmButton", function () {
             compile('data-mini="true"','data-mini="true"');
             compare();
         });
+        it("has same markup with inline option", function () {
+            compile('data-inline="true"','data-inline="true"');
+            compare();
+        });
         it("has same markup with iconpos option", function () {
             compile('data-iconpos="right"','data-iconpos="right"');
             compare();
