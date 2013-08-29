@@ -10,9 +10,8 @@ jqmModule.directive('jqmLiLink', [function() {
             icon: '@',
             iconpos: '@',
             iconShadow: '@',
-            hasThumb: '@',
-            hasCount: '@',
-            link: '@jqmLiLink'
+            link: '@jqmLiLink',
+            //hasThumb and hasCount set by jqmLiCount and jqmLiThumb
         },
         compile: function(element, attr) {
             attr.icon = isdef(attr.icon) ? attr.icon : 'ui-icon-arrow-r';
@@ -21,5 +20,6 @@ jqmModule.directive('jqmLiLink', [function() {
         }
     };
     function JqmLiController($scope) {
+        this.$scope = $scope;
     }
 }]);
