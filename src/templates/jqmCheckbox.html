@@ -6,6 +6,7 @@
            'ui-btn-active':$scopeAs.jqmCheckbox.isActive(),
            'ui-btn-icon-left': $scopeAs.jqmCheckbox.getIconPos()!='right', 'ui-btn-icon-right': $scopeAs.jqmCheckbox.getIconPos()=='right'}"
            ng-click="$scopeAs.jqmCheckbox.toggleChecked()"
+           jqm-once-class="ui-btn-up-{{$scopeAs.jqmCheckbox.$theme}}"
            class="ui-btn ui-btn-corner-all">
         <span class="ui-btn-inner">
             <span class="ui-btn-text" ng-transclude></span>

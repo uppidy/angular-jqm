@@ -39,7 +39,7 @@ describe("jqmButton", function () {
                          '</fieldset>');
         }
         function compare() {
-            return testutils.compareElementRecursive(ngElement, jqmElement, /ui-btn-(up|down)/);
+            return testutils.compareElementRecursive(ngElement, jqmElement);
         }
 
         it("has same markup with nothing", function () {

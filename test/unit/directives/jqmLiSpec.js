@@ -9,10 +9,10 @@ describe('jqmLi directives', function() {
     });
 
     describe('markup compared to jqm', function() {
-        function compileAndCompare(one, two) {
+        function compileAndCompare(one, two, ignore) {
             ngElement = ng.init('<ul jqm-listview>'+one+'</ul>');
             jqmElement = jqm.init('<ul data-role="listview">'+two+'</ul>');
-            testutils.compareElementRecursive(ngElement, jqmElement, /ui-btn-/);
+            testutils.compareElementRecursive(ngElement, jqmElement, ignore);
         }
         it('should work for entries', function() {
             compileAndCompare(
@@ -32,24 +32,28 @@ describe('jqmLi directives', function() {
                 '<li><a href="hello"><i>Whattt</i></a></li>'
             );
         });
-        it('should work with thumbnails', function() {
+
+        it('should work with jqmLiThumb', function() {
             compileAndCompare(
-                '<li jqm-li-link="stuff" has-thumb="true">' +
-                    '<img class="ui-li-thumb" src="src"><h2 class="ui-li-heading">Title</h2><p class="ui-li-desc">Content</p>' +
+                '<li jqm-li-link="stuff">' +
+                    '<img jqm-li-thumb src="src">' +
+                    '<h2 class="ui-li-heading">Title</h2>' +
+                    '<p class="ui-li-desc">Content</p>'  +
                 '</li>',
                 '<li><a href="stuff">' +
                     '<img src="src"><h2>Title</h2><p>Content</p>' +
                 '</a></li>'
             );
         });
-        it('should add count for has-count', function() {
+        it('should add count with jqmLiCount', function() {
             compileAndCompare(
-                '<li jqm-li-link="stuff" has-count="true">' +
-                    '<span class="ui-li-count">4</span>' +
+                '<li jqm-li-link="stuff">' +
+                    '<span jqm-li-count>4</span>' +
                 '</li>',
                 '<li><a href="stuff">' +
                     '<span class="ui-li-count">4</span>' +
-                '</a></li>'
+                '</a></li>',
+                /ui-btn-(up|down)/ //for some reason counts have ui-btn-up-* in jqm?
             );
         });
     });

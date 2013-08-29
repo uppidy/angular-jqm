@@ -72,12 +72,6 @@ describe("jqmCheckbox", function () {
             triggerJqmLabel("click");
             testutils.compareElementRecursive(ngElement, jqmElement);
         });
-        it("has same markup if pressed", function () {
-            compile('','');
-            triggerNgLabel("mousedown");
-            triggerJqmLabel("mousedown");
-            testutils.compareElementRecursive(ngElement, jqmElement);
-        });
         it("has same markup when disabled", function() {
             compile('disabled="disabled"','disabled="disabled"');
             testutils.compareElementRecursive(ngElement, jqmElement);
@@ -104,12 +98,6 @@ describe("jqmCheckbox", function () {
             triggerJqmFirstLabel("click");
             testutils.compareElementRecursive(ngElement, jqmElement);
         });
-        it("has same markup if pressed (with controlgroup horizontal)", function () {
-            compileGroupHorizontal('','');
-            triggerNgFirstLabel("mousedown");
-            triggerJqmFirstLabel("mousedown");
-            testutils.compareElementRecursive(ngElement, jqmElement);
-        });
         it("has same markup when disabled (with controlgroup horizontal)", function() {
             compileGroupHorizontal('disabled="disabled"','disabled="disabled"');
             testutils.compareElementRecursive(ngElement, jqmElement);
@@ -134,12 +122,6 @@ describe("jqmCheckbox", function () {
             compileGroupVertical('','');
             triggerNgFirstLabel("click");
             triggerJqmFirstLabel("click");
-            testutils.compareElementRecursive(ngElement, jqmElement);
-        });
-        it("has same markup if pressed (with controlgroup vertical)", function () {
-            compileGroupVertical('','');
-            triggerNgFirstLabel("mousedown");
-            triggerJqmFirstLabel("mousedown");
             testutils.compareElementRecursive(ngElement, jqmElement);
         });
         it("has same markup when disabled (with controlgroup vertical)", function() {

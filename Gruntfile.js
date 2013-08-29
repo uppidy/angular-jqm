@@ -11,12 +11,14 @@ module.exports = function(grunt) {
               footer: grunt.file.read('build/footer.js')
           },
           src: ['src/module.js',
-                  'src/**/*.js']
-              .concat('<%= html2js.all.dest %>').concat('<%= css2js.all.dest %>'),
+                'src/**/*.js',
+                '<%= html2js.all.dest %>',
+                '<%= css2js.all.dest %>'],
           dest: 'dist/<%= pkg.name %>-nodeps.js'
         },
         all: {
             src: ['<%= concat.nodeps.dest %>',
+                'components/fastclick/fastclick.js',
                 'components/angular-scrolly/angular-scrolly.js',
                 'components/angular-bootstrap/position.js'],
             dest: 'dist/<%= pkg.name %>.js'
@@ -122,7 +124,6 @@ module.exports = function(grunt) {
       options: {
         configFile: 'test/config/karma-shared.conf.js',
         files: ['components/angular/angular.js',
-                'components/angular/angular-mobile.js',
                 'components/angular/angular-mocks.js',
                 'test/lib/testutils.js',
                 'test/lib/matchers.js',
@@ -130,6 +131,7 @@ module.exports = function(grunt) {
                 'src/**/*.js',
                 'components/angular-scrolly/angular-scrolly.js',
                 'components/angular-bootstrap/position.js',
+                'components/fastclick/fastclick.js',
                 '<%= html2js.all.dest %>',
                 'test/**/*Spec.js',
                 {pattern: 'test/**/*', watched: true, included: false, served: true},
@@ -168,7 +170,6 @@ module.exports = function(grunt) {
         scripts: [
           'docs/scripts/jquery.mobile.css.js',
           'angular.js',
-          '//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-mobile.js',
           '<%= concat.all.dest %>',
           'docs/scripts/angular-scrolly-docs.js'
         ],
@@ -201,7 +202,6 @@ module.exports = function(grunt) {
       'components/angular': [
         'http://code.angularjs.org/1.1.5/angular.js',
         'http://code.angularjs.org/1.1.5/angular-mocks.js',
-        'http://code.angularjs.org/1.1.5/angular-mobile.js'
       ],
       'components/jquery-mobile': [
         'http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.js',
@@ -216,13 +216,16 @@ module.exports = function(grunt) {
       //This is temporary until we have a way to download this easily (all of these will be put on bower in near future)
       'components/angular-bootstrap': [
         'https://rawgithub.com/angular-ui/bootstrap/master/src/position/position.js'
+      ],
+      'components/fastclick': [
+        'https://raw.github.com/ftlabs/fastclick/master/lib/fastclick.js'
       ]
     }
   });
 
   grunt.registerTask('build', ['html2js', 'css2js', 'concat']);
   grunt.registerTask('dev', ['connect','karma:dev','watch']);
-  grunt.registerTask('default', ['install','build','jshint','karma:localBuild','ngdocs']);
+  grunt.registerTask('default', ['build','jshint','karma:localBuild','ngdocs']);
   grunt.registerTask('install', 'Prepare development environment', function() {
     grunt.task.run('curl-dir');
     install();

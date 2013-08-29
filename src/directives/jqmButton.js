@@ -96,6 +96,7 @@ jqmModule.directive('jqmButton', ['jqmClassDirective', 'jqmOnceClassDirective', 
             }
 
             return function(scope, elm, attr, controlGroup) {
+                elm.addClass('ui-btn-up-' + scope.$theme);
 
                 scope.$$scopeAs = 'jqmBtn';
                 scope.isMini = isMini;

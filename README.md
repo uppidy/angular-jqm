@@ -32,9 +32,9 @@ also be easy to keep track of changes in jquery mobile when they release newer v
 Dependencies
 
 - angular
-- angular-mobile
 - jquery-mobile css
 - (included: [angular-scrolly](https://github.com/ajoslin/angular-scrolly))
+- (included: [fastclick](https://github.com/ftlabs/fastclick))
 
 Directory structure
 
