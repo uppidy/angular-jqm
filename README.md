@@ -75,7 +75,6 @@ Your main html file should look like this:
     <head>
         <link type="text/css" rel="stylesheet" href="jquery.mobile-1.3.1.css">
         <script src="angular.js"></script>
-        <script src="angular-mobile.js"></script>
         <script src="angular-jqm.js"></script>
         <!-- include your application script files here -->
         <script src="app.js"></script>
