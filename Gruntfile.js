@@ -135,7 +135,8 @@ module.exports = function(grunt) {
                 '<%= html2js.all.dest %>',
                 'test/**/*Spec.js',
                 {pattern: 'test/**/*', watched: true, included: false, served: true},
-                {pattern: 'components/**/*', watched: true, included: false, served: true}]
+                {pattern: 'components/**/*', watched: true, included: false, served: true}],
+        reporters: [process.env.TRAVIS ? 'dots' : 'progress'] //dots look better on travis log
       },
       dev: {
         options: {
