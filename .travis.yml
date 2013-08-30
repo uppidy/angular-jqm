@@ -5,10 +5,7 @@ node_js:
 env:
   global:
     secure: |-
-      gcXdCLe0qFfwMzIdy7+ChGcRQDYleeMiEJPAOkhQKEchjTgPJbViZNyoI8ZB
-      ZDqegLYlI67NFIfP4jY42dpKxIod+FOjL0LbYhu3qwJ2WvvN3RA7mBlduDkM
-      8bE6c+Kl0wgkjm/X9NPKa5ZVi9SVurqqC3UggeND8kszv5d8D/I=
-
+      cSJmFUQiOuqrtPB/5/8vAmpv35W85mcu8UVyEDHfW1dOlwf7BlsxvXbLgcSSc3u0EgFXeW8c0EEIOUk7hCaw8Va6FhWdfnPx9P0xLDY/OzHEhi/ZvL83KPW+p9N9RDIXCgFfEmPS8bO1Gy0LsF9cQByXwGXQ5XF8u5H1hF/aAIw=
 before_script:
 - export DISPLAY=:99.0
 - sh -e /etc/init.d/xvfb start
@@ -24,3 +21,4 @@ script:
 - grunt karma:sauce2
 
 after_success: ./build/update-gh-pages.sh
+
