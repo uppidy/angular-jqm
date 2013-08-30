@@ -4,8 +4,8 @@
 - Keep directives as simple as possible
 - Use plain angular, without jQuery or other libs.
 - If it makes the directive easier, change the syntax from jqm. We don't want too many hacks in this lib - it should be easy to maintain.
-- Try to put the logic for the directive into the template.
-- for directives with isolate scopes, use jqm-scope-as (TODO: Explain jqm-scope-as)
+- Try to put the presentation logic in the template, and the business logic into the javascript.
+- For directives with isolate scopes, use jqm-scope-as (TODO: Explain jqm-scope-as)
 
 # How to contribute
 1. Clone the repository
