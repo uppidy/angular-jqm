@@ -4,7 +4,6 @@ var shared = require('./karma-shared.conf.js');
 module.exports = function(config) {
   shared(config);
   config.set({
-    reporters: ['dots'],
     singleRun: true,
     sauceLabs: {
       testName: 'angular-jqm',
