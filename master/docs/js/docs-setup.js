@@ -83,6 +83,13 @@ NG_DOCS={
     },
     {
       "section": "api",
+      "id": "jqm.directive:jqmFieldcontain",
+      "shortName": "jqmFieldcontain",
+      "type": "directive",
+      "keywords": "api directive element for html index jqm jqm-fieldcontain jqm-textinput label module name ng-model pair to used wrap"
+    },
+    {
+      "section": "api",
       "id": "jqm.directive:jqmFlip",
       "shortName": "jqmFlip",
       "type": "directive",
@@ -101,6 +108,34 @@ NG_DOCS={
       "shortName": "jqmHeader",
       "type": "directive",
       "keywords": "api below class defines directive directly for header height hello html index jqm jqm-header jqm-page jqm-standalone-page jqmcachingview jqmview module name of page1 persistent put style the world"
+    },
+    {
+      "section": "api",
+      "id": "jqm.directive:jqmLiDivider",
+      "shortName": "jqmLiDivider",
+      "type": "directive",
+      "keywords": "api be creates direcitve directive divider inside jqm jqmlistview jquery list mobile must of"
+    },
+    {
+      "section": "api",
+      "id": "jqm.directive:jqmLiEntry",
+      "shortName": "jqmLiEntry",
+      "type": "directive",
+      "keywords": "api be creates direcitve directive entry inside instead is item jqm jqmlilink jqmlistview jquery just list mobile must of plain this"
+    },
+    {
+      "section": "api",
+      "id": "jqm.directive:jqmLiLink",
+      "shortName": "jqmLiLink",
+      "type": "directive",
+      "keywords": "add api be clicked count creates default directive entry for go have href icon iconpos iconshadow inside item jqm jqm-li-count jqm-li-thumb jqmlilink jqmlistview jquery link list listitem mobile must not of or put right shadow should that the this thumbnail to true ui-icon-arrow-r use what when where whether"
+    },
+    {
+      "section": "api",
+      "id": "jqm.directive:jqmListview",
+      "shortName": "jqmListview",
+      "type": "directive",
+      "keywords": "add and api applies be class com corners count creates default directive entry false have here html http icon if in index inset inside jqm jqm-li-count jqm-li-divider jqm-li-entry jqm-li-link jqm-li-thumb jqm-listview jqm-theme jqmlidivider jqmlientry jqmlilinks jquery list listview mobile module name ng-init ng-repeat not or shadow should src this thumbnail true ui-icon-home ui-li-desc ui-li-heading whether with yeah"
     },
     {
       "section": "api",
@@ -196,7 +231,6 @@ NG_DOCS={
   "scripts": [
     "jquery.mobile.css.js",
     "angular.min.js",
-    "angular-mobile.js",
     "angular-jqm.js",
     "angular-scrolly-docs.js"
   ]

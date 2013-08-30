@@ -1,5 +1,5 @@
-/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-08-12
- * https://github.com/opitzconsulting/angular-jqm
+/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-08-30
+ * https://github.com/angular-widgets/angular-jqm
  * Copyright (c) 2013 OPITZ CONSULTING GmbH; Licensed MIT */
 (function(window, angular) {
     "use strict";
@@ -10,7 +10,7 @@
  *
  * 'jqm' is the one module that contains all jqm code.
  */
-var jqmModule = angular.module("jqm", ["jqm-templates", "ngMobile", "ajoslin.scrolly", "ui.bootstrap.position"]);
+var jqmModule = angular.module("jqm", ["jqm-templates", "ajoslin.scrolly", "ui.bootstrap.position"]);
 
 jqmModule.config(['$provide', function ($provide) {
     $provide.decorator('$animator', ['$delegate', function ($animator) {
@@ -518,6 +518,7 @@ jqmModule.directive('jqmButton', ['jqmClassDirective', 'jqmOnceClassDirective', 
             }
 
             return function(scope, elm, attr, controlGroup) {
+                elm.addClass('ui-btn-up-' + scope.$theme);
 
                 scope.$$scopeAs = 'jqmBtn';
                 scope.isMini = isMini;
@@ -850,6 +851,32 @@ jqmModule.directive('jqmControlgroup', function() {
 });
 /**
  * @ngdoc directive
+ * @name jqm.directive:jqmFieldcontain
+ * @restrict A
+ *
+ * @description
+ * Used to wrap a label/form element pair.
+ *
+ * @example
+ <example module="jqm">
+ <file name="index.html">
+    <div jqm-fieldcontain>
+      <label for="name">Your Name:</label>
+      <div jqm-textinput ng-model="name" />
+    </div>
+ </file>
+ </example>
+ */
+jqmModule.directive('jqmFieldcontain', function() {
+    return {
+        restrict: 'A',
+        compile: function(elm, attr) {
+            elm[0].className += ' ui-field-contain ui-body ui-br';
+        }
+    };
+});
+/**
+ * @ngdoc directive
  * @name jqm.directive:jqmFlip
  * @restrict A
  *
@@ -1065,6 +1092,40 @@ function hxDirective() {
 }
 
 
+jqmModule.directive('jqmLiCount', [function() {
+    return {
+        restrict: 'A',
+        require: '^jqmLiLink',
+        link: function(scope, elm, attr, jqmLiLinkCtrl) {
+            jqmLiLinkCtrl.$scope.hasCount = true;
+            elm.addClass('ui-li-count ui-btn-corner-all ui-btn-up-' + scope.$theme);
+        }
+    };
+}]);
+
+
+/**
+ * @ngdoc directive
+ * @name jqm.directive:jqmLiEntry
+ * @restrict A
+ *
+ * @description
+ * Creates a jQuery mobile entry list item. This is just a plain entry, instead of a 
+ * {@link jqm.directive:jqmLiLink jqmLiLink}.
+ *
+ * Must be inside of a {@link jqm.direcitve:jqmListview jqmListview}.
+ */
+
+/**
+ * @ngdoc directive
+ * @name jqm.directive:jqmLiDivider
+ * @restrict A
+ *
+ * @description
+ * Creates a jQuery mobile list divider.
+ *
+ * Must be inside of a {@link jqm.direcitve:jqmListview jqmListview}
+ */
 jqmModule.directive({
     jqmLiEntry: jqmLiEntryDirective(false),
     jqmLiDivider: jqmLiEntryDirective(true)
@@ -1078,14 +1139,31 @@ function jqmLiEntryDirective(isDivider) {
             scope: {},
             templateUrl: 'templates/jqmLiEntry.html',
             link: function(scope) {
-                if (isDivider) {
-                    scope.divider = true;
-                }
+                scope.divider = isDivider;
             }
         };
     };
 }
 
+/**
+ * @ngdoc directive
+ * @name jqm.directive:jqmLiLink
+ * @restrict A
+ *
+ * @description
+ * Creates a jquery mobile list item link entry.
+ *
+ * Must be inside of a {@link jqm.directive:jqmListview jqmListview}
+ *
+ * - Add a `<img jqm-li-thumb>` inside for a thumbnail.
+ * - Add a `<span jqm-li-count>` inside for a count.
+ *
+ * @param {string=} jqmLiLInk The link, or href, that this listitem should go to when clicked.
+ * @param {string=} icon What icon to use for the link.  Default 'ui-icon-arrow-r'.
+ * @param {string=} iconpos Where to put the icon. Default 'right'.
+ * @param {string=} iconShadow Whether the icon should have a shadow or not. Default true.
+ *
+ */
 jqmModule.directive('jqmLiLink', [function() {
     var isdef = angular.isDefined;
     return {
@@ -1098,9 +1176,8 @@ jqmModule.directive('jqmLiLink', [function() {
             icon: '@',
             iconpos: '@',
             iconShadow: '@',
-            hasThumb: '@',
-            hasCount: '@',
-            link: '@jqmLiLink'
+            link: '@jqmLiLink',
+            //hasThumb and hasCount set by jqmLiCount and jqmLiThumb
         },
         compile: function(element, attr) {
             attr.icon = isdef(attr.icon) ? attr.icon : 'ui-icon-arrow-r';
@@ -1109,10 +1186,62 @@ jqmModule.directive('jqmLiLink', [function() {
         }
     };
     function JqmLiController($scope) {
+        this.$scope = $scope;
     }
 }]);
 
 
+jqmModule.directive('jqmLiThumb', [function() {
+    return {
+        restrict: 'A',
+        require: '^jqmLiLink',
+        link: function(scope, elm, attr, jqmLiLinkCtrl) {
+            jqmLiLinkCtrl.$scope.hasThumb = true;
+            elm.addClass('ui-li-thumb');
+        }
+    };
+}]);
+
+/**
+ * @ngdoc directive
+ * @name jqm.directive:jqmListview
+ * @restrict A
+ *
+ * @description 
+ * Creates a jQuery mobile listview.  Add jqmLiDivider, jqmLiEntry, and/or jqmLiLinks inside.
+ *
+ * @param {string=} inset Whether this listview should be inset or not. Default false.
+ * @param {string=} shadow Whether this listview should have a shadow or not (only applies if inset). Default true.
+ * @param {string=} shadow Whether this listview should have corners or not (only applies if inset). Default true.
+ *
+ * @example
+<example module="jqm">
+  <file name="index.html">
+    <div ng-init="list=[1,2,3,4,5,6]"></div>
+    <h3>Entries</h3>
+    <ul jqm-listview>
+      <li jqm-li-entry>Hello, entry!</li>
+      <li jqm-li-entry>Another entry!</li>
+      <li jqm-li-entry>More!! entry!</li>
+      <li jqm-li-divider jqm-theme="b">Divider</li>
+      <li jqm-li-entry>Hello, entry!</li>
+      <li jqm-li-entry>Another entry!</li>
+      <li jqm-li-entry>More!! entry!</li>
+    </ul>
+    <h3>Links</h3>
+    <ul jqm-listview>
+      <li ng-repeat="i in list" jqm-li-link="#/{{i}}">{{i}}</li>
+      <li jqm-li-divider jqm-theme="b">Here's a thumbnail with a count</li>
+      <li jqm-li-link icon="ui-icon-home">
+        <img jqm-li-thumb src="http://placekitten.com/80/80">
+        <h2 class="ui-li-heading">Kitten!</h2>
+        <p class="ui-li-desc">Subtext here. Yeah.</p>
+        <span jqm-li-count>44</span>
+      </li>
+    </ul>
+  </file>
+</example>
+ */
 jqmModule.directive('jqmListview', [function() {
     var isdef = angular.isDefined;
     return {
@@ -1576,7 +1705,7 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
             //We can't do this for left/right because we don't have a 
             //way to tell screen width right now
             var scroll = pageCtrl ? pageCtrl.scroll() : 0;
-            var scrollHeight = pageCtrl ? pageCtrl.scrollHeight() : 0;
+            var scrollHeight = pageCtrl ? Math.abs(pageCtrl.scrollHeight()) : 0;
             var height = $rootElement.prop('offsetHeight');
 
             if (placement === 'top' && (pos.top - popHeight - height) < 0) {
@@ -1661,7 +1790,7 @@ jqmModule.directive('jqmPopupTarget', ['$parse', function($parse) {
     return {
         restrict: 'A',
         link: function(scope, elm, attr) {
-            var jqmPopup, popupStateChangedOff = angular.noop;
+            var jqmPopup;
             var popupModel = $parse(attr.jqmPopupModel || '$popup');
 
             var placement;
@@ -2237,42 +2366,6 @@ jqmModule.directive('jqmView', ['$templateCache', '$route', '$anchorScroll', '$c
         }
     }]);
 
-// set the initial `ui-btn-up-<theme>` class for buttons
-jqmModule.directive('ngClick', [function () {
-    return function (scope, element, attr) {
-        if (element.hasClass('ui-btn') || element.hasClass('jqm-active-toggle')) {
-            element.addClass("ui-btn-up-" + scope.$theme);
-            element.data('$$jqmActiveToggle', true);
-        }
-    };
-}]);
-
-// set the `ui-btn-down-<theme>` class on buttons on mouse down / touchstart
-jqmModule.run([function () {
-    var jqLiteProto = angular.element.prototype;
-    // Note that this may be called multiple times during tests!
-    jqLiteProto._addClass = jqLiteProto._addClass || jqLiteProto.addClass;
-    jqLiteProto._removeClass = jqLiteProto._removeClass || jqLiteProto.removeClass;
-    jqLiteProto.addClass = function (className) {
-        var theme;
-        if (className === 'ng-click-active' && this.data('$$jqmActiveToggle')) {
-            theme = this.scope().$theme;
-            this._removeClass("ui-btn-up-" + theme);
-            className += " ui-btn-down-" + theme;
-        }
-        return this._addClass(className);
-    };
-    jqLiteProto.removeClass = function (className) {
-        var theme;
-        if (className === 'ng-click-active' && this.data('$$jqmActiveToggle')) {
-            theme = this.scope().$theme;
-            this._addClass("ui-btn-up-" + theme);
-            className += " ui-btn-down-" + theme;
-        }
-        return this._removeClass(className);
-    };
-}]);
-
 /**
  * @ngdoc function
  * @name jqm.$anchorScroll
@@ -2349,6 +2442,10 @@ jqmModule.config(['$provide', function ($provide) {
         return $browser;
     }
 }]);
+jqmModule.run(['$rootElement', function($rootElement) {
+    window.FastClick.attach($rootElement[0]);
+}]);
+
 /**
  * @ngdoc function
  * @name jqm.$hideAddressBar
@@ -2530,6 +2627,75 @@ jqmModule.factory('$history', ['$window', '$timeout', function $historyFactory($
         }
     }
 }]);
+
+jqmModule.run(['jqmButtonToggler', '$rootElement', function(jqmButtonToggler, $rootElement) {
+    jqmButtonToggler($rootElement);
+}]);
+jqmModule.factory('jqmButtonToggler', function() {
+
+    return function(element) {
+        var self = {};
+
+        //Exposed for testing
+        self.$mousedown = function(e) {
+            var target = angular.element(e.target);
+            var btnElement = parentWithClass(target, 'ui-btn-up-' + target.scope().$theme);
+            if (btnElement) {
+                toggleBtnDown(btnElement, true);
+                //TODO(1.2): 1.2 fixes unbind breaking on space-seperated events, so do one bind
+                target.bind('mouseup', onBtnUp);
+                target.bind('mousemove', onBtnUp);
+            }
+            function onBtnUp() {
+                toggleBtnDown(btnElement, false);
+                //TODO(1.2): 1.2 fixes unbind breaking on space-seperated events, so do one unbind
+                target.unbind('mouseup', onBtnUp);
+                target.unbind('mousemove', onBtnUp);
+            }
+        };
+
+        //Exposed for testing
+        self.$mouseover = function(e) {
+            var target = angular.element(e.target);
+            var btnElement = parentWithClass(target, 'ui-btn');
+            if (btnElement) {
+                toggleBtnHover(btnElement, true);
+                target.bind('mouseout', onBtnMouseout);
+            }
+            function onBtnMouseout() {
+                toggleBtnHover(btnElement, false);
+                target.unbind('mouseout', onBtnMouseout);
+            }
+        };
+
+        element.bind('mousedown', self.$mousedown);
+        element.bind('mouseover', self.$mouseover);
+
+        return self;
+
+        function toggleBtnDown(el, isDown) {
+            var theme = el.scope().$theme;
+            el.toggleClass('ui-btn-down-' + theme, isDown);
+            el.toggleClass('ui-btn-up-' + theme, !isDown);
+        }
+        function toggleBtnHover(el, isHover) {
+            var theme = el.scope().$theme;
+            el.toggleClass('ui-btn-hover-' + theme, isHover);
+        }
+        function parentWithClass(el, className) {
+            var maxDepth = 5;
+            var current = el;
+            while (current.length && maxDepth--) {
+                if (current.hasClass(className)) {
+                    return current;
+                }
+                current = current.parent();
+            }
+            return null;
+        }
+
+    };
+});
 
 /**
  * @ngdoc object
@@ -3192,7 +3358,7 @@ jqmModule.config(['$provide', function ($provide) {
 
         //Fix android 2 not reading transitions correct.
         //https://github.com/angular/angular.js/pull/3086
-        //https://github.com/opitzconsulting/angular-jqm/issues/89
+        //https://github.com/angular-widgets/angular-jqm/issues/89
         function android2Transitions() {
             if (!$sniffer.transitions || !$sniffer.animations) {
                 $sniffer.transitions = angular.isString($document[0].body.style.webkitTransition);
@@ -3260,6 +3426,7 @@ angular.module("templates/jqmCheckbox.html", []).run(["$templateCache", function
     "           'ui-btn-active':$scopeAs.jqmCheckbox.isActive(),\n" +
     "           'ui-btn-icon-left': $scopeAs.jqmCheckbox.getIconPos()!='right', 'ui-btn-icon-right': $scopeAs.jqmCheckbox.getIconPos()=='right'}\"\n" +
     "           ng-click=\"$scopeAs.jqmCheckbox.toggleChecked()\"\n" +
+    "           jqm-once-class=\"ui-btn-up-{{$scopeAs.jqmCheckbox.$theme}}\"\n" +
     "           class=\"ui-btn ui-btn-corner-all\">\n" +
     "        <span class=\"ui-btn-inner\">\n" +
     "            <span class=\"ui-btn-text\" ng-transclude></span>\n" +
@@ -3310,7 +3477,7 @@ angular.module("templates/jqmFlip.html", []).run(["$templateCache", function($te
 angular.module("templates/jqmLiEntry.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/jqmLiEntry.html",
     "<li class=\"ui-li\" jqm-scope-as=\"jqmLi\"\n" +
-    "  jqm-once-class=\"{{$scopeAs.jqmLi.divider ? 'ui-li-divider ui-bar-'+$theme : 'ui-li-static jqm-active-toggle'}}\"\n" +
+    "jqm-once-class=\"{{$scopeAs.jqmLi.divider ? 'ui-li-divider ui-bar-'+$scopeAs.jqmLi.$theme : 'ui-li-static ui-btn-up-'+$scopeAs.jqmLi.$theme}}\"\n" +
     "  jqm-class=\"{'ui-first-child': $scopeAs.jqmLi.$position.first, 'ui-last-child': $scopeAs.jqmLi.$position.last}\"\n" +
     "  ng-transclude>\n" +
     "</li>\n" +
@@ -3320,7 +3487,7 @@ angular.module("templates/jqmLiEntry.html", []).run(["$templateCache", function(
 angular.module("templates/jqmLiLink.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/jqmLiLink.html",
     "<li class=\"ui-li ui-btn\" jqm-scope-as=\"jqmLiLink\"\n" +
-    "  jqm-once-class=\"{{$scopeAs.jqmLiLink.icon ? 'ui-li-has-arrow ui-btn-icon-'+$scopeAs.jqmLiLink.iconpos : ''}}\"\n" +
+    "jqm-once-class=\"{{$scopeAs.jqmLiLink.icon ? 'ui-li-has-arrow ui-btn-icon-'+$scopeAs.jqmLiLink.iconpos : ''}} ui-btn-up-{{$theme}}\"\n" +
     "  jqm-class=\"{'ui-first-child': $scopeAs.jqmLiLink.$position.first, \n" +
     "    'ui-last-child': $scopeAs.jqmLiLink.$position.last, \n" +
     "    'ui-li-has-thumb': $scopeAs.jqmLiLink.hasThumb, \n" +
@@ -3364,9 +3531,10 @@ angular.module("templates/jqmPanelContainer.html", []).run(["$templateCache", fu
   $templateCache.put("templates/jqmPanelContainer.html",
     "<div jqm-scope-as=\"pc\" ng-transclude class=\"jqm-panel-container\">\n" +
     "    <div class=\"ui-panel-dismiss\"\n" +
-    "        ng-click=\"$scopeAs.pc.openPanelName = null\" ng-class=\"{\'ui-panel-dismiss-open\' : $scopeAs.pc.openPanelName}\"\n" +
+    "        ng-click=\"$scopeAs.pc.openPanelName = null\" ng-class=\"{'ui-panel-dismiss-open' : $scopeAs.pc.openPanelName}\"\n" +
     "    ></div>\n" +
-    "</div>");
+    "</div>\n" +
+    "");
 }]);
 
 angular.module("templates/jqmPopup.html", []).run(["$templateCache", function($templateCache) {
@@ -3393,26 +3561,28 @@ angular.module("templates/jqmTextarea.html", []).run(["$templateCache", function
   $templateCache.put("templates/jqmTextarea.html",
     "<textarea\n" +
     "        jqm-scope-as=\"jqmTextarea\"\n" +
-    "        ng-class=\"{\'ui-disabled mobile-textinput-disabled ui-state-disabled\' : $scopeAs.jqmTextarea.disabled}\"\n" +
+    "        ng-class=\"{'ui-disabled mobile-textinput-disabled ui-state-disabled' : $scopeAs.jqmTextarea.disabled}\"\n" +
     "        class=\"ui-input-text ui-corner-all ui-shadow-inset ui-body-{{$scopeAs.jqmTextarea.$theme}}\">\n" +
-    "</textarea>");
+    "</textarea>\n" +
+    "");
 }]);
 
 angular.module("templates/jqmTextinput.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/jqmTextinput.html",
     "<div jqm-scope-as=\"jqmTextinput\"\n" +
     "     ng-class=\"{\n" +
-    "        \'ui-input-has-clear\': ($scopeAs.jqmTextinput.clearBtn && !$scopeAs.jqmTextinput.isSearch()),\n" +
-    "        \'ui-disabled\': $scopeAs.jqmTextinput.disabled,\n" +
-    "        \'ui-mini\': $scopeAs.jqmTextinput.mini,\n" +
-    "        \'ui-input-search ui-btn-corner-all ui-icon-searchfield\': $scopeAs.jqmTextinput.type === 'search',\n" +
-    "        \'ui-input-text ui-corner-all\': !$scopeAs.jqmTextinput.isSearch()}\"\n" +
+    "        'ui-input-has-clear': ($scopeAs.jqmTextinput.clearBtn && !$scopeAs.jqmTextinput.isSearch()),\n" +
+    "        'ui-disabled': $scopeAs.jqmTextinput.disabled,\n" +
+    "        'ui-mini': $scopeAs.jqmTextinput.mini,\n" +
+    "        'ui-input-search ui-btn-corner-all ui-icon-searchfield': $scopeAs.jqmTextinput.type === 'search',\n" +
+    "        'ui-input-text ui-corner-all': !$scopeAs.jqmTextinput.isSearch()}\"\n" +
     "     class=\"ui-shadow-inset ui-btn-shadow ui-body-{{$scopeAs.jqmTextinput.$theme}}\">\n" +
     "    <input type=\"{{$scopeAs.jqmTextinput.typeValue}}\" class=\"ui-input-text ui-body-{{$scopeAs.jqmTextinput.$theme}}\"\n" +
-    "           ng-class=\"{\'mobile-textinput-disabled ui-state-disabled\': $scopeAs.jqmTextinput.disabled}\" placeholder=\"{{$scopeAs.jqmTextinput.placeholder}}\">\n" +
-    "    <a ng-if=\"$scopeAs.jqmTextinput.clearBtn || $scopeAs.jqmTextinput.type === 'search'\" href=\"#\" ng-class=\"{\'ui-input-clear-hidden\': !getValue()}\"\n" +
+    "           ng-class=\"{'mobile-textinput-disabled ui-state-disabled': $scopeAs.jqmTextinput.disabled}\" placeholder=\"{{$scopeAs.jqmTextinput.placeholder}}\">\n" +
+    "    <a ng-if=\"$scopeAs.jqmTextinput.clearBtn || $scopeAs.jqmTextinput.type === 'search'\" href=\"#\" ng-class=\"{'ui-input-clear-hidden': !getValue()}\"\n" +
     "       ng-click=\"clearValue($event)\"\n" +
     "       class=\"ui-input-clear ui-btn ui-shadow ui-btn-corner-all ui-fullsize ui-btn-icon-notext\"\n" +
+    "       jqm-once-class=\"ui-btn-up-{{$theme}}\"\n" +
     "       title=\"{{clearBtnTextValue}}\">\n" +
     "   <span class=\"ui-btn-inner\">\n" +
     "                   <span class=\"ui-btn-text\" ng-bind=\"clearBtnTextValue\"></span>\n" +
@@ -3420,12 +3590,775 @@ angular.module("templates/jqmTextinput.html", []).run(["$templateCache", functio
     "               </span>\n" +
     "    </a>\n" +
     "\n" +
-    "</div>");
+    "</div>\n" +
+    "");
 }]);
 
 angular.element(window.document).find('head').append('<style type="text/css">* {\n    -webkit-backface-visibility-hidden;\n}\nhtml, body {\n    -webkit-user-select: none;\n}\n\n/* browser resets */\n.ui-mobile, .ui-mobile html, .ui-mobile body {\n    height: 100%;\n    margin: 0\n}\n\n.ui-footer {\n    position: absolute;\n    bottom: 0;\n    width: 100%;\n    z-index: 1\n}\n\n.ui-header {\n    position: absolute;\n    top: 0;\n    width: 100%;\n    z-index: 1\n}\n\n.ui-mobile .ui-page {\n    height: 100%;\n    min-height: 0;\n    overflow: hidden;\n}\n.ui-content {\n    position: relative;\n    margin: 0;\n    padding: 0;\n}\n.ui-content.jqm-content-with-header {\n    margin-top: 42px\n}\n\n.ui-content.jqm-content-with-footer {\n    margin-bottom: 43px\n}\n.jqm-standalone-page {\n    display: block;\n    position: relative;\n}\n\n.ui-panel {\n  position: absolute;\n}\n\n.ui-panel-closed {\n  display: none;\n}\n\n.ui-panel.ui-panel-opened {\n  z-index: 1001;\n}\n.ui-panel-dismiss {\n  z-index: 1000; /* lower than ui-panel */\n}\n\n.ui-panel-content-wrap {\n    height: 100%\n}\n\n.jqm-panel-container {\n    position: relative;\n    width: 100%;\n    height: 100%;\n}\n\n\n.ui-mobile-viewport {\n    /* needed to allow multiple viewports */\n    position: relative;\n    height:100%\n}\n</style>');})(window, angular);
+/**
+ * @preserve FastClick: polyfill to remove click delays on browsers with touch UIs.
+ *
+ * @version 0.6.9
+ * @codingstandard ftlabs-jsv2
+ * @copyright The Financial Times Limited [All Rights Reserved]
+ * @license MIT License (see LICENSE.txt)
+ */
+
+/*jslint browser:true, node:true*/
+/*global define, Event, Node*/
+
+
+/**
+ * Instantiate fast-clicking listeners on the specificed layer.
+ *
+ * @constructor
+ * @param {Element} layer The layer to listen on
+ */
+function FastClick(layer) {
+	'use strict';
+	var oldOnClick, self = this;
+
+
+	/**
+	 * Whether a click is currently being tracked.
+	 *
+	 * @type boolean
+	 */
+	this.trackingClick = false;
+
+
+	/**
+	 * Timestamp for when when click tracking started.
+	 *
+	 * @type number
+	 */
+	this.trackingClickStart = 0;
+
+
+	/**
+	 * The element being tracked for a click.
+	 *
+	 * @type EventTarget
+	 */
+	this.targetElement = null;
+
+
+	/**
+	 * X-coordinate of touch start event.
+	 *
+	 * @type number
+	 */
+	this.touchStartX = 0;
+
+
+	/**
+	 * Y-coordinate of touch start event.
+	 *
+	 * @type number
+	 */
+	this.touchStartY = 0;
+
+
+	/**
+	 * ID of the last touch, retrieved from Touch.identifier.
+	 *
+	 * @type number
+	 */
+	this.lastTouchIdentifier = 0;
+
+
+	/**
+	 * Touchmove boundary, beyond which a click will be cancelled.
+	 *
+	 * @type number
+	 */
+	this.touchBoundary = 10;
+
+
+	/**
+	 * The FastClick layer.
+	 *
+	 * @type Element
+	 */
+	this.layer = layer;
+
+	if (!layer || !layer.nodeType) {
+		throw new TypeError('Layer must be a document node');
+	}
+
+	/** @type function() */
+	this.onClick = function() { return FastClick.prototype.onClick.apply(self, arguments); };
+
+	/** @type function() */
+	this.onMouse = function() { return FastClick.prototype.onMouse.apply(self, arguments); };
+
+	/** @type function() */
+	this.onTouchStart = function() { return FastClick.prototype.onTouchStart.apply(self, arguments); };
+
+	/** @type function() */
+	this.onTouchMove = function() { return FastClick.prototype.onTouchMove.apply(self, arguments); };
+
+	/** @type function() */
+	this.onTouchEnd = function() { return FastClick.prototype.onTouchEnd.apply(self, arguments); };
+
+	/** @type function() */
+	this.onTouchCancel = function() { return FastClick.prototype.onTouchCancel.apply(self, arguments); };
+
+	if (FastClick.notNeeded(layer)) {
+		return;
+	}
+
+	// Set up event handlers as required
+	if (this.deviceIsAndroid) {
+		layer.addEventListener('mouseover', this.onMouse, true);
+		layer.addEventListener('mousedown', this.onMouse, true);
+		layer.addEventListener('mouseup', this.onMouse, true);
+	}
+
+	layer.addEventListener('click', this.onClick, true);
+	layer.addEventListener('touchstart', this.onTouchStart, false);
+	layer.addEventListener('touchmove', this.onTouchMove, false);
+	layer.addEventListener('touchend', this.onTouchEnd, false);
+	layer.addEventListener('touchcancel', this.onTouchCancel, false);
+
+	// Hack is required for browsers that don't support Event#stopImmediatePropagation (e.g. Android 2)
+	// which is how FastClick normally stops click events bubbling to callbacks registered on the FastClick
+	// layer when they are cancelled.
+	if (!Event.prototype.stopImmediatePropagation) {
+		layer.removeEventListener = function(type, callback, capture) {
+			var rmv = Node.prototype.removeEventListener;
+			if (type === 'click') {
+				rmv.call(layer, type, callback.hijacked || callback, capture);
+			} else {
+				rmv.call(layer, type, callback, capture);
+			}
+		};
+
+		layer.addEventListener = function(type, callback, capture) {
+			var adv = Node.prototype.addEventListener;
+			if (type === 'click') {
+				adv.call(layer, type, callback.hijacked || (callback.hijacked = function(event) {
+					if (!event.propagationStopped) {
+						callback(event);
+					}
+				}), capture);
+			} else {
+				adv.call(layer, type, callback, capture);
+			}
+		};
+	}
+
+	// If a handler is already declared in the element's onclick attribute, it will be fired before
+	// FastClick's onClick handler. Fix this by pulling out the user-defined handler function and
+	// adding it as listener.
+	if (typeof layer.onclick === 'function') {
+
+		// Android browser on at least 3.2 requires a new reference to the function in layer.onclick
+		// - the old one won't work if passed to addEventListener directly.
+		oldOnClick = layer.onclick;
+		layer.addEventListener('click', function(event) {
+			oldOnClick(event);
+		}, false);
+		layer.onclick = null;
+	}
+}
+
+
+/**
+ * Android requires exceptions.
+ *
+ * @type boolean
+ */
+FastClick.prototype.deviceIsAndroid = navigator.userAgent.indexOf('Android') > 0;
+
+
+/**
+ * iOS requires exceptions.
+ *
+ * @type boolean
+ */
+FastClick.prototype.deviceIsIOS = /iP(ad|hone|od)/.test(navigator.userAgent);
+
+
+/**
+ * iOS 4 requires an exception for select elements.
+ *
+ * @type boolean
+ */
+FastClick.prototype.deviceIsIOS4 = FastClick.prototype.deviceIsIOS && (/OS 4_\d(_\d)?/).test(navigator.userAgent);
+
+
+/**
+ * iOS 6.0(+?) requires the target element to be manually derived
+ *
+ * @type boolean
+ */
+FastClick.prototype.deviceIsIOSWithBadTarget = FastClick.prototype.deviceIsIOS && (/OS ([6-9]|\d{2})_\d/).test(navigator.userAgent);
+
+
+/**
+ * Determine whether a given element requires a native click.
+ *
+ * @param {EventTarget|Element} target Target DOM element
+ * @returns {boolean} Returns true if the element needs a native click
+ */
+FastClick.prototype.needsClick = function(target) {
+	'use strict';
+	switch (target.nodeName.toLowerCase()) {
+
+	// Don't send a synthetic click to disabled inputs (issue #62)
+	case 'button':
+	case 'select':
+	case 'textarea':
+		if (target.disabled) {
+			return true;
+		}
+
+		break;
+	case 'input':
+
+		// File inputs need real clicks on iOS 6 due to a browser bug (issue #68)
+		if ((this.deviceIsIOS && target.type === 'file') || target.disabled) {
+			return true;
+		}
+
+		break;
+	case 'label':
+	case 'video':
+		return true;
+	}
+
+	return (/\bneedsclick\b/).test(target.className);
+};
+
+
+/**
+ * Determine whether a given element requires a call to focus to simulate click into element.
+ *
+ * @param {EventTarget|Element} target Target DOM element
+ * @returns {boolean} Returns true if the element requires a call to focus to simulate native click.
+ */
+FastClick.prototype.needsFocus = function(target) {
+	'use strict';
+	switch (target.nodeName.toLowerCase()) {
+	case 'textarea':
+	case 'select':
+		return true;
+	case 'input':
+		switch (target.type) {
+		case 'button':
+		case 'checkbox':
+		case 'file':
+		case 'image':
+		case 'radio':
+		case 'submit':
+			return false;
+		}
+
+		// No point in attempting to focus disabled inputs
+		return !target.disabled && !target.readOnly;
+	default:
+		return (/\bneedsfocus\b/).test(target.className);
+	}
+};
+
+
+/**
+ * Send a click event to the specified element.
+ *
+ * @param {EventTarget|Element} targetElement
+ * @param {Event} event
+ */
+FastClick.prototype.sendClick = function(targetElement, event) {
+	'use strict';
+	var clickEvent, touch;
+
+	// On some Android devices activeElement needs to be blurred otherwise the synthetic click will have no effect (#24)
+	if (document.activeElement && document.activeElement !== targetElement) {
+		document.activeElement.blur();
+	}
+
+	touch = event.changedTouches[0];
+
+	// Synthesise a click event, with an extra attribute so it can be tracked
+	clickEvent = document.createEvent('MouseEvents');
+	clickEvent.initMouseEvent('click', true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
+	clickEvent.forwardedTouchEvent = true;
+	targetElement.dispatchEvent(clickEvent);
+};
+
+
+/**
+ * @param {EventTarget|Element} targetElement
+ */
+FastClick.prototype.focus = function(targetElement) {
+	'use strict';
+	var length;
+
+	if (this.deviceIsIOS && targetElement.setSelectionRange) {
+		length = targetElement.value.length;
+		targetElement.setSelectionRange(length, length);
+	} else {
+		targetElement.focus();
+	}
+};
+
+
+/**
+ * Check whether the given target element is a child of a scrollable layer and if so, set a flag on it.
+ *
+ * @param {EventTarget|Element} targetElement
+ */
+FastClick.prototype.updateScrollParent = function(targetElement) {
+	'use strict';
+	var scrollParent, parentElement;
+
+	scrollParent = targetElement.fastClickScrollParent;
+
+	// Attempt to discover whether the target element is contained within a scrollable layer. Re-check if the
+	// target element was moved to another parent.
+	if (!scrollParent || !scrollParent.contains(targetElement)) {
+		parentElement = targetElement;
+		do {
+			if (parentElement.scrollHeight > parentElement.offsetHeight) {
+				scrollParent = parentElement;
+				targetElement.fastClickScrollParent = parentElement;
+				break;
+			}
+
+			parentElement = parentElement.parentElement;
+		} while (parentElement);
+	}
+
+	// Always update the scroll top tracker if possible.
+	if (scrollParent) {
+		scrollParent.fastClickLastScrollTop = scrollParent.scrollTop;
+	}
+};
+
+
+/**
+ * @param {EventTarget} targetElement
+ * @returns {Element|EventTarget}
+ */
+FastClick.prototype.getTargetElementFromEventTarget = function(eventTarget) {
+	'use strict';
+
+	// On some older browsers (notably Safari on iOS 4.1 - see issue #56) the event target may be a text node.
+	if (eventTarget.nodeType === Node.TEXT_NODE) {
+		return eventTarget.parentNode;
+	}
+
+	return eventTarget;
+};
+
+
+/**
+ * On touch start, record the position and scroll offset.
+ *
+ * @param {Event} event
+ * @returns {boolean}
+ */
+FastClick.prototype.onTouchStart = function(event) {
+	'use strict';
+	var targetElement, touch, selection;
+
+	// Ignore multiple touches, otherwise pinch-to-zoom is prevented if both fingers are on the FastClick element (issue #111).
+	if (event.targetTouches.length > 1) {
+		return true;
+	}
+
+	targetElement = this.getTargetElementFromEventTarget(event.target);
+	touch = event.targetTouches[0];
+
+	if (this.deviceIsIOS) {
+
+		// Only trusted events will deselect text on iOS (issue #49)
+		selection = window.getSelection();
+		if (selection.rangeCount && !selection.isCollapsed) {
+			return true;
+		}
+
+		if (!this.deviceIsIOS4) {
+
+			// Weird things happen on iOS when an alert or confirm dialog is opened from a click event callback (issue #23):
+			// when the user next taps anywhere else on the page, new touchstart and touchend events are dispatched
+			// with the same identifier as the touch event that previously triggered the click that triggered the alert.
+			// Sadly, there is an issue on iOS 4 that causes some normal touch events to have the same identifier as an
+			// immediately preceeding touch event (issue #52), so this fix is unavailable on that platform.
+			if (touch.identifier === this.lastTouchIdentifier) {
+				event.preventDefault();
+				return false;
+			}
+
+			this.lastTouchIdentifier = touch.identifier;
+
+			// If the target element is a child of a scrollable layer (using -webkit-overflow-scrolling: touch) and:
+			// 1) the user does a fling scroll on the scrollable layer
+			// 2) the user stops the fling scroll with another tap
+			// then the event.target of the last 'touchend' event will be the element that was under the user's finger
+			// when the fling scroll was started, causing FastClick to send a click event to that layer - unless a check
+			// is made to ensure that a parent layer was not scrolled before sending a synthetic click (issue #42).
+			this.updateScrollParent(targetElement);
+		}
+	}
+
+	this.trackingClick = true;
+	this.trackingClickStart = event.timeStamp;
+	this.targetElement = targetElement;
+
+	this.touchStartX = touch.pageX;
+	this.touchStartY = touch.pageY;
+
+	// Prevent phantom clicks on fast double-tap (issue #36)
+	if ((event.timeStamp - this.lastClickTime) < 200) {
+		event.preventDefault();
+	}
+
+	return true;
+};
+
+
+/**
+ * Based on a touchmove event object, check whether the touch has moved past a boundary since it started.
+ *
+ * @param {Event} event
+ * @returns {boolean}
+ */
+FastClick.prototype.touchHasMoved = function(event) {
+	'use strict';
+	var touch = event.changedTouches[0], boundary = this.touchBoundary;
+
+	if (Math.abs(touch.pageX - this.touchStartX) > boundary || Math.abs(touch.pageY - this.touchStartY) > boundary) {
+		return true;
+	}
+
+	return false;
+};
+
+
+/**
+ * Update the last position.
+ *
+ * @param {Event} event
+ * @returns {boolean}
+ */
+FastClick.prototype.onTouchMove = function(event) {
+	'use strict';
+	if (!this.trackingClick) {
+		return true;
+	}
+
+	// If the touch has moved, cancel the click tracking
+	if (this.targetElement !== this.getTargetElementFromEventTarget(event.target) || this.touchHasMoved(event)) {
+		this.trackingClick = false;
+		this.targetElement = null;
+	}
+
+	return true;
+};
+
+
+/**
+ * Attempt to find the labelled control for the given label element.
+ *
+ * @param {EventTarget|HTMLLabelElement} labelElement
+ * @returns {Element|null}
+ */
+FastClick.prototype.findControl = function(labelElement) {
+	'use strict';
+
+	// Fast path for newer browsers supporting the HTML5 control attribute
+	if (labelElement.control !== undefined) {
+		return labelElement.control;
+	}
+
+	// All browsers under test that support touch events also support the HTML5 htmlFor attribute
+	if (labelElement.htmlFor) {
+		return document.getElementById(labelElement.htmlFor);
+	}
+
+	// If no for attribute exists, attempt to retrieve the first labellable descendant element
+	// the list of which is defined here: http://www.w3.org/TR/html5/forms.html#category-label
+	return labelElement.querySelector('button, input:not([type=hidden]), keygen, meter, output, progress, select, textarea');
+};
+
+
+/**
+ * On touch end, determine whether to send a click event at once.
+ *
+ * @param {Event} event
+ * @returns {boolean}
+ */
+FastClick.prototype.onTouchEnd = function(event) {
+	'use strict';
+	var forElement, trackingClickStart, targetTagName, scrollParent, touch, targetElement = this.targetElement;
+
+	if (!this.trackingClick) {
+		return true;
+	}
+
+	// Prevent phantom clicks on fast double-tap (issue #36)
+	if ((event.timeStamp - this.lastClickTime) < 200) {
+		this.cancelNextClick = true;
+		return true;
+	}
+
+	this.lastClickTime = event.timeStamp;
+
+	trackingClickStart = this.trackingClickStart;
+	this.trackingClick = false;
+	this.trackingClickStart = 0;
+
+	// On some iOS devices, the targetElement supplied with the event is invalid if the layer
+	// is performing a transition or scroll, and has to be re-detected manually. Note that
+	// for this to function correctly, it must be called *after* the event target is checked!
+	// See issue #57; also filed as rdar://13048589 .
+	if (this.deviceIsIOSWithBadTarget) {
+		touch = event.changedTouches[0];
+
+		// In certain cases arguments of elementFromPoint can be negative, so prevent setting targetElement to null
+		targetElement = document.elementFromPoint(touch.pageX - window.pageXOffset, touch.pageY - window.pageYOffset) || targetElement;
+		targetElement.fastClickScrollParent = this.targetElement.fastClickScrollParent;
+	}
+
+	targetTagName = targetElement.tagName.toLowerCase();
+	if (targetTagName === 'label') {
+		forElement = this.findControl(targetElement);
+		if (forElement) {
+			this.focus(targetElement);
+			if (this.deviceIsAndroid) {
+				return false;
+			}
+
+			targetElement = forElement;
+		}
+	} else if (this.needsFocus(targetElement)) {
+
+		// Case 1: If the touch started a while ago (best guess is 100ms based on tests for issue #36) then focus will be triggered anyway. Return early and unset the target element reference so that the subsequent click will be allowed through.
+		// Case 2: Without this exception for input elements tapped when the document is contained in an iframe, then any inputted text won't be visible even though the value attribute is updated as the user types (issue #37).
+		if ((event.timeStamp - trackingClickStart) > 100 || (this.deviceIsIOS && window.top !== window && targetTagName === 'input')) {
+			this.targetElement = null;
+			return false;
+		}
+
+		this.focus(targetElement);
+
+		// Select elements need the event to go through on iOS 4, otherwise the selector menu won't open.
+		if (!this.deviceIsIOS4 || targetTagName !== 'select') {
+			this.targetElement = null;
+			event.preventDefault();
+		}
+
+		return false;
+	}
+
+	if (this.deviceIsIOS && !this.deviceIsIOS4) {
+
+		// Don't send a synthetic click event if the target element is contained within a parent layer that was scrolled
+		// and this tap is being used to stop the scrolling (usually initiated by a fling - issue #42).
+		scrollParent = targetElement.fastClickScrollParent;
+		if (scrollParent && scrollParent.fastClickLastScrollTop !== scrollParent.scrollTop) {
+			return true;
+		}
+	}
+
+	// Prevent the actual click from going though - unless the target node is marked as requiring
+	// real clicks or if it is in the whitelist in which case only non-programmatic clicks are permitted.
+	if (!this.needsClick(targetElement)) {
+		event.preventDefault();
+		this.sendClick(targetElement, event);
+	}
+
+	return false;
+};
+
+
+/**
+ * On touch cancel, stop tracking the click.
+ *
+ * @returns {void}
+ */
+FastClick.prototype.onTouchCancel = function() {
+	'use strict';
+	this.trackingClick = false;
+	this.targetElement = null;
+};
+
+
+/**
+ * Determine mouse events which should be permitted.
+ *
+ * @param {Event} event
+ * @returns {boolean}
+ */
+FastClick.prototype.onMouse = function(event) {
+	'use strict';
+
+	// If a target element was never set (because a touch event was never fired) allow the event
+	if (!this.targetElement) {
+		return true;
+	}
+
+	if (event.forwardedTouchEvent) {
+		return true;
+	}
+
+	// Programmatically generated events targeting a specific element should be permitted
+	if (!event.cancelable) {
+		return true;
+	}
+
+	// Derive and check the target element to see whether the mouse event needs to be permitted;
+	// unless explicitly enabled, prevent non-touch click events from triggering actions,
+	// to prevent ghost/doubleclicks.
+	if (!this.needsClick(this.targetElement) || this.cancelNextClick) {
+
+		// Prevent any user-added listeners declared on FastClick element from being fired.
+		if (event.stopImmediatePropagation) {
+			event.stopImmediatePropagation();
+		} else {
+
+			// Part of the hack for browsers that don't support Event#stopImmediatePropagation (e.g. Android 2)
+			event.propagationStopped = true;
+		}
+
+		// Cancel the event
+		event.stopPropagation();
+		event.preventDefault();
+
+		return false;
+	}
+
+	// If the mouse event is permitted, return true for the action to go through.
+	return true;
+};
+
+
+/**
+ * On actual clicks, determine whether this is a touch-generated click, a click action occurring
+ * naturally after a delay after a touch (which needs to be cancelled to avoid duplication), or
+ * an actual click which should be permitted.
+ *
+ * @param {Event} event
+ * @returns {boolean}
+ */
+FastClick.prototype.onClick = function(event) {
+	'use strict';
+	var permitted;
+
+	// It's possible for another FastClick-like library delivered with third-party code to fire a click event before FastClick does (issue #44). In that case, set the click-tracking flag back to false and return early. This will cause onTouchEnd to return early.
+	if (this.trackingClick) {
+		this.targetElement = null;
+		this.trackingClick = false;
+		return true;
+	}
+
+	// Very odd behaviour on iOS (issue #18): if a submit element is present inside a form and the user hits enter in the iOS simulator or clicks the Go button on the pop-up OS keyboard the a kind of 'fake' click event will be triggered with the submit-type input element as the target.
+	if (event.target.type === 'submit' && event.detail === 0) {
+		return true;
+	}
+
+	permitted = this.onMouse(event);
+
+	// Only unset targetElement if the click is not permitted. This will ensure that the check for !targetElement in onMouse fails and the browser's click doesn't go through.
+	if (!permitted) {
+		this.targetElement = null;
+	}
+
+	// If clicks are permitted, return true for the action to go through.
+	return permitted;
+};
+
+
+/**
+ * Remove all FastClick's event listeners.
+ *
+ * @returns {void}
+ */
+FastClick.prototype.destroy = function() {
+	'use strict';
+	var layer = this.layer;
+
+	if (this.deviceIsAndroid) {
+		layer.removeEventListener('mouseover', this.onMouse, true);
+		layer.removeEventListener('mousedown', this.onMouse, true);
+		layer.removeEventListener('mouseup', this.onMouse, true);
+	}
+
+	layer.removeEventListener('click', this.onClick, true);
+	layer.removeEventListener('touchstart', this.onTouchStart, false);
+	layer.removeEventListener('touchmove', this.onTouchMove, false);
+	layer.removeEventListener('touchend', this.onTouchEnd, false);
+	layer.removeEventListener('touchcancel', this.onTouchCancel, false);
+};
+
+
+/**
+ * Check whether FastClick is needed.
+ *
+ * @param {Element} layer The layer to listen on
+ */
+FastClick.notNeeded = function(layer) {
+	'use strict';
+	var metaViewport;
+
+	// Devices that don't support touch don't need FastClick
+	if (typeof window.ontouchstart === 'undefined') {
+		return true;
+	}
+
+	if ((/Chrome\/[0-9]+/).test(navigator.userAgent)) {
+
+		// Chrome on Android with user-scalable="no" doesn't need FastClick (issue #89)
+		if (FastClick.prototype.deviceIsAndroid) {
+			metaViewport = document.querySelector('meta[name=viewport]');
+			if (metaViewport && metaViewport.content.indexOf('user-scalable=no') !== -1) {
+				return true;
+			}
+
+		// Chrome desktop doesn't need FastClick (issue #15)
+		} else {
+			return true;
+		}
+	}
+
+	// IE10 with -ms-touch-action: none, which disables double-tap-to-zoom (issue #97)
+	if (layer.style.msTouchAction === 'none') {
+		return true;
+	}
+
+	return false;
+};
+
+
+/**
+ * Factory method for creating a FastClick object
+ *
+ * @param {Element} layer The layer to listen on
+ */
+FastClick.attach = function(layer) {
+	'use strict';
+	return new FastClick(layer);
+};
+
+
+if (typeof define !== 'undefined' && define.amd) {
+
+	// AMD. Register as an anonymous module.
+	define(function() {
+		'use strict';
+		return FastClick;
+	});
+} else if (typeof module !== 'undefined' && module.exports) {
+	module.exports = FastClick.attach;
+	module.exports.FastClick = FastClick;
+} else {
+	window.FastClick = FastClick;
+}
+
 /*
- * angular-scrolly - v0.0.3 - 2013-08-09
+ * angular-scrolly - v0.0.4 - 2013-08-13
  * http://github.com/ajoslin/angular-scrolly
  * Created by Andy Joslin; Licensed under Public Domain
  */
@@ -3588,6 +4521,7 @@ angular.module('ajoslin.scrolly', [
         }
         function dragStart(e) {
           e = e.originalEvent || e;
+          e.stopPropagation();
           var target = e.target || e.srcElement;
           var point = e.touches ? e.touches[0] : e;
           if (parentWithAttr(target, 'dragger-ignore')) {
@@ -3611,6 +4545,7 @@ angular.module('ajoslin.scrolly', [
         function dragMove(e) {
           e = e.originalEvent || e;
           e.preventDefault();
+          e.stopPropagation();
           if (state.dragging) {
             var point = e.touches ? e.touches[0] : e;
             var delta = getPos(point) - state.pos;
@@ -3645,6 +4580,7 @@ angular.module('ajoslin.scrolly', [
         }
         function dragEnd(e) {
           e = e.originalEvent || e;
+          e.stopPropagation();
           if (state.dragging) {
             state.dragging = false;
             var now = Date.now();
@@ -3967,13 +4903,6 @@ angular.module('ui.bootstrap.position', [])
  */
   .factory('$position', ['$document', '$window', function ($document, $window) {
 
-    var mouseX, mouseY;
-
-    $document.bind('mousemove', function mouseMoved(event) {
-      mouseX = event.pageX;
-      mouseY = event.pageY;
-    });
-
     function getStyle(el, cssprop) {
       if (el.currentStyle) { //IE
         return el.currentStyle[cssprop];
@@ -4037,16 +4966,9 @@ angular.module('ui.bootstrap.position', [])
         return {
           width: element.prop('offsetWidth'),
           height: element.prop('offsetHeight'),
-          top: boundingClientRect.top + ($window.pageYOffset || $document[0].body.scrollTop),
-          left: boundingClientRect.left + ($window.pageXOffset || $document[0].body.scrollLeft)
+          top: boundingClientRect.top + ($window.pageYOffset || $document[0].body.scrollTop || $document[0].documentElement.scrollTop),
+          left: boundingClientRect.left + ($window.pageXOffset || $document[0].body.scrollLeft  || $document[0].documentElement.scrollLeft)
         };
-      },
-
-      /**
-       * Provides the coordinates of the mouse
-       */
-      mouse: function () {
-        return {x: mouseX, y: mouseY};
       }
     };
   }]);

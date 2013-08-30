@@ -49,10 +49,10 @@ be called using the <code>$injector</code> with the extra locals <code>$routePar
 </div>
 <h2 id="Example">Example</h2>
 <div class="example"><h4>Source</h4>
-<div source-edit="jqmView" source-edit-deps="angular.js script.js" source-edit-html="index.html-12 book.html chapter.html" source-edit-css="" source-edit-js="script.js-13" source-edit-unit="" source-edit-scenario=""></div>
+<div source-edit="jqmView" source-edit-deps="angular.js script.js" source-edit-html="index.html-14 book.html chapter.html" source-edit-css="" source-edit-js="script.js-15" source-edit-unit="" source-edit-scenario=""></div>
 <div class="tabbable"><div class="tab-pane" title="index.html">
-<pre class="prettyprint linenums" ng-set-text="index.html-12" ng-html-wrap-loaded="jqmView angular.js script.js"></pre>
-<script type="text/ng-template" id="index.html-12">
+<pre class="prettyprint linenums" ng-set-text="index.html-14" ng-html-wrap-loaded="jqmView angular.js script.js"></pre>
+<script type="text/ng-template" id="index.html-14">
 Choose:
 <a href="#/Book/Moby">Moby</a> |
 <a href="#/Book/Moby/ch/1">Moby: Ch1</a> |
@@ -82,8 +82,8 @@ This chapter contains ...
 </script>
 </div>
 <div class="tab-pane" title="script.js">
-<pre class="prettyprint linenums" ng-set-text="script.js-13"></pre>
-<script type="text/ng-template" id="script.js-13">
+<pre class="prettyprint linenums" ng-set-text="script.js-15"></pre>
+<script type="text/ng-template" id="script.js-15">
 angular.module('jqmView', ['jqm'], function($routeProvider) {
          $routeProvider.when('/Book/:bookId', {
            templateUrl: 'book.html',
@@ -109,5 +109,5 @@ function ChapterCntl($routeParams) {
 </script>
 </div>
 </div><h4>Demo</h4>
-<div class="well doc-example-live animator-container" ng-embed-app="jqmView" ng-set-html="index.html-12" ng-eval-javascript="script.js-13"></div></div>
+<div class="well doc-example-live animator-container" ng-embed-app="jqmView" ng-set-html="index.html-14" ng-eval-javascript="script.js-15"></div></div>
 </div>
