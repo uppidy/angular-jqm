@@ -5,6 +5,7 @@
     <link type="text/css" rel="stylesheet" href="../components/jquery-mobile/jquery.mobile-1.3.1.min.css">
 
     <script src="../components/angular/angular.js"></script>
+    <script src="../components/angular/angular-mobile.js"></script>
     <script src="../dist/angular-jqm.js"></script>
 
     <script>
@@ -47,11 +48,15 @@
         <div jqm-header><h1>Page1</h1></div>
         <a href="#/page2.html">To page2</a>
 
-        <div jqm-button ng-click="popIsShown = !popIsShown">
+        <div jqm-button ng-click="popIsShown = true">
           Popup on the page
         </div>
-        <div jqm-button jqm-popup-target="$root.myPopup" jqm-popup-model="buttonPopup" ng-click="buttonPopup = !buttonPopup">
+        <div jqm-button jqm-popup-target="$root.myPopup" jqm-popup-model="buttonPopup" ng-click="buttonPopup = true">
           Popup on the button
+        </div>
+
+        <div jqm-button>
+          Test
         </div>
 
         <p>hello</p>
@@ -101,7 +106,6 @@
     <div jqm-footer><h1>Fixed Footer</h1></div>
 
 </div>
-
 </body>
 
 </html>

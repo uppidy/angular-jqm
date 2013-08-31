@@ -10,10 +10,6 @@ describe('jqmButtonToggler', function() {
         listener = jqmButtonToggler(el);
     }));
 
-    it('should bind mouseover and mouseout to element', function() {
-        expect(el.bind).toHaveBeenCalledWith('mousedown', listener.$mousedown);
-        expect(el.bind).toHaveBeenCalledWith('mouseover', listener.$mouseover);
-    });
     it('should do nothing for mousedown on non-buttons', function() {
         listener.$mousedown({ target: el });
         expect(el).not.toHaveClass('ui-btn-up-' + scope.$theme);
@@ -38,38 +34,61 @@ describe('jqmButtonToggler', function() {
         beforeEach(function() {
             el.addClass('ui-btn-up-' + scope.$theme);
         });
-        it('should change class on mousedown and mouseup', function() {
+        it('should change class on mousedown', function() {
             expectBtnDown(false);
-            listener.$mousedown({ target: el[0] });
+            listener.$mousedown({ target: el[0], type: 'mousedown' });
+            expectBtnDown(true);
+        });
+        it('should change class on touchstart', function() {
+            expectBtnDown(false);
+            listener.$mousedown({ target: el[0], type: 'touchstart' });
             expectBtnDown(true);
         });
         it('should do nothing on mousedown if already down', function() {
             expectBtnDown(false);
-            listener.$mousedown({ target: el[0] });
+            listener.$mousedown({ target: el[0], type: 'mousedown' });
             expectBtnDown(true);
-            listener.$mousedown({ target: el[0] });
+            listener.$mousedown({ target: el[0], type: 'mousedown' });
             expectBtnDown(true);
         });
-        it('should restore btn up class on mousemove', function() {
-            listener.$mousedown({ target: el[0] });
+        it('mousedown should restore btn up class on mousemove', function() {
+            listener.$mousedown({ target: el[0], type: 'mousedown' });
             expectBtnDown(true);
             el.triggerHandler('mousemove');
             expectBtnDown(false);
             el.triggerHandler('mousemove');
             expectBtnDown(false);
         });
-        it('should restore btn up class on mouseup', function() {
-            listener.$mousedown({ target: el[0] });
+        it('mousedown should restore btn up class on mouseup', function() {
+            listener.$mousedown({ target: el[0], type: 'mousedown' });
             expectBtnDown(true);
             el.triggerHandler('mouseup');
             expectBtnDown(false);
             el.triggerHandler('mouseup');
+            expectBtnDown(false);
+        });
+        it('touchstart should restore btn up class on touchmove', function() {
+            listener.$mousedown({ target: el[0], type: 'touchstart' });
+            expectBtnDown(true);
+            el.triggerHandler('touchmove');
+            expectBtnDown(false);
+        });
+        it('touchstart should restore btn up class on touchend', function() {
+            listener.$mousedown({ target: el[0], type: 'touchend' });
+            expectBtnDown(true);
+            el.triggerHandler('touchend');
+            expectBtnDown(false);
+        });
+        it('touchstart should restore btn up class on touchcancel', function() {
+            listener.$mousedown({ target: el[0], type: 'touchstart' });
+            expectBtnDown(true);
+            el.triggerHandler('touchcancel');
             expectBtnDown(false);
         });
 
         it('should work if the target is a child of a button', function() {
             var child = el.children();
-            listener.$mousedown({ target: child[0] });
+            listener.$mousedown({ target: child[0], type: 'mousedown' });
             expectBtnDown(true);
             child.triggerHandler('mousemove');
             expectBtnDown(false);
@@ -91,6 +110,14 @@ describe('jqmButtonToggler', function() {
         
         it('should add hover class', function() {
             expectBtnHover(false);
+            listener.$mouseover({ target: el[0] });
+            expectBtnHover(true);
+        });
+        it('should do nothing if the button is down', function() {
+            el.addClass('ui-btn-down-c');
+            listener.$mouseover({ target: el[0] });
+            expectBtnHover(false);
+            el.removeClass('ui-btn-down-c');
             listener.$mouseover({ target: el[0] });
             expectBtnHover(true);
         });

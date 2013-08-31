@@ -8,19 +8,21 @@ jqmModule.factory('jqmButtonToggler', function() {
 
         //Exposed for testing
         self.$mousedown = function(e) {
+            var unbindEvents = e.type === 'mousedown' ?
+                'mouseup mousemove' :
+                'touchmove touchend touchcancel';
             var target = angular.element(e.target);
             var btnElement = parentWithClass(target, 'ui-btn-up-' + target.scope().$theme);
             if (btnElement) {
                 toggleBtnDown(btnElement, true);
-                //TODO(1.2): 1.2 fixes unbind breaking on space-seperated events, so do one bind
-                target.bind('mouseup', onBtnUp);
-                target.bind('mousemove', onBtnUp);
+                target.bind(unbindEvents, onBtnUp);
             }
             function onBtnUp() {
                 toggleBtnDown(btnElement, false);
                 //TODO(1.2): 1.2 fixes unbind breaking on space-seperated events, so do one unbind
-                target.unbind('mouseup', onBtnUp);
-                target.unbind('mousemove', onBtnUp);
+                angular.forEach(unbindEvents.split(' '), function(eventName) {
+                    target.unbind(eventName, onBtnUp);
+                });
             }
         };
 
@@ -28,7 +30,7 @@ jqmModule.factory('jqmButtonToggler', function() {
         self.$mouseover = function(e) {
             var target = angular.element(e.target);
             var btnElement = parentWithClass(target, 'ui-btn');
-            if (btnElement) {
+            if (btnElement && !btnElement.hasClass('ui-btn-down-' + target.scope().$theme)) {
                 toggleBtnHover(btnElement, true);
                 target.bind('mouseout', onBtnMouseout);
             }
@@ -38,8 +40,9 @@ jqmModule.factory('jqmButtonToggler', function() {
             }
         };
 
-        element.bind('mousedown', self.$mousedown);
-        element.bind('mouseover', self.$mouseover);
+        element[0].addEventListener('touchstart', self.$mousedown, true);
+        element[0].addEventListener('mousedown', self.$mousedown, true);
+        element[0].addEventListener('mouseover', self.$mouseover, true);
 
         return self;
 

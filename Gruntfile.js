@@ -18,7 +18,6 @@ module.exports = function(grunt) {
         },
         all: {
             src: ['<%= concat.nodeps.dest %>',
-                'components/fastclick/fastclick.js',
                 'components/angular-scrolly/angular-scrolly.js',
                 'components/angular-bootstrap/position.js'],
             dest: 'dist/<%= pkg.name %>.js'
@@ -124,6 +123,7 @@ module.exports = function(grunt) {
       options: {
         configFile: 'test/config/karma-shared.conf.js',
         files: ['components/angular/angular.js',
+                'components/angular/angular-mobile.js',
                 'components/angular/angular-mocks.js',
                 'test/lib/testutils.js',
                 'test/lib/matchers.js',
@@ -131,7 +131,6 @@ module.exports = function(grunt) {
                 'src/**/*.js',
                 'components/angular-scrolly/angular-scrolly.js',
                 'components/angular-bootstrap/position.js',
-                'components/fastclick/fastclick.js',
                 '<%= html2js.all.dest %>',
                 'test/**/*Spec.js',
                 {pattern: 'test/**/*', watched: true, included: false, served: true},
@@ -171,6 +170,7 @@ module.exports = function(grunt) {
         scripts: [
           'docs/scripts/jquery.mobile.css.js',
           'angular.js',
+          'components/angular/angular-mobile.js',
           '<%= concat.all.dest %>',
           'docs/scripts/angular-scrolly-docs.js'
         ],
@@ -202,6 +202,7 @@ module.exports = function(grunt) {
     'curl-dir': {
       'components/angular': [
         'http://code.angularjs.org/1.1.5/angular.js',
+        'http://code.angularjs.org/1.1.5/angular-mobile.js',
         'http://code.angularjs.org/1.1.5/angular-mocks.js',
       ],
       'components/jquery-mobile': [
@@ -217,9 +218,6 @@ module.exports = function(grunt) {
       //This is temporary until we have a way to download this easily (all of these will be put on bower in near future)
       'components/angular-bootstrap': [
         'https://rawgithub.com/angular-ui/bootstrap/master/src/position/position.js'
-      ],
-      'components/fastclick': [
-        'https://raw.github.com/ftlabs/fastclick/master/lib/fastclick.js'
       ]
     }
   });
