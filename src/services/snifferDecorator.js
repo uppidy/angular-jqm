@@ -34,7 +34,7 @@
 jqmModule.config(['$provide', function ($provide) {
     $provide.decorator('$sniffer', ['$delegate', '$window', '$document', function ($sniffer, $window, $document) {
         var fakeBody = angular.element("<body>");
-        angular.element($window).prepend(fakeBody);
+        angular.element($window.document.body).prepend(fakeBody);
 
         $sniffer.cssTransform3d = transform3dTest();
 
