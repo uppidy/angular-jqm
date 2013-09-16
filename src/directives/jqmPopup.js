@@ -172,7 +172,7 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
             }
 
             newPosition.top = Math.max(newPosition.top, 0);
-            newPosition.left = Math.min(newPosition.left, 0);
+            newPosition.left = Math.max(newPosition.left, 0);
 
             newPosition.top += 'px';
             newPosition.left += 'px';
