@@ -86,9 +86,9 @@ describe('jqmPanelContainer', function() {
             var dismiss = panelContainerEl.children().eq(0);
             scope.openedPanel = "left";
             scope.$apply();
-            expect(dismiss).toHaveClass("ui-panel-dismiss-open");
+            expect(dismiss).toHaveClass(["ui-panel-dismiss-open", "ui-panel-dismiss-left"]);
             dismiss.triggerHandler("click");
-            expect(dismiss).not.toHaveClass("ui-panel-dismiss-open");
+            expect(dismiss).not.toHaveClass(["ui-panel-dismiss-open","ui-panel-dismiss-left","ui-panel-dismiss-right"]);
             expect(scope.openedPanel).toBe(null);
         });
     });

@@ -6,13 +6,6 @@
   display: none;
 }
 
-.ui-panel.ui-panel-opened {
-  z-index: 1001;
-}
-.ui-panel-dismiss {
-  z-index: 1000; /* lower than ui-panel */
-}
-
 .ui-panel-content-wrap {
     height: 100%
 }
@@ -23,3 +16,18 @@
     height: 100%;
 }
 
+.ui-panel-dismiss {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: auto;
+  height: auto;
+}
+.ui-panel-dismiss-open.ui-panel-dismiss-left {
+  left: 17em;
+}
+.ui-panel-dismiss-open.ui-panel-dismiss-right {
+  right: 17em;
+}
