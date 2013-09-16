@@ -2,17 +2,22 @@
 describe('jqmPopup', function() {
     //We can't really test us versus jqm popups because jqm popups are
     //just too complex to setup
-    var el, scope;
+    var el, scope, parent;
     function compile(popupModel, attr) {
+        var elm;
         inject(function($rootScope, $compile) {
             scope = $rootScope.$new();
-            el = $compile('<div jqm-popup="'+popupModel+'" '+(attr||'')+'></div>')(scope);
+            elm = el = angular.element('<div jqm-popup="'+popupModel+'" '+(attr||'')+'>');
+            parent.append(elm);
+            $compile(elm)(scope);
             scope.$apply();
         });
+        return elm;
     }
 
     var target;
     beforeEach(function() {
+        parent = angular.element('<div>');
         target = angular.element('<div>');
         compile('poppy', 'animation="banana"');
     });
@@ -32,13 +37,13 @@ describe('jqmPopup', function() {
         expect(el).toHaveClass('banana');
     });
 
-    it('should append a jqmPopupOverlay to $rootElement', inject(function($rootElement) {
-        var overlay = angular.element($rootElement[0].querySelector('.ui-popup-screen'));
-        expect(overlay.length).toBe(1);
-        expect(overlay.parent()[0]).toBe($rootElement[0]);
-    }));
+    it('should create one overlay per popup', function() {
+        expect(parent[0].querySelectorAll('.ui-popup-screen').length).toBe(1);
+        var popup1 = compile('p2');
+        expect(parent[0].querySelectorAll('.ui-popup-screen').length).toBe(2);
+    });
 
-    describe('show and hide', function() {
+    describe('show and hide with anim', function() {
 
         it('should show', function() {
             scope.poppy.show(target);

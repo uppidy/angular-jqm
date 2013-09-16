@@ -1,4 +1,4 @@
-<div class="ui-popup-screen ui-overlay-{{popup.overlayTheme || popup.$theme}}" 
-  jqm-class="{'ui-screen-hidden': !popup.opened, 'in': popup.opened}"
-  ng-click="popup.hide()">
+<div view-fixed="true" class="ui-popup-screen ui-overlay-{{$scopeAs.jqmPopup.overlayTheme || $scopeAs.jqmPopup.$theme}}" 
+  jqm-class="{'ui-screen-hidden': !$scopeAs.jqmPopup.opened, 'in': $scopeAs.jqmPopup.opened}"
+  ng-click="$scopeAs.jqmPopup.hide()">
 </div>

@@ -1,17 +1,17 @@
 "use strict";
 describe('jqmPopupOverlay', function() {
-    var el, scope, popup;
+    var el, scope;
     beforeEach(inject(function($compile, $rootScope) {
-        scope = $rootScope.$new();
-        el = $compile('<div jqm-popup-overlay></div>')(scope);
-        scope.$apply();
-
-        popup = {
+        scope = angular.extend($rootScope.$new(), {
+            $$scopeAs: 'jqmPopup',
             hide: jasmine.createSpy('popup.hide'),
             opened: false,
             $theme: 'banana',
             overlayTheme: ''
-        };
+        });
+        el = $compile('<div jqm-popup-overlay></div>')(scope);
+        scope.$apply();
+
     }));
 
     it('should create an overlay', function() {
@@ -23,9 +23,8 @@ describe('jqmPopupOverlay', function() {
         expect(el).toHaveClass('ui-screen-hidden');
     });
 
-    it('should show when given $popupStateChanged and match popup theme', function() {
-        popup.opened = true;
-        scope.$root.$broadcast('$popupStateChanged', popup);
+    it('should show when given popup scope opens and have overlayTheme', function() {
+        scope.opened = true;
         scope.$apply();
         
         expect(el).toHaveClass('in');
@@ -34,35 +33,31 @@ describe('jqmPopupOverlay', function() {
     });
 
     it('should match popup overlayTheme if given', function() {
-        popup.opened = true;
-        popup.overlayTheme = 'mango';
-        scope.$root.$broadcast('$popupStateChanged', popup);
+        scope.opened = true;
+        scope.overlayTheme = 'mango';
         scope.$apply();
 
         expect(el).toHaveClass('ui-overlay-mango');
     });
 
-    it('should hide if not-opened popup is given', function() {
-        popup.opened = true;
-        scope.$root.$broadcast('$popupStateChanged', popup);
+    it('should hide when scope is not opened', function() {
+        scope.opened = true;
         scope.$apply();
         expect(el).toHaveClass('in');
         expect(el).not.toHaveClass('ui-screen-hidden');
 
-        popup.opened = false;
-        scope.$root.$broadcast('$popupStateChanged', popup);
+        scope.opened = false;
         scope.$apply();
         expect(el).toHaveClass('ui-screen-hidden');
     });
 
     it('should catch a click event and close the popup when opened', function() {
-        popup.opened = true;
-        scope.$root.$broadcast('$popupStateChanged', popup);
+        scope.opened = true;
         scope.$apply();
 
-        expect(popup.hide).not.toHaveBeenCalled();
+        expect(scope.hide).not.toHaveBeenCalled();
         el.triggerHandler('click');
-        expect(popup.hide).toHaveBeenCalled();
+        expect(scope.hide).toHaveBeenCalled();
     });
 
 });

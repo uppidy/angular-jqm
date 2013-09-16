@@ -9,8 +9,8 @@
  * Tip: put a {@link jqm.directive:jqmView jqmView} inside a popup to have full scrollable pages inside.
  * <pre>
  * <div jqm-popup="myPopup">
- *   <div jqm-view="{ 
- *     templateUrl: 'views/my-popup-content-page.html', 
+ *   <div jqm-view="{
+ *     templateUrl: 'views/my-popup-content-page.html',
  *     controller: 'MyPopupController'
  *   }"></div>
  * </div>
@@ -30,14 +30,14 @@
         Hey guys, here's a popup!
       </div>
       <div style="padding: 50px;"
-         jqm-popup-target="myPopup" 
+         jqm-popup-target="myPopup"
          jqm-popup-model="pageCenterPop">
-         
+
          <div jqm-button ng-click="pageCenterPop = true">
             Open Page Center Popup
          </div>
          <div jqm-button
-           jqm-popup-target="myPopup" 
+           jqm-popup-target="myPopup"
            jqm-popup-model="buttonPop"
            jqm-popup-placement="left"
            ng-click="buttonPop = true">
@@ -51,7 +51,6 @@ jqmModule.directive('jqmPopup', ['$position', '$animationComplete', '$parse', '$
 function($position, animationComplete, $parse, $rootElement, $timeout, $compile, $rootScope) {
     var isDef = angular.isDefined;
     var popupOverlayTemplate = '<div jqm-popup-overlay></div>';
-    var popupOverlay;
 
     return {
         restrict: 'A',
@@ -71,11 +70,6 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
             attr.corners = isDef(attr.corners) ? attr.corners==='true' : true;
             attr.shadow = isDef(attr.shadow) ? attr.shadow==='true' : true;
 
-            if (!popupOverlay) {
-                popupOverlay = $compile(popupOverlayTemplate)($rootScope);
-                $rootElement.append(popupOverlay);
-            }
-
             return postLink;
         }
     };
@@ -87,6 +81,8 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
             throw new Error("jqm-popup expected assignable expression for jqm-popup attribute, got '" + attr.jqmPopup + "'");
         }
         popupModel.assign(scope.$parent, scope);
+
+        elm.after( $compile(popupOverlayTemplate)(scope) );
 
         //Publicly expose show, hide methods
         scope.show = show;
@@ -101,8 +97,13 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
             placement = placement || scope.placement;
 
             elm.css( getPosition(elm, target, placement) );
-            elm.addClass('in').removeClass('out');
             scope.$root.$broadcast('$popupStateChanged', scope);
+            if (scope.animation === 'none') {
+                onAnimationComplete();
+            } else {
+                elm.addClass('in').removeClass('out');
+            }
+
         }
         function hideForElement(target) {
             if (scope.target && target && scope.target[0] === target[0]) {
@@ -115,6 +116,11 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
             elm.addClass('out').removeClass('in');
 
             scope.$root.$broadcast('$popupStateChanged', scope);
+            if (scope.animation === 'none') {
+                onAnimationComplete();
+            } else {
+                elm.addClass('out').removeClass('in');
+            }
         }
 
         function onAnimationComplete() {
@@ -131,55 +137,46 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
             var popHeight = elm.prop( 'offsetHeight' );
             var pos = $position.position(target);
 
-            //Flip top/bottom if they're out of bounds and we're in a page
-            //We can't do this for left/right because we don't have a 
-            //way to tell screen width right now
-            var scroll = pageCtrl ? pageCtrl.scroll() : 0;
-            var scrollHeight = pageCtrl ? Math.abs(pageCtrl.scrollHeight()) : 0;
-            var height = $rootElement.prop('offsetHeight');
-
-            if (placement === 'top' && (pos.top - popHeight - height) < 0) {
-                placement = 'bottom';
-
-            } else if (placement === 'bottom' && (pos.top + popHeight - scroll) > (height - scrollHeight)) {
-                placement = 'top';
-            }
-
             var newPosition = {};
             switch (placement) {
                 case 'right':
                     newPosition = {
-                    top: pos.top + pos.height / 2 - popHeight / 2,
-                    left: pos.left + pos.width
-                };
-                break;
+                        top: pos.top + pos.height / 2 - popHeight / 2,
+                        left: pos.left + pos.width
+                    };
+                    break;
                 case 'bottom':
                     newPosition = {
-                    top: pos.top + pos.height,
-                    left: pos.left + pos.width / 2 - popWidth / 2
-                };
-                break;
+                        top: pos.top + pos.height,
+                        left: pos.left + pos.width / 2 - popWidth / 2
+                    };
+                    break;
                 case 'left':
                     newPosition = {
-                    top: pos.top + pos.height / 2 - popHeight / 2,
-                    left: pos.left - popWidth
-                };
-                break;
+                        top: pos.top + pos.height / 2 - popHeight / 2,
+                        left: pos.left - popWidth
+                    };
+                    break;
                 case 'top':
                     newPosition = {
-                    top: pos.top - popHeight,
-                    left: pos.left + pos.width / 2 - popWidth / 2
-                };
-                break;
+                        top: pos.top - popHeight,
+                        left: pos.left + pos.width / 2 - popWidth / 2
+                    };
+                    break;
                 default:
                     newPosition = {
-                    top: pos.top + pos.height / 2 - popHeight / 2,
-                    left: pos.left + pos.width / 2 - popWidth / 2
-                };
-                break;
+                        top: pos.top + pos.height / 2 - popHeight / 2,
+                        left: pos.left + pos.width / 2 - popWidth / 2
+                    };
+                    break;
             }
+
+            newPosition.top = Math.max(newPosition.top, 0);
+            newPosition.left = Math.min(newPosition.left, 0);
+
             newPosition.top += 'px';
             newPosition.left += 'px';
+
             return newPosition;
         }
     }
