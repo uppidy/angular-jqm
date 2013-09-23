@@ -5,7 +5,7 @@ node_js:
 env:
   global:
     secure: |-
-      cSJmFUQiOuqrtPB/5/8vAmpv35W85mcu8UVyEDHfW1dOlwf7BlsxvXbLgcSSc3u0EgFXeW8c0EEIOUk7hCaw8Va6FhWdfnPx9P0xLDY/OzHEhi/ZvL83KPW+p9N9RDIXCgFfEmPS8bO1Gy0LsF9cQByXwGXQ5XF8u5H1hF/aAIw=
+      edhK6qlvAL2d86lb5SludMjH1/3CWNGXxck4P25hnYblTr+AaGaY+VXHS1eyhoh0Q3tUz3fDuVSQxYxBwYIVisMR2IirJBB7MogokicV5TpsUOjmHRp+r8MpqcjqqnbH2N8D70gXNuu2cFEMNS9VnPLNpcI0DWPuSbQ8TpLNGw4=
 before_script:
 - export DISPLAY=:99.0
 - sh -e /etc/init.d/xvfb start
