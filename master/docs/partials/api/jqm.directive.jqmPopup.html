@@ -8,8 +8,8 @@
 <p>Tip: put a <a href="#/api/jqm.directive:jqmView">jqmView</a> inside a popup to have full scrollable pages inside.
 <pre class="prettyprint linenums">
 &lt;div jqm-popup="myPopup"&gt;
-  &lt;div jqm-view="{ 
-    templateUrl: 'views/my-popup-content-page.html', 
+  &lt;div jqm-view="{
+    templateUrl: 'views/my-popup-content-page.html',
     controller: 'MyPopupController'
   }"&gt;&lt;/div&gt;
 &lt;/div&gt;
@@ -48,14 +48,14 @@
       Hey guys, here's a popup!
     </div>
     <div style="padding: 50px;"
-       jqm-popup-target="myPopup" 
+       jqm-popup-target="myPopup"
        jqm-popup-model="pageCenterPop">
-       
+
        <div jqm-button ng-click="pageCenterPop = true">
           Open Page Center Popup
        </div>
        <div jqm-button
-         jqm-popup-target="myPopup" 
+         jqm-popup-target="myPopup"
          jqm-popup-model="buttonPop"
          jqm-popup-placement="left"
          ng-click="buttonPop = true">

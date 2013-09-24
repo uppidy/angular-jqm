@@ -1,4 +1,4 @@
-/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-08-30
+/*! angular-jqm - v0.0.1-SNAPSHOT - 2013-09-24
  * https://github.com/angular-widgets/angular-jqm
  * Copyright (c) 2013 OPITZ CONSULTING GmbH; Licensed MIT */
 (function(window, angular) {
@@ -10,7 +10,7 @@
  *
  * 'jqm' is the one module that contains all jqm code.
  */
-var jqmModule = angular.module("jqm", ["jqm-templates", "ajoslin.scrolly", "ui.bootstrap.position"]);
+var jqmModule = angular.module("jqm", ["ngMobile", "jqm-templates", "ajoslin.scrolly", "ui.bootstrap.position"]);
 
 jqmModule.config(['$provide', function ($provide) {
     $provide.decorator('$animator', ['$delegate', function ($animator) {
@@ -1579,8 +1579,8 @@ jqmModule.directive('jqmPanelContainer', ['$timeout', '$transitionComplete', '$s
  * Tip: put a {@link jqm.directive:jqmView jqmView} inside a popup to have full scrollable pages inside.
  * <pre>
  * <div jqm-popup="myPopup">
- *   <div jqm-view="{ 
- *     templateUrl: 'views/my-popup-content-page.html', 
+ *   <div jqm-view="{
+ *     templateUrl: 'views/my-popup-content-page.html',
  *     controller: 'MyPopupController'
  *   }"></div>
  * </div>
@@ -1600,14 +1600,14 @@ jqmModule.directive('jqmPanelContainer', ['$timeout', '$transitionComplete', '$s
         Hey guys, here's a popup!
       </div>
       <div style="padding: 50px;"
-         jqm-popup-target="myPopup" 
+         jqm-popup-target="myPopup"
          jqm-popup-model="pageCenterPop">
-         
+
          <div jqm-button ng-click="pageCenterPop = true">
             Open Page Center Popup
          </div>
          <div jqm-button
-           jqm-popup-target="myPopup" 
+           jqm-popup-target="myPopup"
            jqm-popup-model="buttonPop"
            jqm-popup-placement="left"
            ng-click="buttonPop = true">
@@ -1621,7 +1621,6 @@ jqmModule.directive('jqmPopup', ['$position', '$animationComplete', '$parse', '$
 function($position, animationComplete, $parse, $rootElement, $timeout, $compile, $rootScope) {
     var isDef = angular.isDefined;
     var popupOverlayTemplate = '<div jqm-popup-overlay></div>';
-    var popupOverlay;
 
     return {
         restrict: 'A',
@@ -1641,11 +1640,6 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
             attr.corners = isDef(attr.corners) ? attr.corners==='true' : true;
             attr.shadow = isDef(attr.shadow) ? attr.shadow==='true' : true;
 
-            if (!popupOverlay) {
-                popupOverlay = $compile(popupOverlayTemplate)($rootScope);
-                $rootElement.append(popupOverlay);
-            }
-
             return postLink;
         }
     };
@@ -1657,6 +1651,8 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
             throw new Error("jqm-popup expected assignable expression for jqm-popup attribute, got '" + attr.jqmPopup + "'");
         }
         popupModel.assign(scope.$parent, scope);
+
+        elm.after( $compile(popupOverlayTemplate)(scope) );
 
         //Publicly expose show, hide methods
         scope.show = show;
@@ -1671,8 +1667,13 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
             placement = placement || scope.placement;
 
             elm.css( getPosition(elm, target, placement) );
-            elm.addClass('in').removeClass('out');
             scope.$root.$broadcast('$popupStateChanged', scope);
+            if (scope.animation === 'none') {
+                onAnimationComplete();
+            } else {
+                elm.addClass('in').removeClass('out');
+            }
+
         }
         function hideForElement(target) {
             if (scope.target && target && scope.target[0] === target[0]) {
@@ -1685,6 +1686,11 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
             elm.addClass('out').removeClass('in');
 
             scope.$root.$broadcast('$popupStateChanged', scope);
+            if (scope.animation === 'none') {
+                onAnimationComplete();
+            } else {
+                elm.addClass('out').removeClass('in');
+            }
         }
 
         function onAnimationComplete() {
@@ -1701,55 +1707,46 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
             var popHeight = elm.prop( 'offsetHeight' );
             var pos = $position.position(target);
 
-            //Flip top/bottom if they're out of bounds and we're in a page
-            //We can't do this for left/right because we don't have a 
-            //way to tell screen width right now
-            var scroll = pageCtrl ? pageCtrl.scroll() : 0;
-            var scrollHeight = pageCtrl ? Math.abs(pageCtrl.scrollHeight()) : 0;
-            var height = $rootElement.prop('offsetHeight');
-
-            if (placement === 'top' && (pos.top - popHeight - height) < 0) {
-                placement = 'bottom';
-
-            } else if (placement === 'bottom' && (pos.top + popHeight - scroll) > (height - scrollHeight)) {
-                placement = 'top';
-            }
-
             var newPosition = {};
             switch (placement) {
                 case 'right':
                     newPosition = {
-                    top: pos.top + pos.height / 2 - popHeight / 2,
-                    left: pos.left + pos.width
-                };
-                break;
+                        top: pos.top + pos.height / 2 - popHeight / 2,
+                        left: pos.left + pos.width
+                    };
+                    break;
                 case 'bottom':
                     newPosition = {
-                    top: pos.top + pos.height,
-                    left: pos.left + pos.width / 2 - popWidth / 2
-                };
-                break;
+                        top: pos.top + pos.height,
+                        left: pos.left + pos.width / 2 - popWidth / 2
+                    };
+                    break;
                 case 'left':
                     newPosition = {
-                    top: pos.top + pos.height / 2 - popHeight / 2,
-                    left: pos.left - popWidth
-                };
-                break;
+                        top: pos.top + pos.height / 2 - popHeight / 2,
+                        left: pos.left - popWidth
+                    };
+                    break;
                 case 'top':
                     newPosition = {
-                    top: pos.top - popHeight,
-                    left: pos.left + pos.width / 2 - popWidth / 2
-                };
-                break;
+                        top: pos.top - popHeight,
+                        left: pos.left + pos.width / 2 - popWidth / 2
+                    };
+                    break;
                 default:
                     newPosition = {
-                    top: pos.top + pos.height / 2 - popHeight / 2,
-                    left: pos.left + pos.width / 2 - popWidth / 2
-                };
-                break;
+                        top: pos.top + pos.height / 2 - popHeight / 2,
+                        left: pos.left + pos.width / 2 - popWidth / 2
+                    };
+                    break;
             }
+
+            newPosition.top = Math.max(newPosition.top, 0);
+            newPosition.left = Math.max(newPosition.left, 0);
+
             newPosition.top += 'px';
             newPosition.left += 'px';
+
             return newPosition;
         }
     }
@@ -1759,13 +1756,7 @@ jqmModule.directive('jqmPopupOverlay', function() {
     return {
         restrict: 'A',
         replace: true,
-        templateUrl: 'templates/jqmPopupOverlay.html',
-        scope: {},
-        link: function(scope, elm, attr) {
-            scope.$on('$popupStateChanged', function($e, popup) {
-                scope.popup = popup;
-            });
-        }
+        templateUrl: 'templates/jqmPopupOverlay.html'
     };
 });
 
@@ -2442,10 +2433,6 @@ jqmModule.config(['$provide', function ($provide) {
         return $browser;
     }
 }]);
-jqmModule.run(['$rootElement', function($rootElement) {
-    window.FastClick.attach($rootElement[0]);
-}]);
-
 /**
  * @ngdoc function
  * @name jqm.$hideAddressBar
@@ -2638,19 +2625,21 @@ jqmModule.factory('jqmButtonToggler', function() {
 
         //Exposed for testing
         self.$mousedown = function(e) {
+            var unbindEvents = e.type === 'mousedown' ?
+                'mouseup mousemove' :
+                'touchmove touchend touchcancel';
             var target = angular.element(e.target);
             var btnElement = parentWithClass(target, 'ui-btn-up-' + target.scope().$theme);
             if (btnElement) {
                 toggleBtnDown(btnElement, true);
-                //TODO(1.2): 1.2 fixes unbind breaking on space-seperated events, so do one bind
-                target.bind('mouseup', onBtnUp);
-                target.bind('mousemove', onBtnUp);
+                target.bind(unbindEvents, onBtnUp);
             }
             function onBtnUp() {
                 toggleBtnDown(btnElement, false);
                 //TODO(1.2): 1.2 fixes unbind breaking on space-seperated events, so do one unbind
-                target.unbind('mouseup', onBtnUp);
-                target.unbind('mousemove', onBtnUp);
+                angular.forEach(unbindEvents.split(' '), function(eventName) {
+                    target.unbind(eventName, onBtnUp);
+                });
             }
         };
 
@@ -2658,7 +2647,7 @@ jqmModule.factory('jqmButtonToggler', function() {
         self.$mouseover = function(e) {
             var target = angular.element(e.target);
             var btnElement = parentWithClass(target, 'ui-btn');
-            if (btnElement) {
+            if (btnElement && !btnElement.hasClass('ui-btn-down-' + target.scope().$theme)) {
                 toggleBtnHover(btnElement, true);
                 target.bind('mouseout', onBtnMouseout);
             }
@@ -2668,8 +2657,9 @@ jqmModule.factory('jqmButtonToggler', function() {
             }
         };
 
-        element.bind('mousedown', self.$mousedown);
-        element.bind('mouseover', self.$mouseover);
+        element[0].addEventListener('touchstart', self.$mousedown, true);
+        element[0].addEventListener('mousedown', self.$mousedown, true);
+        element[0].addEventListener('mouseover', self.$mouseover, true);
 
         return self;
 
@@ -3313,7 +3303,7 @@ jqmModule.config(['$provide', function ($provide) {
 jqmModule.config(['$provide', function ($provide) {
     $provide.decorator('$sniffer', ['$delegate', '$window', '$document', function ($sniffer, $window, $document) {
         var fakeBody = angular.element("<body>");
-        angular.element($window).prepend(fakeBody);
+        angular.element($window.document.body).prepend(fakeBody);
 
         $sniffer.cssTransform3d = transform3dTest();
 
@@ -3531,8 +3521,9 @@ angular.module("templates/jqmPanelContainer.html", []).run(["$templateCache", fu
   $templateCache.put("templates/jqmPanelContainer.html",
     "<div jqm-scope-as=\"pc\" ng-transclude class=\"jqm-panel-container\">\n" +
     "    <div class=\"ui-panel-dismiss\"\n" +
-    "        ng-click=\"$scopeAs.pc.openPanelName = null\" ng-class=\"{'ui-panel-dismiss-open' : $scopeAs.pc.openPanelName}\"\n" +
-    "    ></div>\n" +
+    "        ng-click=\"$scopeAs.pc.openPanelName = null\" \n" +
+    "        ng-class=\"$scopeAs.pc.openPanelName ? 'ui-panel-dismiss-open ui-panel-dismiss-'+$scopeAs.pc.openPanelName : ''\">\n" +
+    "    </div>\n" +
     "</div>\n" +
     "");
 }]);
@@ -3550,9 +3541,9 @@ angular.module("templates/jqmPopup.html", []).run(["$templateCache", function($t
 
 angular.module("templates/jqmPopupOverlay.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("templates/jqmPopupOverlay.html",
-    "<div class=\"ui-popup-screen ui-overlay-{{popup.overlayTheme || popup.$theme}}\" \n" +
-    "  jqm-class=\"{'ui-screen-hidden': !popup.opened, 'in': popup.opened}\"\n" +
-    "  ng-click=\"popup.hide()\">\n" +
+    "<div view-fixed=\"true\" class=\"ui-popup-screen ui-overlay-{{$scopeAs.jqmPopup.overlayTheme || $scopeAs.jqmPopup.$theme}}\" \n" +
+    "  jqm-class=\"{'ui-screen-hidden': !$scopeAs.jqmPopup.opened, 'in': $scopeAs.jqmPopup.opened}\"\n" +
+    "  ng-click=\"$scopeAs.jqmPopup.hide()\">\n" +
     "</div>\n" +
     "");
 }]);
@@ -3594,4 +3585,4 @@ angular.module("templates/jqmTextinput.html", []).run(["$templateCache", functio
     "");
 }]);
 
-angular.element(window.document).find('head').append('<style type="text/css">* {\n    -webkit-backface-visibility-hidden;\n}\nhtml, body {\n    -webkit-user-select: none;\n}\n\n/* browser resets */\n.ui-mobile, .ui-mobile html, .ui-mobile body {\n    height: 100%;\n    margin: 0\n}\n\n.ui-footer {\n    position: absolute;\n    bottom: 0;\n    width: 100%;\n    z-index: 1\n}\n\n.ui-header {\n    position: absolute;\n    top: 0;\n    width: 100%;\n    z-index: 1\n}\n\n.ui-mobile .ui-page {\n    height: 100%;\n    min-height: 0;\n    overflow: hidden;\n}\n.ui-content {\n    position: relative;\n    margin: 0;\n    padding: 0;\n}\n.ui-content.jqm-content-with-header {\n    margin-top: 42px\n}\n\n.ui-content.jqm-content-with-footer {\n    margin-bottom: 43px\n}\n.jqm-standalone-page {\n    display: block;\n    position: relative;\n}\n\n.ui-panel {\n  position: absolute;\n}\n\n.ui-panel-closed {\n  display: none;\n}\n\n.ui-panel.ui-panel-opened {\n  z-index: 1001;\n}\n.ui-panel-dismiss {\n  z-index: 1000; /* lower than ui-panel */\n}\n\n.ui-panel-content-wrap {\n    height: 100%\n}\n\n.jqm-panel-container {\n    position: relative;\n    width: 100%;\n    height: 100%;\n}\n\n\n.ui-mobile-viewport {\n    /* needed to allow multiple viewports */\n    position: relative;\n    height:100%\n}\n</style>');})(window, angular);
+angular.element(window.document).find('head').append('<style type="text/css">* {\n    -webkit-backface-visibility-hidden;\n}\nhtml, body {\n    -webkit-user-select: none;\n}\n\n/* browser resets */\n.ui-mobile, .ui-mobile html, .ui-mobile body {\n    height: 100%;\n    margin: 0\n}\n\n.ui-footer {\n    position: absolute;\n    bottom: 0;\n    width: 100%;\n    z-index: 1\n}\n\n.ui-header {\n    position: absolute;\n    top: 0;\n    width: 100%;\n    z-index: 1\n}\n\n.ui-mobile .ui-page {\n    height: 100%;\n    min-height: 0;\n    overflow: hidden;\n}\n.ui-content {\n    position: relative;\n    margin: 0;\n    padding: 0;\n}\n.ui-content.jqm-content-with-header {\n    top: 42px\n}\n\n.ui-content.jqm-content-with-footer {\n    bottom: 43px\n}\n.jqm-standalone-page {\n    display: block;\n    position: relative;\n}\n\n.ui-panel {\n  position: absolute;\n}\n\n.ui-panel-closed {\n  display: none;\n}\n\n.ui-panel-content-wrap {\n    height: 100%\n}\n\n.jqm-panel-container {\n    position: relative;\n    width: 100%;\n    height: 100%;\n}\n\n.ui-panel-dismiss {\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  margin: auto;\n  width: auto;\n  height: auto;\n}\n.ui-panel-dismiss-open.ui-panel-dismiss-left {\n  left: 17em;\n}\n.ui-panel-dismiss-open.ui-panel-dismiss-right {\n  right: 17em;\n}\n\n.ui-mobile-viewport {\n    /* needed to allow multiple viewports */\n    position: relative;\n    height:100%\n}\n</style>');})(window, angular);
