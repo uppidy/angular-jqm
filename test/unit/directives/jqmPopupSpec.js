@@ -81,6 +81,24 @@ describe('jqmPopup', function() {
         });
     });
 
+    describe('overlay', function() {
+        var overlay;
+        beforeEach(function() {
+            overlay = angular.element(parent[0].querySelector('.ui-popup-screen'));
+        });
+
+        it('should show and hide overlay with popup', function() {
+            scope.poppy.show(target);
+            scope.$apply();
+            expect(overlay).toHaveClass('in');
+            expect(overlay).not.toHaveClass('ui-screen-hidden');
+            scope.poppy.hide();
+            scope.$apply();
+            expect(overlay).not.toHaveClass('in');
+            expect(overlay).toHaveClass('ui-screen-hidden');
+        });
+    });
+
     describe('event broadcast', function() {
         var spy;
         beforeEach(inject(function($rootScope) {
