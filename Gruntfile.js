@@ -33,9 +33,15 @@ module.exports = function(grunt) {
         dest: '.tmp/angular-jqm-templates.js'
       }
     },
-    css2js: {
+    cssmin: {
       all: {
         src: ['src/css/**/*.css'],
+        dest: '.tmp/angular-jqm.css'
+      }
+    },
+    css2js: {
+      all: {
+        src: ['.tmp/angular-jqm.css'],
         dest: '.tmp/angular-jqm.css.js'
       }
     },
@@ -51,7 +57,7 @@ module.exports = function(grunt) {
     },
     watch: {
       files: ['src/**/*','test/**/*'],
-      tasks: ['html2js','css2js','concat','karma:dev:run']
+      tasks: ['build', 'karma:dev:run']
     },
     jshint: {
       options: {
@@ -140,7 +146,7 @@ module.exports = function(grunt) {
       dev: {
         options: {
           singleRun: false,
-          browsers: [process.env.TRAVIS ? 'Firefox' : 'PhantomJS'] //Travis CI has firefox, we use it
+          browsers: ['PhantomJS']
         },
         background: true
       },
@@ -157,7 +163,8 @@ module.exports = function(grunt) {
       localBuild: {
         options: {
           singleRun: true,
-          browsers: ['PhantomJS']
+           //Travis CI has firefox, we use it
+          browsers: [process.env.TRAVIS ? 'Firefox' : 'PhantomJS']
         }
       }
     },
@@ -222,7 +229,7 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('build', ['html2js', 'css2js', 'concat']);
+  grunt.registerTask('build', ['html2js', 'cssmin', 'css2js', 'concat']);
   grunt.registerTask('dev', ['connect','karma:dev','watch']);
   grunt.registerTask('default', ['build','jshint','karma:localBuild','ngdocs']);
   grunt.registerTask('install', 'Prepare development environment', function() {
@@ -232,6 +239,7 @@ module.exports = function(grunt) {
   grunt.registerTask('curl', 'curl-dir'); //alias
 
   grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');

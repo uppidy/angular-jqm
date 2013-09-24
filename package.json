@@ -18,7 +18,8 @@
     "grunt-conventional-changelog": "~1.0.0",
     "grunt-curl": "~1.1.1",
     "karma-sauce-launcher": "~0.1.0",
-    "karma": "~0.10.2"
+    "karma": "~0.10.2",
+    "grunt-contrib-cssmin": "~0.6.2"
   },
   "engine": "node 0.8.x",
   "repository": {
