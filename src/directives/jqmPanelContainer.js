@@ -91,7 +91,6 @@ jqmModule.directive('jqmPanelContainer', ['$timeout', '$transitionComplete', '$s
 
         function openPanelChanged() {
             updatePanelContent();
-            var panelIsOpen = false;
             angular.forEach(panels, function (panel) {
                 var opened = panel.scope.position === $scope.openPanelName;
                 if (opened) {

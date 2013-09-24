@@ -29,10 +29,15 @@ describe('jqmPanelContainer', function() {
             expect(panelContainerEl).not.toHaveClass('jqm-panel-container-open');
         });
         it('adds the right classes when a panel is open', function() {
-            compile('<div jqm-panel-container="\'left\'"><div jqm-panel position="left"></div></div>');
+            compile('<div jqm-panel-container="panel"><div jqm-panel position="left"></div></div>');
             expect(panelContainerEl).toHaveClass('jqm-panel-container');
+            scope.$apply("panel = 'left'");
             $timeout.flush();
+            expect(panelContainerEl).toHaveClass('jqm-panel-container');
             expect(panelContainerEl).toHaveClass('jqm-panel-container-open');
+            scope.$apply("panel = null");
+            expect(panelContainerEl).toHaveClass('jqm-panel-container');
+            expect(panelContainerEl).not.toHaveClass('jqm-panel-container-open');
         });
     });
 
