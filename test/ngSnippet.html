@@ -45,7 +45,11 @@
           Hello, popup! What's poppin?! 
         </div>
 
-        <div jqm-header><h1>Page1</h1></div>
+        <div jqm-header>
+          <div class="ui-btn-left" jqm-button ng-click="$root.panel='left'">left</div>
+          <h1>Header</h1>
+          <div class="ui-btn-right" jqm-button ng-click="$root.panel='right'">right</div>
+        </div>
         <a href="#/page2.html">To page2</a>
 
         <div jqm-button ng-click="popIsShown = true">
@@ -57,6 +61,12 @@
 
         <div jqm-button>
           Test
+        </div>
+
+        <div jqm-controlgroup type="horizontal">
+          <div jqm-button ng-repeat="d in ['push','reveal','overlay']" ng-click="$root.display=d">
+            {{$root.display==d ? '**'+d+'**' : d}}
+          </div> 
         </div>
 
         <p>hello</p>
@@ -102,10 +112,18 @@
     </div>
 </script>
 
-<div jqm-caching-view>
-    <div jqm-footer><h1>Fixed Footer</h1></div>
-
-</div>
+<div jqm-panel-container="$root.panel" ng-init="$root.display = 'reveal'">
+  <div jqm-panel display="{{$root.display}}">
+    <h1>Hello</h1>
+  </div>
+  <div jqm-panel position="right" display="{{$root.display}}">
+    <h1>Goodbye</h1>
+  </div>
+  <div jqm-caching-view>
+    <div jqm-footer>
+      <h1>Fixed Footer</h1>
+    </div>
+  </div>
 </body>
 
 </html>
