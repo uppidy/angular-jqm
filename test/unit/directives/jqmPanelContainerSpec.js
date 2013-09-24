@@ -21,6 +21,20 @@ describe('jqmPanelContainer', function() {
         });
 
     }
+    
+    describe('container', function() {
+        it('adds the right classes when no panel is open', function() {
+            compile('<div jqm-panel-container></div>');
+            expect(panelContainerEl).toHaveClass('jqm-panel-container');
+            expect(panelContainerEl).not.toHaveClass('jqm-panel-container-open');
+        });
+        it('adds the right classes when a panel is open', function() {
+            compile('<div jqm-panel-container="\'left\'"><div jqm-panel position="left"></div></div>');
+            expect(panelContainerEl).toHaveClass('jqm-panel-container');
+            $timeout.flush();
+            expect(panelContainerEl).toHaveClass('jqm-panel-container-open');
+        });
+    });
 
     describe('content wrapping', function() {
         it('adds the right classes when no panel is open', function() {

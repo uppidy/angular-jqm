@@ -16,18 +16,24 @@
     height: 100%;
 }
 
-.ui-panel-dismiss {
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  width: auto;
-  height: auto;
+.ui-panel-dismiss-open {
+  -webkit-transition: -webkit-transform 350ms ease;
+  -moz-transition: -moz-transform 350ms ease;
+  transition: transform 350ms ease;
+
+  -webkit-transform: translateX(0em);
+  -moz-transform: translateX(0em);
+  transform: translateX(0em);
+
+  display: block;
 }
-.ui-panel-dismiss-open.ui-panel-dismiss-left {
-  left: 17em;
+.jqm-panel-container-open .ui-panel-dismiss-open.ui-panel-dismiss-left {
+  -webkit-transform: translateX(17em);
+  -moz-transform: translateX(17em);
+  transform: translateX(17em);
 }
-.ui-panel-dismiss-open.ui-panel-dismiss-right {
-  right: 17em;
+.jqm-panel-container-open .ui-panel-dismiss-open.ui-panel-dismiss-right {
+  -webkit-transform: translateX(-17em);
+  -moz-transform: translateX(-17em);
+  transform: translateX(-17em);
 }

@@ -91,15 +91,18 @@ jqmModule.directive('jqmPanelContainer', ['$timeout', '$transitionComplete', '$s
 
         function openPanelChanged() {
             updatePanelContent();
+            var panelIsOpen = false;
             angular.forEach(panels, function (panel) {
                 var opened = panel.scope.position === $scope.openPanelName;
                 if (opened) {
                     panel.element.removeClass('ui-panel-closed');
                     $timeout(function () {
+                        $element.addClass('jqm-panel-container-open');
                         panel.element.addClass('ui-panel-open');
                     }, 1, false);
                 } else {
                     panel.element.removeClass('ui-panel-open ui-panel-opened');
+                    $element.removeClass('jqm-panel-container-open');
                 }
             });
 
