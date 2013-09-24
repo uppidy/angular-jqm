@@ -1654,7 +1654,7 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
         }
         popupModel.assign(scope.$parent, scope);
 
-        elm.after( $compile(popupOverlayTemplate)(scope) );
+        elm.parent().prepend( $compile(popupOverlayTemplate)(scope) );
 
         //Publicly expose show, hide methods
         scope.show = show;
