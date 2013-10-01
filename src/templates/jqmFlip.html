@@ -1,17 +1,17 @@
 <div jqm-scope-as="jqmFlip">
-        <label class="ui-slider" ng-transclude></label>
-        <div class="ui-slider ui-slider-switch ui-btn-down-{{$scopeAs.jqmFlip.theme}} ui-btn-corner-all"
-             jqm-class="{'ui-disabled': $scopeAs.jqmFlip.disabled,
-                        'ui-mini': $scopeAs.jqmFlip.isMini()}"
-             ng-click="$scopeAs.jqmFlip.toggle()">
-             <span class="ui-slider-label ui-slider-label-a ui-btn-active ui-btn-corner-all" ng-style="{width: $scopeAs.jqmFlip.onStyle + '%'}">{{$scopeAs.jqmFlip.onLabel}}</span>
-             <span class="ui-slider-label ui-slider-label-b ui-btn-down-{{$scopeAs.jqmFlip.theme}} ui-btn-corner-all" ng-style="{width: $scopeAs.jqmFlip.offStyle + '%'}">{{$scopeAs.jqmFlip.offLabel}}</span>
-                <div class="ui-slider-inneroffset">
-                  <a class="ui-slider-handle ui-slider-handle-snapping ui-btn ui-btn-corner-all ui-btn-up-{{$scopeAs.jqmFlip.theme}} ui-shadow"
-                     title="{{$scopeAs.jqmFlip.toggleLabel}}"
-                     ng-style="{left: $scopeAs.jqmFlip.onStyle + '%'}">
-                    <span class="ui-btn-inner"><span class="ui-btn-text"></span></span>
-                  </a>
-                </div>
+    <label class="ui-slider" ng-transclude></label>
+    <div class="ui-slider ui-slider-switch ui-btn-down-{{$scopeAs.jqmFlip.theme}} ui-btn-corner-all"
+       jqm-class="{'ui-disabled': $scopeAs.jqmFlip.disabled,
+            'ui-mini': $scopeAs.jqmFlip.isMini()}"
+       ng-click="$scopeAs.jqmFlip.toggle()">
+       <span class="ui-slider-label ui-slider-label-a ui-btn-active ui-btn-corner-all" ng-style="{width: $scopeAs.jqmFlip.onStyle + '%'}">{{$scopeAs.jqmFlip.onLabel}}</span>
+       <span class="ui-slider-label ui-slider-label-b ui-btn-down-{{$scopeAs.jqmFlip.theme}} ui-btn-corner-all" ng-style="{width: $scopeAs.jqmFlip.offStyle + '%'}">{{$scopeAs.jqmFlip.offLabel}}</span>
+        <div class="ui-slider-inneroffset">
+          <a class="ui-slider-handle ui-slider-handle-snapping ui-btn ui-btn-corner-all ui-btn-up-{{$scopeAs.jqmFlip.theme}} ui-shadow"
+           title="{{$scopeAs.jqmFlip.toggleLabel}}"
+           ng-style="{left: $scopeAs.jqmFlip.onStyle + '%'}">
+          <span class="ui-btn-inner"><span class="ui-btn-text"></span></span>
+          </a>
         </div>
+    </div>
 </div>

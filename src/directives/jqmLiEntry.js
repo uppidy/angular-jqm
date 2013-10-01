@@ -22,20 +22,20 @@
  * Must be inside of a {@link jqm.direcitve:jqmListview jqmListview}
  */
 jqmModule.directive({
-    jqmLiEntry: jqmLiEntryDirective(false),
-    jqmLiDivider: jqmLiEntryDirective(true)
+  jqmLiEntry: jqmLiEntryDirective(false),
+  jqmLiDivider: jqmLiEntryDirective(true)
 });
 function jqmLiEntryDirective(isDivider) {
-    return function() {
-        return {
-            restrict: 'A',
-            replace: true,
-            transclude: true,
-            scope: {},
-            templateUrl: 'templates/jqmLiEntry.html',
-            link: function(scope) {
-                scope.divider = isDivider;
-            }
-        };
+  return function() {
+    return {
+      restrict: 'A',
+      replace: true,
+      transclude: true,
+      scope: {},
+      templateUrl: 'templates/jqmLiEntry.html',
+      link: function(scope) {
+        scope.divider = isDivider;
+      }
     };
+  };
 }

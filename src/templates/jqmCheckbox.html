@@ -1,18 +1,18 @@
 <div jqm-scope-as="jqmCheckbox"
-     class="ui-checkbox" jqm-class="{'ui-disabled': $scopeAs.jqmCheckbox.disabled}">
-    <label jqm-class="{'ui-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-checkbox-off': !$scopeAs.jqmCheckbox.checked,
-           'ui-first-child': $scopeAs.jqmCheckbox.$position.first, 'ui-last-child': $scopeAs.jqmCheckbox.$position.last,
-           'ui-mini':$scopeAs.jqmCheckbox.isMini(), 'ui-fullsize':!$scopeAs.jqmCheckbox.isMini(),
-           'ui-btn-active':$scopeAs.jqmCheckbox.isActive(),
-           'ui-btn-icon-left': $scopeAs.jqmCheckbox.getIconPos()!='right', 'ui-btn-icon-right': $scopeAs.jqmCheckbox.getIconPos()=='right'}"
-           ng-click="$scopeAs.jqmCheckbox.toggleChecked()"
-           jqm-once-class="ui-btn-up-{{$scopeAs.jqmCheckbox.$theme}}"
-           class="ui-btn ui-btn-corner-all">
-        <span class="ui-btn-inner">
-            <span class="ui-btn-text" ng-transclude></span>
-            <span jqm-class="{'ui-icon-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-icon-checkbox-off': !$scopeAs.jqmCheckbox.checked}"
-                  class="ui-icon ui-icon-shadow"></span>
-        </span>
-    </label>
-    <input type="checkbox" ng-model="$scopeAs.jqmCheckbox.checked">
+   class="ui-checkbox" jqm-class="{'ui-disabled': $scopeAs.jqmCheckbox.disabled}">
+  <label jqm-class="{'ui-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-checkbox-off': !$scopeAs.jqmCheckbox.checked,
+       'ui-first-child': $scopeAs.jqmCheckbox.$position.first, 'ui-last-child': $scopeAs.jqmCheckbox.$position.last,
+       'ui-mini':$scopeAs.jqmCheckbox.isMini(), 'ui-fullsize':!$scopeAs.jqmCheckbox.isMini(),
+       'ui-btn-active':$scopeAs.jqmCheckbox.isActive(),
+       'ui-btn-icon-left': $scopeAs.jqmCheckbox.getIconPos()!='right', 'ui-btn-icon-right': $scopeAs.jqmCheckbox.getIconPos()=='right'}"
+       ng-click="$scopeAs.jqmCheckbox.toggleChecked()"
+       jqm-once-class="ui-btn-up-{{$scopeAs.jqmCheckbox.$theme}}"
+       class="ui-btn ui-btn-corner-all">
+    <span class="ui-btn-inner">
+      <span class="ui-btn-text" ng-transclude></span>
+      <span jqm-class="{'ui-icon-checkbox-on': $scopeAs.jqmCheckbox.checked, 'ui-icon-checkbox-off': !$scopeAs.jqmCheckbox.checked}"
+          class="ui-icon ui-icon-shadow"></span>
+    </span>
+  </label>
+  <input type="checkbox" ng-model="$scopeAs.jqmCheckbox.checked">
 </div>

@@ -1,8 +1,8 @@
 * {
-    -webkit-backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 html, body {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
 }

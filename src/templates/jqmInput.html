@@ -1,21 +1,21 @@
 <div jqm-scope-as="jqmTextinput"
-     ng-class="{
-        'ui-input-has-clear': ($scopeAs.jqmTextinput.clearBtn && !$scopeAs.jqmTextinput.isSearch()),
-        'ui-disabled': $scopeAs.jqmTextinput.disabled,
-        'ui-mini': $scopeAs.jqmTextinput.mini,
-        'ui-input-search ui-btn-corner-all ui-icon-searchfield': $scopeAs.jqmTextinput.type === 'search',
-        'ui-input-text ui-corner-all': !$scopeAs.jqmTextinput.isSearch()}"
-     class="ui-shadow-inset ui-btn-shadow ui-body-{{$scopeAs.jqmTextinput.$theme}}">
-    <a ng-if="$scopeAs.jqmTextinput.clearBtn || $scopeAs.jqmTextinput.type === 'search'" 
-       ng-class="{'ui-input-clear-hidden': !showClearBtn()}"
-       ng-click="clearBtnClicked()"
-       class="ui-input-clear ui-btn ui-shadow ui-btn-corner-all ui-fullsize ui-btn-icon-notext"
-       jqm-once-class="ui-btn-up-{{$theme}}"
-       title="{{clearBtnTextValue}}">
+   ng-class="{
+    'ui-input-has-clear': ($scopeAs.jqmTextinput.clearBtn && !$scopeAs.jqmTextinput.isSearch()),
+    'ui-disabled': $scopeAs.jqmTextinput.disabled,
+    'ui-mini': $scopeAs.jqmTextinput.mini,
+    'ui-input-search ui-btn-corner-all ui-icon-searchfield': $scopeAs.jqmTextinput.type === 'search',
+    'ui-input-text ui-corner-all': !$scopeAs.jqmTextinput.isSearch()}"
+   class="ui-shadow-inset ui-btn-shadow ui-body-{{$scopeAs.jqmTextinput.$theme}}">
+  <a ng-if="$scopeAs.jqmTextinput.clearBtn || $scopeAs.jqmTextinput.type === 'search'" 
+     ng-class="{'ui-input-clear-hidden': !showClearBtn()}"
+     ng-click="clearBtnClicked()"
+     class="ui-input-clear ui-btn ui-shadow ui-btn-corner-all ui-fullsize ui-btn-icon-notext"
+     jqm-once-class="ui-btn-up-{{$theme}}"
+     title="{{clearBtnTextValue}}">
    <span class="ui-btn-inner">
-                   <span class="ui-btn-text" ng-bind="clearBtnTextValue"></span>
-                   <span class="ui-icon ui-icon-delete ui-icon-shadow">&nbsp;</span>
-               </span>
-    </a>
+           <span class="ui-btn-text" ng-bind="clearBtnTextValue"></span>
+           <span class="ui-icon ui-icon-delete ui-icon-shadow">&nbsp;</span>
+         </span>
+  </a>
 
 </div>

@@ -13,32 +13,32 @@
  * @require jqmPanelContainer.
  */
 jqmModule.directive('jqmPanel', function() {
-    var isDef = angular.isDefined;
-    return {
-        restrict: 'A',
-        require: '^jqmPanelContainer',
-        replace: true,
-        transclude: true,
-        templateUrl: 'templates/jqmPanel.html',
-        // marker controller.
-        controller: angular.noop,
-        scope: {
-            display: '@',
-            position: '@'
-        },
-        compile: function(element, attr) {
-            attr.display = isDef(attr.display) ? attr.display : 'reveal';
-            attr.position = isDef(attr.position) ? attr.position : 'left';
+  var isDef = angular.isDefined;
+  return {
+    restrict: 'A',
+    require: '^jqmPanelContainer',
+    replace: true,
+    transclude: true,
+    templateUrl: 'templates/jqmPanel.html',
+    // marker controller.
+    controller: angular.noop,
+    scope: {
+      display: '@',
+      position: '@'
+    },
+    compile: function(element, attr) {
+      attr.display = isDef(attr.display) ? attr.display : 'reveal';
+      attr.position = isDef(attr.position) ? attr.position : 'left';
 
-            return function(scope, element, attr, jqmPanelContainerCtrl) {
-                if (scope.position !== 'left' && scope.position !== 'right') {
-                    throw new Error("jqm-panel position is invalid. Expected 'left' or 'right', got '"+scope.position+"'");
-                }
-                jqmPanelContainerCtrl.addPanel({
-                    scope: scope,
-                    element: element
-                });
-            };
+      return function(scope, element, attr, jqmPanelContainerCtrl) {
+        if (scope.position !== 'left' && scope.position !== 'right') {
+          throw new Error("jqm-panel position is invalid. Expected 'left' or 'right', got '"+scope.position+"'");
         }
-    };
+        jqmPanelContainerCtrl.addPanel({
+          scope: scope,
+          element: element
+        });
+      };
+    }
+  };
 });

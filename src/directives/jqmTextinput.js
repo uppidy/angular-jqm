@@ -29,66 +29,66 @@
  </example>
  */
 jqmModule.directive('jqmTextinput', ['inputDirective', function (inputDirective) {
-    return {
-        templateUrl: 'templates/jqmTextinput.html',
-        replace: true,
-        restrict: 'A',
-        require: '?ngModel',
-        scope: {
-            clearBtn: '@',
-            type: '@',
-            clearBtnText: '@',
-            disabled: '@',
-            mini: '@',
-            placeholder: '@'
-        },
-        link: function (scope, element, attr, ngModelCtrl) {
-            var input = angular.element(element[0].getElementsByTagName("input"));
+  return {
+    templateUrl: 'templates/jqmTextinput.html',
+    replace: true,
+    restrict: 'A',
+    require: '?ngModel',
+    scope: {
+      clearBtn: '@',
+      type: '@',
+      clearBtnText: '@',
+      disabled: '@',
+      mini: '@',
+      placeholder: '@'
+    },
+    link: function (scope, element, attr, ngModelCtrl) {
+      var input = angular.element(element[0].getElementsByTagName("input"));
 
-            scope.typeValue = type();
-            scope.clearBtnTextValue = scope.clearBtnText || 'clear text';
+      scope.typeValue = type();
+      scope.clearBtnTextValue = scope.clearBtnText || 'clear text';
 
-            linkInput();
-            scope.getValue = getValue;
-            scope.clearValue = clearValue;
-            scope.isSearch = isSearch;
+      linkInput();
+      scope.getValue = getValue;
+      scope.clearValue = clearValue;
+      scope.isSearch = isSearch;
 
-            function type() {
-                var inputType = scope.type || 'text';
-                return (inputType === 'search') ? 'text' : inputType;
-            }
+      function type() {
+        var inputType = scope.type || 'text';
+        return (inputType === 'search') ? 'text' : inputType;
+      }
 
-            function getValue() {
-                return scope.type === 'color' || (ngModelCtrl && ngModelCtrl.$viewValue);
-            }
+      function getValue() {
+        return scope.type === 'color' || (ngModelCtrl && ngModelCtrl.$viewValue);
+      }
 
-            function clearValue(event) {
-                event.preventDefault();
+      function clearValue(event) {
+        event.preventDefault();
 
 
-                input[0].value = '';
-                if (ngModelCtrl) {
-                    ngModelCtrl.$setViewValue('');
-                }
-            }
-
-            function isSearch() {
-                return scope.type === 'search';
-            }
-
-            function linkInput() {
-                input.bind('focus', function () {
-                    element.addClass('ui-focus');
-                });
-                input.bind('blur', function () {
-                    element.removeClass('ui-focus');
-                });
-
-                angular.forEach(inputDirective, function (directive) {
-                    directive.link(scope, input, attr, ngModelCtrl);
-                });
-                return input;
-            }
+        input[0].value = '';
+        if (ngModelCtrl) {
+          ngModelCtrl.$setViewValue('');
         }
-    };
+      }
+
+      function isSearch() {
+        return scope.type === 'search';
+      }
+
+      function linkInput() {
+        input.bind('focus', function () {
+          element.addClass('ui-focus');
+        });
+        input.bind('blur', function () {
+          element.removeClass('ui-focus');
+        });
+
+        angular.forEach(inputDirective, function (directive) {
+          directive.link(scope, input, attr, ngModelCtrl);
+        });
+        return input;
+      }
+    }
+  };
 }]);
