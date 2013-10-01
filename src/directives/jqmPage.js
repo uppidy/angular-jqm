@@ -83,9 +83,9 @@ jqmModule.directive('jqmPage', ['$rootScope', '$controller', '$scroller', functi
     this.scroll = function(newPos, easeTime) {
       if (arguments.length) {
         if (arguments.length === 2) {
-          scroller.transformer.easeTo(newPos, easeTime);
+          scroller.transformer.easeTo({x:0,y:newPos}, easeTime);
         } else {
-          scroller.transformer.setTo(newPos);
+          scroller.transformer.setTo({x:0,y:newPos});
         }
       }
       return scroller.transformer.pos;

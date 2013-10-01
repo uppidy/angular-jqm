@@ -108,18 +108,18 @@ describe('jqmPage controller', function() {
 
     it('page method gives $transformer.pos with args',  function() {
         expect(pageCtrl.scroll()).toEqual(transformer.pos);
-        transformer.setTo(-50);
-        expect(pageCtrl.scroll()).toEqual(-50);
+        transformer.setTo({x:0,y:-50});
+        expect(pageCtrl.scroll()).toEqual({x:0,y:-50});
     });
 
     it('page method calls setTo with one arg', function() {
         pageCtrl.scroll(-50);
-        expect(transformer.pos).toBe(-50);
+        expect(transformer.pos.y).toBe(-50);
     });
 
     it('page method with two args calls easeTo', function() {
         spyOn(transformer, 'easeTo').andCallThrough();
-        pageCtrl.scroll(-50, 50);
-        expect(transformer.easeTo).toHaveBeenCalledWith(-50, 50);
+        pageCtrl.scroll({x:0,y:-50}, 50);
+        expect(transformer.easeTo).toHaveBeenCalledWith({x:0,y:-50}, 50);
     });
 });
