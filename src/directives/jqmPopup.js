@@ -8,7 +8,7 @@
  *
  * Tip: put a {@link jqm.directive:jqmView jqmView} inside a popup to have full scrollable pages inside.
  * <pre>
- * <div jqm-popup="myPopup">
+ * <div jqm-popup="myPopup" class="fade">
  *   <div jqm-view="{
  *   templateUrl: 'views/my-popup-content-page.html',
  *   controller: 'MyPopupController'
@@ -17,7 +17,6 @@
  * </pre>
  *
  * @param {expression} jqmPopup Assignable angular expression to bind this popup to.  jqmPopupTargets will point to this model.
- * @param {expression=} animation jQuery Mobile animation to use to show/hide this popup.  Default 'fade'.
  * @param {expression=} placement Where to put the popup relative to its target.  Available: 'left', 'right', 'top', 'bottom', 'inside'. Default: 'inside'.
  * @param {expression=} overlay-theme The theme to use for the overlay behind the popup. Defaults to the popup's theme.
  * @param {expression=} corners Whether the popup has corners. Default true.
@@ -56,7 +55,7 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
     restrict: 'A',
     replace: true,
     transclude: true,
-    templateUrl: 'templates/jqmPopup.html',
+    template: '<%= inlineTemplate("templates/jqmPopup.html") %>',
     require: '^?jqmPage',
     scope: {
       corners: '@',

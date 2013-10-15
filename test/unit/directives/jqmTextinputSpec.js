@@ -4,7 +4,6 @@ describe("jqmTextInput", function () {
     beforeEach(function () {
         ng = testutils.ng;
         jqm = testutils.jqm;
-        module('templates/jqmTextinput.html');
     });
 
      describe("Same Markup compared to jqm", function () {

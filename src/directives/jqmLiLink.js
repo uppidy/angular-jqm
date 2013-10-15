@@ -23,7 +23,7 @@ jqmModule.directive('jqmLiLink', [function() {
     restrict: 'A',
     transclude: true,
     replace: true,
-    templateUrl: 'templates/jqmLiLink.html',
+    template: '<%= inlineTemplate("templates/jqmLiLink.html") %>',
     controller: ['$scope', JqmLiController],
     scope: {
       icon: '@',

@@ -17,14 +17,17 @@ module.exports = function(config) {
 
     // list of files to exclude
     exclude: [
-      
     ],
 
     // web server port
     port: 9876,
 
-    preprocessors: {},
-
+    preprocessors: {
+      'src/directives/*.js': ['inlineTemplate']
+    },
+    inlineTemplatePreprocessor: {
+      base: 'src'
+    },
 
     // cli runner port
     runnerPort: 9100,
@@ -33,6 +36,7 @@ module.exports = function(config) {
     // enable / disable colors in the output (reporters and logs)
     colors: true,
 
+    reporters: ['dots'],
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG

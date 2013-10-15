@@ -1,3 +1,4 @@
+/*
 function jqmWrappedDirective(directiveName, templateUrl, directiveObject) {
   var actualDirectiveName = directiveName + 'Actual';
   
@@ -68,3 +69,4 @@ jqmWrappedDirective('jqmInput', 'templates/jqmInput.html', [function() {
     }
   };
 }]);
+*/

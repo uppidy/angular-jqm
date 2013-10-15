@@ -12,15 +12,14 @@ jqmModule.factory('$hideAddressBar', ['$window', '$rootElement', '$orientation',
   var MIN_SCREEN_HEIGHT_WIDTH_OPT_OUT = 500,
     MAX_SCREEN_HEIGHT = 800,
     scrollToHideAddressBar,
-    cachedHeights = {
-    };
+    cachedHeights = {};
   if (!$window.addEventListener || addressBarHidingOptOut()) {
-    return noop;
+    return noopCallback;
   } else {
     return hideAddressBar;
   }
 
-  function noop(done) {
+  function noopCallback(done) {
     if (done) {
       done();
     }
@@ -29,7 +28,7 @@ jqmModule.factory('$hideAddressBar', ['$window', '$rootElement', '$orientation',
   // -----------------
   function hideAddressBar(done) {
     var orientation = $orientation(),
-      docHeight = cachedHeights[orientation];
+    docHeight = cachedHeights[orientation];
     if (!docHeight) {
       // if we don't know the exact height of the document without the address bar,
       // start with one that is always higher than the screen to be

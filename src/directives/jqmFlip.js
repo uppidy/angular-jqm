@@ -43,7 +43,7 @@ jqmModule.directive('jqmFlip', [function () {
     restrict: 'A',
     transclude: true,
     replace: true,
-    templateUrl: 'templates/jqmFlip.html',
+    template: '<%= inlineTemplate("templates/jqmFlip.html") %>',
     scope: {
       onLabel: '@',
       onValue: '@',

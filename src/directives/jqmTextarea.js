@@ -25,7 +25,7 @@
  */
 jqmModule.directive('jqmTextarea', ['textareaDirective', function (textareaDirective) {
   return {
-    templateUrl: 'templates/jqmTextarea.html',
+    template: '<%= inlineTemplate("templates/jqmTextarea.html") %>',
     replace: true,
     restrict: 'A',
     require: '?ngModel',

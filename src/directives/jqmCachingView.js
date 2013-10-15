@@ -75,63 +75,95 @@
     </file>
   </example>
 */
-jqmModule.directive('jqmCachingView', ['jqmViewDirective', 'jqmViewCache', '$injector',
-  function (jqmViewDirectives, jqmViewCache, $injector) {
-    return {
-      restrict: 'ECA',
-      controller: ['$scope', JqmCachingViewCtrl],
-      require: 'jqmCachingView',
-      compile: function(element, attr) {
-        var links = [];
-        angular.forEach(jqmViewDirectives, function (directive) {
-          links.push(directive.compile(element, attr));
-        });
-        return function (scope, element, attr, ctrl) {
-          angular.forEach(links, function (link) {
-            link(scope, element, attr, ctrl);
-          });
-        };
-      }
-    };
-
-    function JqmCachingViewCtrl($scope) {
-      var self = this;
-      angular.forEach(jqmViewDirectives, function (directive) {
-        $injector.invoke(directive.controller, self, {$scope: $scope});
+jqmModule.directive('jqmCachingView', ['jqmViewDirective', 'jqmViewCache', '$injector', '$q',
+function (jqmViewDirectives, jqmViewCache, $injector, $q) {
+  return {
+    restrict: 'A',
+    template: '<%= inlineTemplate("templates/jqmView.html") %>',
+    replace: true,
+    transclude: true,
+    controller: ['$scope', '$element', JqmCachingViewCtrl],
+    link: function(scope, element, attr, ctrl) {
+      forEach(jqmViewDirectives, function (directive) {
+        directive.link(scope, element, attr, ctrl);
       });
-      this.loadAndCompile = loadAndCompile;
-      this.watchAttrName = 'jqmCachingView';
-      this.onClearContent = onClearContent;
+    }
+  };
 
-      // --------
+  function JqmCachingViewCtrl($scope, $element) {
+    var self = this;
+    angular.forEach(jqmViewDirectives, function (directive) {
+      $injector.invoke(directive.controller, self, {
+        $scope: $scope,
+        $element: $element
+      });
+    });
+    //let other directives require this like a jqmView
+    $element.data('$jqmViewController', this);
 
-      function loadAndCompile(templateUrl) {
-        return jqmViewCache.load($scope, templateUrl).then(function (cacheEntry) {
-          var templateInstance = cacheEntry.next();
-          templateInstance.scope.$reconnect();
-          return templateInstance;
+    var loadViewNoCache = this.loadView;
+
+    this.viewWatchAttr = 'jqmCachingView';
+    this.loadView = loadViewCached;
+
+    function loadViewCached(templateUrl, template, lastView) {
+      var cachedView = jqmViewCache.get(templateUrl);
+      if (!templateUrl && template) {
+        return loadViewNoCache('', template);
+      }
+      if (cachedView) {
+        //If we're trying to load a view that's already loaded, just create a new instance for now
+        if (cachedView === lastView) {
+          return loadViewNoCache(templateUrl, template);
+        }
+        return $q.when(cachedView);
+      } else {
+        return self.fetchView(templateUrl).then(function(view) {
+          view.clear = cachingViewClear;
+          view.scope.$destroy = scopeClearAndDisconnect;
+          view.element.remove = detachNodes;
+          return jqmViewCache.put(templateUrl, view);
         });
       }
-
-      function onClearContent(contents) {
-        // Don't destroy the data of the elements when they are removed
-        contents.remove = detachNodes;
-      }
-
     }
+  }
 
-    // Note: element.remove() would
-    // destroy all data associated to those nodes,
-    // e.g. widgets, ...
-    function detachNodes() {
-      /*jshint -W040:true*/
-      var i, node, parent;
-      for (i = 0; i < this.length; i++) {
-        node = this[i];
-        parent = node.parentNode;
-        if (parent) {
-          parent.removeChild(node);
-        }
+  function cachingViewClear() {
+    /*jshint -W040:true*/
+    this.element.remove(); //detachNodes()
+    this.scope.$destroy(); //disconnectAndClear()
+    if (this.element.hasClass('ng-animate')) {
+      this.element.triggerHandler('animationend');
+    }
+    this.element.removeClass('ui-page-active');
+  }
+
+  // Note: element.remove() would
+  // destroy all data associated to those nodes,
+  // e.g. widgets, ...
+  function detachNodes() {
+    /*jshint -W040:true*/
+    var i, node, parent;
+    for (i = 0; i < this.length; i++) {
+      node = this[i];
+      parent = node.parentNode;
+      if (parent) {
+        parent.removeChild(node);
       }
     }
+  }
+  function scopeClearAndDisconnect() {
+    /*jshint -W040:true*/
+    var prop;
+    // clear all watchers, listeners and all non angular properties,
+    // so we have a fresh scope!
+    this.$$watchers = [];
+    this.$$listeners = [];
+    for (prop in this) {
+      if (this.hasOwnProperty(prop) && prop.charAt(0) !== '$') {
+        delete this[prop];
+      }
+    }
+    this.$disconnect();
+  }
 }]);

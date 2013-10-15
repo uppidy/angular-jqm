@@ -279,7 +279,7 @@ jasmine.getEnv().defaultTimeoutInterval = 25000;
         if (typeof pages === 'string') {
             pages = generatePages(pages);
         }
-        inject(function ($rootElement, $compile, $rootScope, $location, $templateCache, $animator) {
+        inject(function ($rootElement, $compile, $rootScope, $location, $templateCache, $animate) {
             addPages(pages);
             self.viewPort = $("<div jqm-caching-view></div>");
             $($rootElement).append(self.viewPort);
@@ -290,7 +290,7 @@ jasmine.getEnv().defaultTimeoutInterval = 25000;
             $rootScope.$apply();
             // Note: angular does not start animations until the first $apply is finished.
             // We have to simulate this here also!
-            $animator.enabled(true);
+            $animate.enabled(true);
 
             function addPages() {
                 var pageUrl, firstPage, page;

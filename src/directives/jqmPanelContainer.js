@@ -39,49 +39,28 @@
 </example>
  */
 
- jqmModule.directive('jqmPanelContainer', function () {
-  return {
-    restrict: 'A',
-    scope: {
-      openPanelName: '=jqmPanelContainer'
-    },
-    transclude: true,
-    templateUrl: 'templates/jqmPanelContainer.html',
-    replace: true
-  };
-});
-// Separate directive for the controller as we can't inject a controller from a directive with templateUrl
-// into children!
 jqmModule.directive('jqmPanelContainer', ['$timeout', '$transitionComplete', '$sniffer', function ($timeout, $transitionComplete, $sniffer) {
   return {
     restrict: 'A',
-    controller: ['$scope', '$element', JqmPanelContainerCtrl],
-    link: function(scope, element, attr, jqmPanelContainerCtrl) {
-      jqmPanelContainerCtrl.setContent(findPanelContent());
-
-      function findPanelContent() {
-        var content = angular.element();
-        angular.forEach(element.children(), function(element) {
-          var el = angular.element(element);
-          // ignore panels and the generated ui-panel-dismiss div.
-          if (!el.data('$jqmPanelController') && el.data('$scope') && el.scope().$$transcluded) {
-            content.push(element);
-          }
-        });
-        return content;
-      }
-    }
+    transclude: true,
+    replace: true,
+    template: '<%= inlineTemplate("templates/jqmPanelContainer.html") %>',
+    scope: {
+      openPanelName: '=jqmPanelContainer'
+    },
+    controller: ['$scope', '$element', JqmPanelContainerCtrl]
   };
   function JqmPanelContainerCtrl($scope, $element) {
     var panels = {},
-      content;
+      panelContent;
 
     this.addPanel = function (panel) {
       panels[panel.scope.position] = panel;
     };
-    this.setContent = function(_content) {
-      content = _content;
+    this.getPanel = function(position) {
+      return panels[position];
     };
+
     $scope.$watch('$scopeAs.pc.openPanelName', openPanelChanged);
     if (!$sniffer.animations) {
       $scope.$watch('$scopeAs.pc.openPanelName', transitionComplete);
@@ -124,9 +103,7 @@ jqmModule.directive('jqmPanelContainer', ['$timeout', '$transitionComplete', '$s
     }
 
     function updatePanelContent() {
-      if (!content) {
-        return;
-      }
+      var content = findPanelContent();
       var openPanel = panels[$scope.openPanelName],
         openPanelScope = openPanel && openPanel.scope;
 
@@ -146,5 +123,117 @@ jqmModule.directive('jqmPanelContainer', ['$timeout', '$transitionComplete', '$s
       content.toggleClass('ui-panel-content-wrap-display-overlay',
         !!(openPanelScope && openPanelScope.display === 'overlay'));
     }
+
+    function findPanelContent() {
+      if (!panelContent) {
+        panelContent = jqLite();
+        forEach($element.children(), function(node) {
+          var el = jqLite(node);
+          // ignore panels and the generated ui-panel-dismiss div.
+          if (!el.data('$jqmPanelController') && !el.hasClass('ui-panel-dismiss')) {
+            panelContent.push(node);
+          }
+        });
+      }
+      return panelContent;
+    }
+
+    /*
+    $scope.$evalAsync(function() {
+      setupPull();
+    });
+    function setupPull() {
+      var panelWidth = 17 * 16; //17em
+      var content = findPanelContent();
+      var dragger = $dragger(content, { mouse: true });
+      var contentsTransformer = $transformer(content);
+      var width;
+
+      dragger.addListener($dragger.DIRECTION_HORIZONTAL, onPullView);
+      
+      var panel, panelTransformer;
+      function onPullView(eventType, data) {
+        var newPos;
+        if (eventType === 'start') {
+          width = content.prop('offsetWidth');
+        } else if (eventType === 'move') {
+          if (!panel && (data.origin.x < 50 || data.origin.x > width - 50)) {
+            if (data.delta.x > 0) {
+              panel = panels.left && panels.left.scope.pullable && panels.left;
+            } else if (data.delta.x < 0) {
+              panel = panels.right && panels.right.scope.pullable && panels.right;
+            }
+            if (panel) {
+              panelTransformer = $transformer(panel.element);
+              panelTransformer.updatePosition();
+            }
+          }
+          if (panel) {
+            if (panel.scope.display === 'overlay' || panel.scope.display === 'push') {
+              newPos = panel.scope.position === 'left' ?
+                clamp(-panelWidth, -panelWidth + data.distance.x, 0) :
+                clamp(0, panelWidth + data.distance.x, panelWidth);
+              panelTransformer.setTo({x: newPos}, true);
+            }
+            if (panel.scope.display === 'push' || panel.scope.display === 'reveal') {
+              newPos = panel.scope.position === 'left' ? 
+                clamp(0, contentsTransformer.pos.x + data.delta.x, panelWidth) :
+                clamp(-panelWidth, contentsTransformer.pos.x + data.delta.x, 0);
+              contentsTransformer.setTo({x: newPos}, true);
+            }
+            if ($scope.openPanelName !== panel.scope.position) {
+              applyOpenPanelName(panel.scope.position);
+            }
+          }
+        } else if (eventType === 'end') {
+          if (panel) {
+            var percentOpen = clamp(0, Math.abs(data.distance.x) / panelWidth, 1);
+            
+            //If we're already there, no need to animate to open/closed spot
+            if (percentOpen === 1 || percentOpen === 0) {
+              done();
+            } else if (percentOpen > 0.25) {
+              if (panel.scope.display === 'overlay' || panel.scope.display === 'push') {
+                panelTransformer.easeTo({x: 0}, 150, done);
+              }
+              if (panel.scope.display === 'push' || panel.scope.display === 'reveal') {
+                newPos = panel.scope.position === 'left' ? panelWidth : -panelWidth;
+                contentsTransformer.easeTo({x: newPos}, 150, done);
+              }
+            } else {
+              if (panel.scope.display === 'overlay' || panel.scope.display === 'push') {
+                newPos = panel.scope.position === 'left' ? -panelWidth : panelWidth;
+                panelTransformer.easeTo({x: newPos}, 150, doneAndClear);
+              }
+              if (panel.scope.display === 'push' || panel.scope.display === 'reveal') {
+                contentsTransformer.easeTo({x: 0}, 150, doneAndClear);
+              }
+            }
+          }
+        }
+      }
+      function done() {
+        if (panel) {
+          panel = null;
+          panelTransformer.clear();
+          contentsTransformer.clear();
+        }
+      }
+      function doneAndClear() {
+        if (panel) {
+          applyOpenPanelName(null);
+          done();
+        }
+      }
+      function clamp(a,b,c) {
+        return Math.max(a, Math.min(b, c));
+      }
+      function applyOpenPanelName(name) {
+        $scope.$apply(function() {
+          $scope.openPanelName = name;
+        });
+      }
+    }
+    */
   }
 }]);

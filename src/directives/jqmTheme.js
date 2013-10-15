@@ -20,7 +20,7 @@
 jqmModule.directive('jqmTheme', [function () {
   return {
     restrict: 'A',
-    // Need an own scope so we can distinguish between the parent and the child scope!
+    priority: 1,
     scope: true,
     compile: function compile() {
       return {

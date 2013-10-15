@@ -19,7 +19,7 @@ describe('jqmPopup', function() {
     beforeEach(function() {
         parent = angular.element('<div>');
         target = angular.element('<div>');
-        compile('poppy', 'animation="banana"');
+        compile('poppy', 'class="pop"');
     });
 
     it('should create a popup scope with show, hide, opened', function() {
@@ -31,10 +31,6 @@ describe('jqmPopup', function() {
 
     it('should be hidden by default', function() {
         expect(el).toHaveClass('ui-popup-hidden');
-    });
-
-    it('should give animation class', function() {
-        expect(el).toHaveClass('banana');
     });
 
     it('should create one overlay per popup', function() {

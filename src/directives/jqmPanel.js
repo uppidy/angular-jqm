@@ -19,7 +19,7 @@ jqmModule.directive('jqmPanel', function() {
     require: '^jqmPanelContainer',
     replace: true,
     transclude: true,
-    templateUrl: 'templates/jqmPanel.html',
+    template: '<%= inlineTemplate("templates/jqmPanel.html") %>',
     // marker controller.
     controller: angular.noop,
     scope: {

@@ -4,7 +4,6 @@ describe("jqmFlip", function () {
     beforeEach(function () {
         ng = testutils.ng;
         jqm = testutils.jqm;
-        module('templates/jqmFlip.html');
     });
 
     function compile(ngAttrs, jqmAttrs) {

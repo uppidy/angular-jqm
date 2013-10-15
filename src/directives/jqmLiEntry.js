@@ -5,7 +5,7 @@
  * @restrict A
  *
  * @description
- * Creates a jQuery mobile entry list item. This is just a plain entry, instead of a 
+ * Creates a jQuery mobile entry list item. This is just a plain entry, instead of a
  * {@link jqm.directive:jqmLiLink jqmLiLink}.
  *
  * Must be inside of a {@link jqm.direcitve:jqmListview jqmListview}.
@@ -32,10 +32,9 @@ function jqmLiEntryDirective(isDivider) {
       replace: true,
       transclude: true,
       scope: {},
-      templateUrl: 'templates/jqmLiEntry.html',
-      link: function(scope) {
-        scope.divider = isDivider;
-      }
+      template: isDivider ?
+        '<%= inlineTemplate("templates/jqmLiDivider.html") %>' :
+        '<%= inlineTemplate("templates/jqmLiEntry.html") %>'
     };
   };
 }

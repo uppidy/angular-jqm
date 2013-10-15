@@ -47,7 +47,7 @@ jqmModule.directive('jqmButton', ['jqmClassDirective', 'jqmOnceClassDirective', 
   return {
     restrict: 'A',
     transclude: true,
-    templateUrl: 'templates/jqmButton.html',
+    template: '<%= inlineTemplate("templates/jqmButton.html") %>',
     scope: {
       iconpos: '@',
       icon: '@',

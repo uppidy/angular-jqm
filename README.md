@@ -31,8 +31,10 @@ also be easy to keep track of changes in jquery mobile when they release newer v
 ## Build
 Dependencies
 
-- angular
-- angular-mobile
+- angular (version 1.2)
+- angular-touch
+- angular-route
+- angular-animate
 - jquery-mobile css
 - (included: [angular-scrolly](https://github.com/ajoslin/angular-scrolly))
 
@@ -75,7 +77,9 @@ Your main html file should look like this:
     <head>
         <link type="text/css" rel="stylesheet" href="jquery.mobile-1.3.1.css">
         <script src="angular.js"></script>
-        <script src="angular-mobile.js"></script>
+        <script src="angular-touch.js"></script>
+        <script src="angular-animate.js"></script>
+        <script src="angular-route.js"></script>
         <script src="angular-jqm.js"></script>
         <!-- include your application script files here -->
         <script src="app.js"></script>

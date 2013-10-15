@@ -4,7 +4,6 @@ describe("jqmButton", function () {
     beforeEach(function () {
         ng = testutils.ng;
         jqm = testutils.jqm;
-        module('templates/jqmButton.html');
     });
 
     describe('markup compared to jqm', function () {

@@ -3,7 +3,7 @@ jqmModule.directive('jqmControlgroup', function() {
     restrict: 'A',
     replace: true,
     transclude: true,
-    templateUrl: 'templates/jqmControlgroup.html',
+    template: '<%= inlineTemplate("templates/jqmControlgroup.html") %>',
     scope: {
       mini: '@',
       iconpos: '@',

@@ -6,6 +6,7 @@
 - If it makes the directive easier, change the syntax from jqm. We don't want too many hacks in this lib - it should be easy to maintain.
 - Try to put the presentation logic in the template, and the business logic into the javascript.
 - For directives with isolate scopes, use jqm-scope-as (TODO: Explain jqm-scope-as)
+- Write external templates for your directives, and reference them as regular templates with the [inline-template](http://github.com/ajoslin/inline-template) plugin.  Check src/directives/jqmButton.js for an example.
 
 # How to contribute
 1. Clone the repository

@@ -4,7 +4,6 @@ describe('jqmListview directive', function() {
     beforeEach(function() {
         ng = testutils.ng;
         jqm = testutils.jqm;
-        module('templates/jqmListview.html');
     });
 
     describe('markup compared to jqm', function() {

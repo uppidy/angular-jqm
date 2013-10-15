@@ -5,7 +5,6 @@ describe('jqmPanelContainer', function() {
 
     beforeEach(function() {
         module(function($provide) {
-            $provide.value('$window', angular.mock.createMockWindow());
             return function(_$sniffer_, _$timeout_) {
                 $sniffer = _$sniffer_;
                 $sniffer.animations = false;

@@ -36,7 +36,7 @@ jqmModule.directive('jqmCheckbox', [function () {
     restrict: 'A',
     transclude: true,
     replace: true,
-    templateUrl: 'templates/jqmCheckbox.html',
+    template: '<%= inlineTemplate("templates/jqmCheckbox.html") %>',
     scope: {
       disabled: '@',
       mini: '@',

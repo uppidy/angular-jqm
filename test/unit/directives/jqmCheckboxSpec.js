@@ -4,7 +4,6 @@ describe("jqmCheckbox", function () {
     beforeEach(function () {
         ng = testutils.ng;
         jqm = testutils.jqm;
-        module('templates/jqmCheckbox.html');
     });
 
     function triggerNgLabel(event) {
@@ -269,7 +268,7 @@ describe("jqmCheckbox", function () {
 
 
             it('should be required if false', function() {
-                compileInput('<div jqm-checkbox ng:model="value" required />');
+                compileInput('<div jqm-checkbox ng-model="value" required />');
 
                 browserTrigger(inputElm, 'click');
                 expect(realInputElm[0].checked).toBe(true);
@@ -278,8 +277,7 @@ describe("jqmCheckbox", function () {
 
                 browserTrigger(inputElm, 'click');
                 expect(realInputElm[0].checked).toBe(false);
-                expect(inputElm.hasClass('ng-valid')).toBe(false);
-                expect(inputElm.hasClass('ng-invalid')).toBe(true);
+                expect(inputElm.hasClass('ng-valid-required')).toBe(true);
             });
         });
     });

@@ -30,7 +30,7 @@
  */
 jqmModule.directive('jqmTextinput', ['inputDirective', function (inputDirective) {
   return {
-    templateUrl: 'templates/jqmTextinput.html',
+    template: '<%= inlineTemplate("templates/jqmTextinput.html") %>',
     replace: true,
     restrict: 'A',
     require: '?ngModel',

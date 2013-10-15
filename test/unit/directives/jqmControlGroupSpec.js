@@ -4,7 +4,6 @@ describe('jqmControlgroup', function() {
     beforeEach(function () {
         ng = testutils.ng;
         jqm = testutils.jqm;
-        module('templates/jqmCheckbox.html');
     });
 
     describe('markup compared to jqm', function () {

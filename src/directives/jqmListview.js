@@ -44,7 +44,7 @@ jqmModule.directive('jqmListview', [function() {
     restrict: 'A',
     replace: true,
     transclude: true,
-    templateUrl: 'templates/jqmListview.html',
+    template: '<%= inlineTemplate("templates/jqmListview.html") %>',
     scope: {
       inset: '@'
     },

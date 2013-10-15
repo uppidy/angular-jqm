@@ -160,7 +160,7 @@ describe('testutils', function () {
                 });
                 expect(viewPort.hasClass('ui-viewport'));
                 expect(viewPort[0]).toBe(api.viewPort[0]);
-                expect(api.activePage().text()).toBe('firstPage');
+                expect(api.activePage().text()).toContain('firstPage');
             });
         });
         describe('beginTransitionTo', function () {
@@ -173,10 +173,10 @@ describe('testutils', function () {
                         template: '<div ' + api.pageAttr + '><div jqm-content data-role="content">secondPage</div></div>'
                     }
                 });
-                expect(api.activePage().text()).toBe('firstPage');
+                expect(api.activePage().text()).toContain('firstPage');
                 api.beginTransitionTo('/page2');
                 api.tick(10);
-                expect(api.activePage().text()).toBe('secondPage');
+                expect(api.activePage().text()).toContain('secondPage');
             });
         });
         describe('fireAnimationEndEvents', function () {

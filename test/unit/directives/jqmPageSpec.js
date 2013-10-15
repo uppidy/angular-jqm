@@ -28,7 +28,7 @@ describe('jqmPage', function () {
 
         it('wraps content into a separate div', function () {
             compile('test');
-            expect(jqmContent.text()).toBe('test');
+            expect(jqmContent.text()).toContain('test');
         });
         it('adds a header class to the content if the page contains a header', function () {
             compile('<div jqm-header></div>');
@@ -56,7 +56,7 @@ describe('jqmPage', function () {
             expect($scroller.mostRecentCall.args[0][0]).toBe(jqmContent[0]);
         });
     });
-    describe('persistent footer/header', function () {
+    describe('footer/header', function () {
         var scope, jqmContent, viewEl;
 
         function compile(otherElements) {
@@ -73,10 +73,12 @@ describe('jqmPage', function () {
         it('adds a header class to the content if the page contains a header as sibling', function () {
             compile('<div jqm-header></div>');
             expect(jqmContent).toHaveClass('jqm-content-with-header');
+            expect(viewEl.scope().$header).toBe(true);
         });
         it('adds a footer class to the content if the page contains a footer', function () {
             compile('<div jqm-footer></div>');
             expect(jqmContent).toHaveClass('jqm-content-with-footer');
+            expect(viewEl.scope().$footer).toBe(true);
         });
     });
 });
@@ -108,7 +110,7 @@ describe('jqmPage controller', function() {
 
     it('page method gives $transformer.pos with args',  function() {
         expect(pageCtrl.scroll()).toEqual(transformer.pos);
-        transformer.setTo({x:0,y:-50});
+        transformer.setTo({y:-50});
         expect(pageCtrl.scroll()).toEqual({x:0,y:-50});
     });
 
@@ -119,7 +121,7 @@ describe('jqmPage controller', function() {
 
     it('page method with two args calls easeTo', function() {
         spyOn(transformer, 'easeTo').andCallThrough();
-        pageCtrl.scroll({x:0,y:-50}, 50);
+        pageCtrl.scroll(-50, 50);
         expect(transformer.easeTo).toHaveBeenCalledWith({x:0,y:-50}, 50);
     });
 });

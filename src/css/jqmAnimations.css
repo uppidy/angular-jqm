@@ -1,0 +1,48 @@
+
+/* 
+ * still: Just something to make an "animation" happen, but really visibly
+ * do nothing
+ */
+@-webkit-keyframes still {
+  from { opacity: 0.99; } 
+  to { opacity: 1.0; }
+}
+@-moz-keyframes still {
+  from { opacity: 0.99; }
+  to{ opacity: 1.0; }
+}
+@keyframes still {
+  from { opacity: 0.99; }
+  to { opacity: 1.0; }
+}
+
+.modal.out {
+  -webkit-animation: still 450ms;
+  -moz-animation: still 450ms;
+  animation: still 450ms;
+  z-index: -1; /* below the animated modal element */
+}
+.modal.in.reverse {
+  -webkit-animation: still 450ms;
+  -moz-animation: still 450ms;
+  animation: still 450ms;
+  z-index: -1; /* below the animated modal element */
+}
+.modal.in {
+  -webkit-transform: translateY(0);
+	-webkit-animation: slideinfrombottom 450ms;
+	-moz-transform: translateY(0);
+	-moz-animation: slideinfrombottom 450ms;
+	transform: translateY(0);
+	animation: slideinfrombottom 450ms;
+  z-index: 0;
+}
+.modal.out.reverse {
+  -webkit-transform: translateY(0);
+	-webkit-animation: slideouttobottom 450ms;
+	-moz-transform: translateY(0);
+	-moz-animation: slideouttobottom 450ms;
+	transform: translateY(0);
+	animation: slideouttobottom 450ms;
+  z-index: 0;
+}

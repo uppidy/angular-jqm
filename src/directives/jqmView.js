@@ -27,6 +27,9 @@
  *   - `animation` - `{string=|function()=}` - the animation to use. If `animation` is a function it will
  *    be called using the `$injector` with the extra locals `$routeParams` (`route.params`) and `$scope` (the scope of `jqm-view`).
  *
+ * @param {boolean=} viewDeepWatch If you have a route expression in `jqmView`, this will tell the
+ *        $watch to use 'value-watch' to see if the view has changed instead of 'reference-watch'.
+ *
  * @scope
  * @example
  <example module="jqmView">
@@ -80,183 +83,254 @@
     }
  </file>
  </example>
- */
-jqmModule.directive('jqmView', ['$templateCache', '$route', '$anchorScroll', '$compile',
-  '$controller', '$animator', '$http', '$q', '$injector',
-  function ($templateCache, $route, $anchorScroll, $compile, $controller, $animator, $http, $q, $injector) {
-    return {
-      restrict: 'ECA',
-      controller: ['$scope', JqmViewCtrl],
-      require: 'jqmView',
-      compile: function (element, attr) {
-        element.children().attr('view-fixed', 'true');
-        return link;
+ */jqmModule.directive('jqmView',
+['$compile', '$templateCache', '$http', '$q', '$route', '$controller', '$injector', '$nextFrame', '$sniffer', '$animate', '$rootScope',
+function($compile, $templateCache, $http, $q, $route, $controller, $injector, $nextFrame, $sniffer, $animate, $rootScope) {
+
+  var SEQUENTIAL_ANIMATIONS = {
+    fade: true,
+    pop: true,
+    slidefade: true,
+    slidedown: true,
+    slideup: true,
+    flip: true,
+    turn: true,
+    flow: true
+  };
+
+  return {
+    restrict: 'A',
+    template: '<%= inlineTemplate("templates/jqmView.html") %>',
+    replace: true,
+    transclude: true,
+    controller: ['$scope', '$element', JqmViewCtrl],
+    link: link
+  };
+
+  function link(scope, element, attr, jqmViewCtrl) {
+    var lastView,
+      leavingView, //store this so we can cancel the leaving view early if need
+      onloadExp = attr.onload || '',
+      viewAttrGetter,
+      changeCounter = 0;
+
+    if (attr[jqmViewCtrl.viewWatchAttr]) {
+      watchRouteAttr();
+    } else {
+      watchRoute();
+    }
+
+    //For some reason, a scope.$watch(attr[watchAttr], onChange, true) doesn't work - it always gives infinite digest error.
+    //And we do need to check value, so people can do '<div jqm-view="{templateUrl: 'myTemplate.html', controller: 'MyCtrl'}"> etc
+    var oldRoute, next=0;
+    function watchRouteAttr() {
+      scope.$watch(attr[jqmViewCtrl.viewWatchAttr], routeChanged, (!!attr.viewDeepWatch));
+    }
+
+    function watchRoute() {
+      scope.$on('$routeChangeSuccess', update);
+      update();
+      function update() {
+        routeChanged($route.current);
       }
-    };
-    function link(scope, element, attr, jqmViewCtrl) {
-      var lastScope,
-        lastContents,
-        lastAnimationName,
-        onloadExp = attr.onload || '',
-        animateAttr = {},
-        animate = $animator(scope, animateAttr),
-        jqmViewExpr = attr[jqmViewCtrl.watchAttrName],
-        changeCounter = 0;
-      if (!jqmViewExpr) {
-        watchRoute();
-      } else {
-        watchRouteExp(jqmViewExpr);
-      }
+    }
 
-      function watchRoute() {
-        scope.$on('$routeChangeSuccess', update);
-        update();
+    function routeChanged(route) {
+      route = route || {};
 
-        function update() {
-          routeChanged($route.current);
-        }
-      }
+      var thisChangeId = ++changeCounter;
 
-
-      function watchRouteExp(routeExp) {
-        // only shallow watch (e.g. change of route instance)
-        scope.$watch(routeExp, routeChanged, false);
-      }
-
-      function routeChanged(route) {
-        // For this counter logic, see ngIncludeDirective!
-        var thisChangeId = ++changeCounter,
-          $template;
-        if (!route || angular.isString(route)) {
-          route = {
-            templateUrl: route
-          };
-        }
-        $template = route.locals && route.locals.$template;
-        var url = route.loadedTemplateUrl || route.templateUrl || $template;
-        if (url) {
-          // Note: $route already loads the template. However, as it's also
-          // using $templateCache and so does loadAndCompile we don't get extra $http requests.
-          jqmViewCtrl.loadAndCompile(url, $template).then(function (templateInstance) {
-            if (thisChangeId !== changeCounter) {
-              return;
-            }
-            templateLoaded(route, templateInstance);
-          }, function () {
-            if (thisChangeId === changeCounter) {
-              clearContent();
-            }
-            clearContent();
-          });
-        } else {
-          clearContent();
-        }
-      }
-
-      function clearContent() {
-        var contents = angular.element();
-        angular.forEach(element.contents(), function(element) {
-          var el = angular.element(element);
-          if (!el.attr('view-fixed')) {
-            contents.push(element);
+      var template = route.locals ? route.locals.$template : route.template;
+      var templateUrl = isString(route) && route || route.loadedTemplateUrl || route.templateUrl;
+      if (templateUrl || template) {
+        jqmViewCtrl.loadView(templateUrl, template, lastView).then(function(view) {
+          if (thisChangeId !== changeCounter) {
+            return;
           }
+          viewLoaded(route, view);
         });
-
-        jqmViewCtrl.onClearContent(contents);
-        animate.leave(contents, element);
-        if (lastScope) {
-          lastScope.$destroy();
-          lastScope = null;
-        }
-      }
-
-      function templateLoaded(route, templateInstance) {
-        var locals = route.locals || {},
-          controller;
-        calcAnimation(route, templateInstance);
-        clearContent();
-        animate.enter(templateInstance.elements, element);
-
-        lastScope = locals.$scope = templateInstance.scope;
-        route.scope = lastScope;
-        lastContents = templateInstance.elements;
-
-        if (route.controller) {
-          controller = $controller(route.controller, locals);
-          if (route.controllerAs) {
-            lastScope[route.controllerAs] = controller;
-          }
-          element.children().data('$ngControllerController', controller);
-        }
-        lastScope.$emit('$viewContentLoaded', templateInstance.elements);
-        lastScope.$eval(onloadExp);
-        // $anchorScroll might listen on event...
-        $anchorScroll();
-      }
-
-      function calcAnimation(route, templateInstance) {
-        var animation,
-          reverse = route.back,
-          routeAnimationName,
-          animationName;
-        if (attr.ngAnimate) {
-          animateAttr.ngAnimate = attr.ngAnimate;
-          return;
-        }
-        animation = route.animation;
-        if (angular.isFunction(animation) || angular.isArray(animation)) {
-          routeAnimationName = $injector.invoke(route.animation, null, {
-            $scope: scope,
-            $routeParams: route.params
-          });
-        } else {
-          routeAnimationName = animation;
-        }
-        if (!routeAnimationName) {
-          angular.forEach(templateInstance.elements, function (element) {
-            var el = angular.element(element);
-            routeAnimationName = routeAnimationName || el.attr('view-animation') || el.attr('data-view-animation');
-          });
-        }
-        if (reverse) {
-          animationName = lastAnimationName;
-          if (animationName) {
-            animationName += "-reverse";
-          }
-        } else {
-          animationName = routeAnimationName;
-        }
-        lastAnimationName = routeAnimationName;
-        if (animationName) {
-          animateAttr.ngAnimate = "'" + animationName + "'";
-        } else {
-          animateAttr.ngAnimate = "''";
-        }
+      } else {
+        changeView(null, lastView);
+        lastView = null;
       }
     }
 
-    function JqmViewCtrl($scope) {
-      this.watchAttrName = 'jqmView';
-      this.loadAndCompile = loadAndCompile;
-      this.onClearContent = angular.noop;
+    function viewLoaded(route, view) {
+      var locals = route.locals || {};
+      var controller;
 
-      function loadAndCompile(templateUrl, template) {
-        if (template) {
-          return $q.when(compile(template));
-        } else {
-          return $http.get(templateUrl, {cache: $templateCache}).then(function (response) {
-            return compile(response.data);
+      var animationName = figureOutAnimation(route, view);
+      var animationExists = JQM_ANIMATIONS.indexOf(animationName.replace(/^page-/,'')) > -1;
+      if (!animationExists) {
+        changeView(view, lastView);
+      } else {
+        performViewAnimation(animationName, route.back, view, lastView);
+      }
+      view.scope.$reconnect();
+
+      locals.$scope = view.scope;
+      if (route.controller) {
+        controller = $controller(route.controller, locals);
+        if (route.controllerAs) {
+          view.scope[route.controllerAs] = controller;
+        }
+        view.element.data('$ngControllerController', controller);
+      }
+
+      $rootScope.$broadcast('$viewContentLoaded', view.element);
+      view.scope.$eval(onloadExp);
+      //no $anchorScroll because we don't use browser scrolling anymore
+
+      scope.$theme = view.element.scope().$theme;
+      lastView = view;
+    }
+
+    function changeView(view, lastView) {
+      if (lastView) {
+        lastView.clear();
+      }
+      if (view) {
+        element.append(view.element);
+        view.element.addClass('ui-page-active');
+      }
+    }
+
+    function performViewAnimation(animationName, reverse, view, lastView) {
+      var isSequential = SEQUENTIAL_ANIMATIONS[animationName.replace(/^page-/, '')];
+      var viewportClass = 'ui-mobile-viewport-transitioning viewport-'+animationName.replace('page-', '');
+      var animationClassName = animationName + (reverse ? ' reverse' : '');
+
+      view.element.addClass(animationClassName);
+      if (lastView) {
+        lastView.element.addClass(animationClassName);
+      }
+      if (leavingView) {
+        leavingView.element.triggerHandler('animationend');
+      }
+      leavingView = lastView;
+      element.addClass(viewportClass);
+
+      if (isSequential && lastView) {
+        element.append(view.element);
+        $animate.leave(lastView.element, function() {
+          //animations only fire after digest
+          scope.$apply(function() {
+            $animate.enter(view.element, element, null, onDone);
           });
+        });
+      } else {
+        $animate.enter(view.element, element, null, onDone);
+        if (lastView) {
+          $animate.leave(lastView.element);
         }
       }
 
-      function compile(template) {
-        var link = $compile(angular.element('<div></div>').html(template).contents());
-        var scope = $scope.$new();
-        return {
-          scope: scope,
-          elements: link(scope)
-        };
+      function onDone() {
+        leavingView = null;
+        if (lastView) {
+          lastView.element.removeClass(animationClassName);
+          lastView.clear();
+        }
+        view.element.removeClass(animationClassName);
+        view.element.addClass('ui-page-active');
+
+        element.removeClass(viewportClass);
       }
     }
-  }]);
+
+    function figureOutAnimation(route, view) {
+      var reverse = route.back,
+      animationName = '';
+
+      if (reverse) {
+        animationName = lastView && lastView.animationName || animationName;
+      }
+      if (!animationName) {
+        if (route.animation) {
+          if (angular.isFunction(route.animation) || isArray(route.animation)) {
+            animationName = $injector.invoke(route.animation, null, {
+              $scope: scope,
+              $routeParams: route.params
+            });
+          } else {
+            animationName = route.animation;
+          }
+        } else {
+          //Find animation in the new page's className
+          forEach((view.element[0].className || '').split(' '), function(klass) {
+            //Eg if view element has 'page-fade' on it we know to fade
+            if (klass.substring(0,5) === 'page-' && $injector.has('.' + klass + '-animation')) {
+              animationName = animationName || klass;
+            }
+          });
+        }
+      }
+      return maybeDegradeAnimation(animationName);
+    }
+
+
+    function maybeDegradeAnimation(animationName) {
+      if (!animationName || !$sniffer.animations) {
+        return '';
+      } else if (!$sniffer.cssTransform3d) {
+        return 'page-fade';
+      }
+      return animationName;
+    }
+  }
+
+  function JqmViewCtrl($scope, $element) {
+    this.$scope = $scope;
+    this.$element = $element;
+
+    this.loadView = loadView;
+    this.fetchView = fetchView;
+    this.viewWatchAttr = 'jqmView';
+
+    function loadView(templateUrl, template) {
+      if (template) {
+        return $q.when(compile(template));
+      } else {
+        return fetchView(templateUrl);
+      }
+    }
+
+    function fetchView(templateUrl) {
+      return $http.get(templateUrl, {cache:$templateCache}).then(function(response) {
+        return compile(response.data);
+      });
+    }
+
+    function compile(template) {
+      //We compile the element as a child of our view, so that everything 'links together' correctly
+      var scope = $scope.$new();
+
+      var element = jqLite('<div></div>').html(template).children();
+      $element.append(element);
+
+      var view = {
+        scope: scope,
+        element: $compile(element)(scope),
+        clear: viewClear
+      };
+
+      scope.$disconnect();
+
+      //Disconnect this from the parent before finishing
+      forEach(element, function(node) {
+        node.parentNode.removeChild(node);
+      });
+
+      return view;
+    }
+  }
+
+  function viewClear() {
+    /*jshint -W040:true*/
+    this.element.remove();
+    this.element = null;
+    this.scope.$destroy();
+    this.scope = null;
+  }
+}]);
+
