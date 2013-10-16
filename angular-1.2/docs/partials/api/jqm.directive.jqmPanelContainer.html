@@ -1,0 +1,50 @@
+<h1><code ng:non-bindable="">jqmPanelContainer</code>
+<span class="hint">(directive in module <code ng:non-bindable="">jqm</code>
+)</span>
+</h1>
+<div><h2 id="Description">Description</h2>
+<div class="description"><p>A container for jquery mobile panels.</p>
+
+<p>If you wish to use this with a view, you want the jqm-panel-container as the
+parent of your view and your panels. For example:
+<pre class="prettyprint linenums">
+&lt;div jqm-panel-container="myPanel"&gt;
+  &lt;div jqm-panel&gt;My Panel!&lt;/div&gt;
+  &lt;div jqm-view&gt;&lt;/div&gt;
+&lt;/div&gt;
+</pre></div>
+<h2 id="Usage">Usage</h2>
+<div class="usage">as attribute<pre class="prettyprint linenums">&lt;ANY jqm-panel-container="{expression}"&gt;
+   ...
+&lt;/ANY&gt;</pre>
+<h3 id="Parameters">Parameters</h3>
+<ul class="parameters"><li><code ng:non-bindable="">jqmPanelContainer<i>(optional)</i> – {expression=} – </code>
+<p>Assignable angular expression to data-bind the panel's open state to.
+This is either <code>left</code> (show left panel), <code>right</code> (show right panel) or null.</p></li>
+</ul>
+</div>
+<h2 id="Example">Example</h2>
+<div class="example"><h4>Source</h4>
+<div source-edit="jqm" source-edit-deps="angular.js" source-edit-html="index.html-8" source-edit-css="" source-edit-js="" source-edit-unit="" source-edit-scenario=""></div>
+<div class="tabbable"><div class="tab-pane" title="index.html">
+<pre class="prettyprint linenums" ng-set-text="index.html-8" ng-html-wrap-loaded="jqm angular.js"></pre>
+<script type="text/ng-template" id="index.html-8">
+ <div ng-init="state={}"></div>
+ <div jqm-panel-container="state.openPanel" style="height:300px;overflow:hidden">
+  <div jqm-panel position="left">
+    Hello, left panel!
+  </div>
+  <div jqm-panel position="right" display="overlay">
+   Hello, right panel!
+  </div>
+  <div style="background: white">
+     Opened panel: {{state.openPanel}}
+     <button ng-click="state.openPanel='left'">Open left</button>
+     <button ng-click="state.openPanel='right'">Open right</button>
+  </div>
+ </div>
+</script>
+</div>
+</div><h4>Demo</h4>
+<div class="well doc-example-live animator-container" ng-embed-app="jqm" ng-set-html="index.html-8" ng-eval-javascript=""></div></div>
+</div>

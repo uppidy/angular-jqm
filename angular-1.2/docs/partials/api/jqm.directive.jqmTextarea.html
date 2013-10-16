@@ -1,0 +1,38 @@
+<h1><code ng:non-bindable="">jqmTextarea</code>
+<span class="hint">(directive in module <code ng:non-bindable="">jqm</code>
+)</span>
+</h1>
+<div><h2 id="Description">Description</h2>
+<div class="description"><p>Creates an jquery mobile textarea on the given elemen.</p></div>
+<h2 id="Usage">Usage</h2>
+<div class="usage">as attribute<pre class="prettyprint linenums">&lt;ANY jqm-textarea
+     ngModel="{string}"
+     [disabled]&gt;
+   ...
+&lt;/ANY&gt;</pre>
+<h3 id="Parameters">Parameters</h3>
+<ul class="parameters"><li><code ng:non-bindable="">ngModel – {string} – </code>
+<p>Assignable angular expression to data-bind to.</p></li>
+<li><code ng:non-bindable="">disabled<i>(optional)</i> – {string=} – </code>
+<p>Whether this input is disabled.</p></li>
+</ul>
+</div>
+<h2 id="Example">Example</h2>
+<div class="example"><h4>Source</h4>
+<div source-edit="jqm" source-edit-deps="angular.js" source-edit-html="index.html-11" source-edit-css="" source-edit-js="" source-edit-unit="" source-edit-scenario=""></div>
+<div class="tabbable"><div class="tab-pane" title="index.html">
+<pre class="prettyprint linenums" ng-set-text="index.html-11" ng-html-wrap-loaded="jqm angular.js"></pre>
+<script type="text/ng-template" id="index.html-11">
+Textarea with ng-model:
+<div ng-model="model" jqm-textarea></div>
+
+Value: {{model}}
+<p/>
+Textarea disabled:
+<div data-disabled="disabled" jqm-textarea>Hello World</div>
+<p/>
+</script>
+</div>
+</div><h4>Demo</h4>
+<div class="well doc-example-live animator-container" ng-embed-app="jqm" ng-set-html="index.html-11" ng-eval-javascript=""></div></div>
+</div>

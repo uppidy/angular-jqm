@@ -1,0 +1,90 @@
+<h1><code ng:non-bindable="">$loadDialog</code>
+<span class="hint">(service in module <code ng:non-bindable="">jqm</code>
+)</span>
+</h1>
+<div><h2 id="Description">Description</h2>
+<div class="description"><p>Shows a wait dialog to indicate some long running work.</p></div>
+<h2 id="Dependencies">Dependencies</h2>
+<ul class="dependencies"><li><code ng:non-bindable=""><a href="#/api/ng.$rootElement">$rootElement</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/ng.$rootScope">$rootScope</a></code>
+</li>
+</ul>
+<h2 id="Usage">Usage</h2>
+<div class="usage"><pre class="prettyprint linenums">$loadDialog();</pre>
+</div>
+<div class="member method"><h2 id="Methods">Methods</h2>
+<ul class="methods"><li><h3 id="hide">hide()</h3>
+<div class=""><p>Restores the dialog state before the show function was called.</p></div>
+</li>
+<li><h3 id="show">show(message, callback)</h3>
+<div class="show"><p>Opens the wait dialog and shows the given message (if existing).
+If the user clicks on the wait dialog the given callback is called.
+This can be called even if the dialog is currently showing. It will
+then change the message and revert back to the last message when
+the hide function is called.</p><h4 id="Parameters">Parameters</h4>
+<ul class="parameters"><li><code ng:non-bindable="">message<i>(optional)</i> – {string=} – </code>
+<p>The message to be shown when the wait dialog is displayed.</p></li>
+<li><code ng:non-bindable="">callback<i>(optional)</i> – {function=} – </code>
+<p>The Callback that is executed when the wait dialog is clicked.</p></li>
+</ul>
+</div>
+</li>
+<li><h3 id="waitFor">waitFor(promise, message)</h3>
+<div class="waitfor"><p>Shows the dialog as long as the given promise runs. Shows the given message
+if defined.</p><h4 id="Parameters">Parameters</h4>
+<ul class="parameters"><li><code ng:non-bindable="">promise – {Promise} – </code>
+<p>The Promise.</p></li>
+<li><code ng:non-bindable="">message<i>(optional)</i> – {string=} – </code>
+<p>The message to be show.</p></li>
+</ul>
+</div>
+</li>
+<li><h3 id="waitForWithCancel">waitForWithCancel(The, cancelData, message)</h3>
+<div class="waitforwithcancel"><p>Same as jqm.$loadDialog#waitFor, but rejects the promise with the given
+cancelData when the user clicks on the wait dialog.</p><h4 id="Parameters">Parameters</h4>
+<ul class="parameters"><li><code ng:non-bindable="">The – {Deferred} – </code>
+<p>deferred object to cancel the promise.</p></li>
+<li><code ng:non-bindable="">cancelData – {*} – </code>
+<p>To reject the promise with.</p></li>
+<li><code ng:non-bindable="">message<i>(optional)</i> – {string=} – </code>
+<p>The message to be show.</p></li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<h2 id="Example">Example</h2>
+<div class="example"><h4>Source</h4>
+<div source-edit="jqm" source-edit-deps="angular.js script.js" source-edit-html="index.html-16" source-edit-css="" source-edit-js="script.js-17" source-edit-unit="" source-edit-scenario=""></div>
+<div class="tabbable"><div class="tab-pane" title="index.html">
+<pre class="prettyprint linenums" ng-set-text="index.html-16" ng-html-wrap-loaded="jqm angular.js script.js"></pre>
+<script type="text/ng-template" id="index.html-16">
+<div ng-controller="DemoCtrl">
+  <button ng-click="$loadDialog.hide()">Hide</button>
+  <hr />
+  <div jqm-textinput placeholder="Dialog Text" ng-model="dialogText"></div>
+  <button ng-click="$loadDialog.show(dialogText)">Show{{dialogText && ' with text' || ''}}</button>
+  <hr />
+  <button ng-click="showForPromise()">waitFor promise</button>
+</div>
+</script>
+</div>
+<div class="tab-pane" title="script.js">
+<pre class="prettyprint linenums" ng-set-text="script.js-17"></pre>
+<script type="text/ng-template" id="script.js-17">
+function DemoCtrl($scope, $loadDialog, $timeout, $q) {
+  $scope.$loadDialog = $loadDialog;   
+
+  $scope.showForPromise = function() {
+  var deferred = $q.defer();
+  $timeout(deferred.resolve, 1000);
+
+  $loadDialog.waitFor(deferred.promise, 'Showing for 1000ms promise...');
+  };
+}
+</script>
+</div>
+</div><h4>Demo</h4>
+<div class="well doc-example-live animator-container" ng-embed-app="jqm" ng-set-html="index.html-16" ng-eval-javascript="script.js-17"></div></div>
+</div>

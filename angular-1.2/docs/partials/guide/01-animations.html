@@ -1,0 +1,44 @@
+<h1><code ng:non-bindable=""></code>
+<span class="hint"></span>
+</h1>
+<div><h3 id="supportedanimations">Supported Animations</h4>
+
+<p>The default jQuery mobile animations are supported:</p>
+
+<ul>
+<li>'slide'</li>
+<li>'fade'</li>
+<li>'pop'</li>
+<li>'slidefade'</li>
+<li>'slidedown'</li>
+<li>'slidedown'</li>
+<li>'slideup'</li>
+<li>'flip'</li>
+<li>'turn'</li>
+<li>'flow'</li>
+</ul>
+
+<p>Also, some custom animations have been bundled into the framework where jQuery mobile did not provide a good alternative:</p>
+
+<ul>
+<li>'modal'</li>
+</ul>
+
+<h3 id="usinganimations">Using Animations</h4>
+
+<p>You can use any animation in a supported ng- function.  For example, to fade iwth ng-show:</p>
+
+<pre><code>&lt;div ng-show="showMe" class="fade'&gt;
+  Fade me!
+&lt;/div&gt;
+</code></pre>
+
+<p>Any animation can be used in a jqmView or route definition by prefixing it with 'page-'. For example:</p>
+
+<pre><code>$routeProivder.when('/modal', {
+  templateUrl: 'modal.html',
+  animation: 'page-modal'
+});
+</code></pre>
+
+<p>Look in <a href="#/guide/02-custom-animations">Custom Animations</a> for how to add custom animations to angular-jqm.</p></div>
