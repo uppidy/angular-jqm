@@ -52,7 +52,7 @@ describe('jqmPageAnimation', function () {
       var anim = getAnimation(animationName);
       var onDone = anim.enter(elm, doneSpy);
       expect(elm).toHaveClass('ui-page-pre-in ui-page-active');
-      expect(elm.css('z-index')).toEqual('-10');
+      expect(''+elm.css('z-index')).toEqual('-10');
 
       $timeout.flush();
       expect(elm).toHaveClass(className + ' in');
