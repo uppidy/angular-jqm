@@ -145,8 +145,10 @@ module.exports = function(grunt) {
         dest: 'dist/docs/',
         scripts: [
           'docs/scripts/jquery.mobile.css.js',
-          'angular.js',
-          'components/angular/angular-mobile.js',
+          'components/angular/angular.js',
+          'components/angular/angular-touch.js',
+          'components/angular/angular-route.js',
+          'components/angular/angular-animate.js',
           '<%= concat.all.dest %>',
           'docs/scripts/angular-scrolly-docs.js'
         ],
