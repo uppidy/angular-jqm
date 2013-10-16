@@ -1,0 +1,43 @@
+@ngdoc overview
+@name Animations
+@description
+
+### Supported Animations
+
+The default jQuery mobile animations are supported:
+
+- 'slide'
+- 'fade'
+- 'pop'
+- 'slidefade'
+- 'slidedown'
+- 'slidedown'
+- 'slideup'
+- 'flip'
+- 'turn'
+- 'flow'
+
+Also, some custom animations have been bundled into the framework where jQuery mobile did not provide a good alternative:
+
+- 'modal'
+
+### Using Animations
+
+You can use any animation in a supported ng- function.  For example, to fade iwth ng-show:
+
+```
+<div ng-show="showMe" class="fade'>
+  Fade me!
+</div>
+```
+
+Any animation can be used in a jqmView or route definition by prefixing it with 'page-'. For example:
+
+```
+$routeProivder.when('/modal', {
+  templateUrl: 'modal.html',
+  animation: 'page-modal'
+});
+```
+
+Look in {@link guide/02-custom-animations Custom Animations} for how to add custom animations to angular-jqm.

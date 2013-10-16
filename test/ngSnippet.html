@@ -15,15 +15,15 @@
         mod.config(function ($routeProvider) {
             $routeProvider.when("/ngSnippet.html", {
                 redirectTo: "main.html",
-                animation: 'page-modal'
+                animation: 'page-fade'
             });
             $routeProvider.when("/main.html", {
                 templateUrl: 'main.html',
-                animation: 'page-modal'
+                animation: 'page-slide'
             });
             $routeProvider.when("/page2.html", {
                 templateUrl: 'page2.html',
-                animation: 'page-modal'
+                animation: 'page-fade'
             });
             $routeProvider.otherwise({
                 redirectTo: "main.html"
