@@ -36,14 +36,14 @@ as class<pre class="prettyprint linenums">&lt;ANY class="jqm-view: {expression};
 
 <ul>
 <li><code>{string}</code>: This will be interpreted as the url of a template.</li>
-<li><code>{object}</code>: A route object with the same properties as <code>$route.current</code>:
-<ul><li><code>templateUrl</code> - <code>{string=}</code> - the url for the template</li>
+<li><code>{object}</code>: A route object with the same properties as <code>$route.current</code>:</li>
+<li><code>templateUrl</code> - <code>{string=}</code> - the url for the template</li>
 <li><code>controller</code> - <code>{string=|function()=}</code> - the controller</li>
 <li><code>controllerAs</code> - <code>{string=}</code> - the name of the controller in the scope</li>
 <li><code>locals</code> - <code>{object=}</code> - locals to be used when instantiating the controller</li>
 <li><code>back</code> - <code>{boolean=}</code> - whether the animation should be executed in reverse</li>
 <li><code>animation</code> - <code>{string=|function()=}</code> - the animation to use. If <code>animation</code> is a function it will
-be called using the <code>$injector</code> with the extra locals <code>$routeParams</code> (<code>route.params</code>) and <code>$scope</code> (the scope of <code>jqm-view</code>).</li></ul></li>
+be called using the <code>$injector</code> with the extra locals <code>$routeParams</code> (<code>route.params</code>) and <code>$scope</code> (the scope of <code>jqm-view</code>).</li>
 </ul></li>
 </ul>
 </div>
@@ -85,27 +85,27 @@ This chapter contains ...
 <pre class="prettyprint linenums" ng-set-text="script.js-15"></pre>
 <script type="text/ng-template" id="script.js-15">
 angular.module('jqmView', ['jqm'], function($routeProvider) {
-         $routeProvider.when('/Book/:bookId', {
-           templateUrl: 'book.html',
-           controller: BookCntl,
-           controllerAs: 'book',
-           animation: 'page-slide'
-         });
-         $routeProvider.when('/Book/:bookId/ch/:chapterId', {
-           templateUrl: 'chapter.html',
-           controller: ChapterCntl,
-           controllerAs: 'chapter',
-           animation: 'page-slide'
-         });
-       });
+     $routeProvider.when('/Book/:bookId', {
+     templateUrl: 'book.html',
+     controller: BookCntl,
+     controllerAs: 'book',
+     animation: 'page-slide'
+     });
+     $routeProvider.when('/Book/:bookId/ch/:chapterId', {
+     templateUrl: 'chapter.html',
+     controller: ChapterCntl,
+     controllerAs: 'chapter',
+     animation: 'page-slide'
+     });
+   });
 
 function BookCntl($routeParams) {
-         this.params = $routeParams;
-       }
+     this.params = $routeParams;
+   }
 
 function ChapterCntl($routeParams) {
-         this.params = $routeParams;
-       }
+     this.params = $routeParams;
+   }
 </script>
 </div>
 </div><h4>Demo</h4>

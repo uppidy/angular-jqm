@@ -29,20 +29,20 @@ This is either <code>left</code> (show left panel), <code>right</code> (show rig
 <div class="tabbable"><div class="tab-pane" title="index.html">
 <pre class="prettyprint linenums" ng-set-text="index.html-8" ng-html-wrap-loaded="jqm angular.js"></pre>
 <script type="text/ng-template" id="index.html-8">
-   <div ng-init="state={}"></div>
-   <div jqm-panel-container="state.openPanel" style="height:300px;overflow:hidden">
-      <div jqm-panel position="left">
-        Hello, left panel!
-      </div>
-      <div jqm-panel position="right" display="overlay">
-       Hello, right panel!
-      </div>
-      <div style="background: white">
-         Opened panel: {{state.openPanel}}
-         <button ng-click="state.openPanel='left'">Open left</button>
-         <button ng-click="state.openPanel='right'">Open right</button>
-      </div>
-   </div>
+ <div ng-init="state={}"></div>
+ <div jqm-panel-container="state.openPanel" style="height:300px;overflow:hidden">
+  <div jqm-panel position="left">
+    Hello, left panel!
+  </div>
+  <div jqm-panel position="right" display="overlay">
+   Hello, right panel!
+  </div>
+  <div style="background: white">
+     Opened panel: {{state.openPanel}}
+     <button ng-click="state.openPanel='left'">Open left</button>
+     <button ng-click="state.openPanel='right'">Open right</button>
+  </div>
+ </div>
 </script>
 </div>
 </div><h4>Demo</h4>

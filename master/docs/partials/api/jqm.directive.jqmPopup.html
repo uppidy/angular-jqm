@@ -9,8 +9,8 @@
 <pre class="prettyprint linenums">
 &lt;div jqm-popup="myPopup"&gt;
   &lt;div jqm-view="{
-    templateUrl: 'views/my-popup-content-page.html',
-    controller: 'MyPopupController'
+  templateUrl: 'views/my-popup-content-page.html',
+  controller: 'MyPopupController'
   }"&gt;&lt;/div&gt;
 &lt;/div&gt;
 </pre></div>
@@ -44,24 +44,24 @@
 <div class="tabbable"><div class="tab-pane" title="index.html">
 <pre class="prettyprint linenums" ng-set-text="index.html-9" ng-html-wrap-loaded="jqm angular.js"></pre>
 <script type="text/ng-template" id="index.html-9">
-    <div jqm-popup="myPopup">
-      Hey guys, here's a popup!
-    </div>
-    <div style="padding: 50px;"
-       jqm-popup-target="myPopup"
-       jqm-popup-model="pageCenterPop">
+  <div jqm-popup="myPopup">
+  Hey guys, here's a popup!
+  </div>
+  <div style="padding: 50px;"
+   jqm-popup-target="myPopup"
+   jqm-popup-model="pageCenterPop">
 
-       <div jqm-button ng-click="pageCenterPop = true">
-          Open Page Center Popup
-       </div>
-       <div jqm-button
-         jqm-popup-target="myPopup"
-         jqm-popup-model="buttonPop"
-         jqm-popup-placement="left"
-         ng-click="buttonPop = true">
-         Open popup left of this button!
-     </div>
-    </div>
+   <div jqm-button ng-click="pageCenterPop = true">
+    Open Page Center Popup
+   </div>
+   <div jqm-button
+     jqm-popup-target="myPopup"
+     jqm-popup-model="buttonPop"
+     jqm-popup-placement="left"
+     ng-click="buttonPop = true">
+     Open popup left of this button!
+   </div>
+  </div>
 </script>
 </div>
 </div><h4>Demo</h4>

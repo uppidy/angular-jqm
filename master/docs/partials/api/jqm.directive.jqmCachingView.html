@@ -48,59 +48,59 @@ as class<pre class="prettyprint linenums">&lt;ANY class="jqm-caching-view: {expr
 <div class="tabbable"><div class="tab-pane" title="index.html">
 <pre class="prettyprint linenums" ng-set-text="index.html-0" ng-html-wrap-loaded="jqmView angular.js script.js"></pre>
 <script type="text/ng-template" id="index.html-0">
-    Choose:
-    <a href="#/Book/Moby">Moby</a> |
-    <a href="#/Book/Moby/ch/1">Moby: Ch1</a> |
-    <a href="#/Book/Gatsby">Gatsby</a> |
-    <a href="#/Book/Gatsby/ch/4?key=value">Gatsby: Ch4</a> |
-    <a href="#/Book/Scarlet">Scarlet Letter</a><br/>
+  Choose:
+  <a href="#/Book/Moby">Moby</a> |
+  <a href="#/Book/Moby/ch/1">Moby: Ch1</a> |
+  <a href="#/Book/Gatsby">Gatsby</a> |
+  <a href="#/Book/Gatsby/ch/4?key=value">Gatsby: Ch4</a> |
+  <a href="#/Book/Scarlet">Scarlet Letter</a><br/>
 
-    <div jqm-caching-view style="height:300px"></div>
+  <div jqm-caching-view style="height:300px"></div>
 </script>
 </div>
 <div class="tab-pane" title="book.html">
 <pre class="prettyprint linenums" ng-set-text="book.html"></pre>
 <script type="text/ng-template" id="book.html">
-  <div jqm-page allow-same-view-animation>
-    <div jqm-header><h3>Book {{book.params.bookId}}</h3></div>
-    The book contains ...
-  </div>
+<div jqm-page allow-same-view-animation>
+  <div jqm-header><h3>Book {{book.params.bookId}}</h3></div>
+  The book contains ...
+</div>
 </script>
 </div>
 <div class="tab-pane" title="chapter.html">
 <pre class="prettyprint linenums" ng-set-text="chapter.html"></pre>
 <script type="text/ng-template" id="chapter.html">
-  <div jqm-page allow-same-view-animation>
-    <div jqm-header><h3>Chapter {{chapter.params.chapterId}} of {{chapter.params.bookId}}</h3></div>
-    This chapter contains ...
-  </div>
+<div jqm-page allow-same-view-animation>
+  <div jqm-header><h3>Chapter {{chapter.params.chapterId}} of {{chapter.params.bookId}}</h3></div>
+  This chapter contains ...
+</div>
 </script>
 </div>
 <div class="tab-pane" title="script.js">
 <pre class="prettyprint linenums" ng-set-text="script.js"></pre>
 <script type="text/ng-template" id="script.js">
-  angular.module('jqmView', ['jqm'], function($routeProvider) {
-    $routeProvider.when('/Book/:bookId', {
-      templateUrl: 'book.html',
-      controller: BookCntl,
-      controllerAs: 'book',
-      animation: 'page-slide'
-    });
-    $routeProvider.when('/Book/:bookId/ch/:chapterId', {
-      templateUrl: 'chapter.html',
-      controller: ChapterCntl,
-      controllerAs: 'chapter',
-      animation: 'page-slide'
-    });
+angular.module('jqmView', ['jqm'], function($routeProvider) {
+  $routeProvider.when('/Book/:bookId', {
+  templateUrl: 'book.html',
+  controller: BookCntl,
+  controllerAs: 'book',
+  animation: 'page-slide'
   });
+  $routeProvider.when('/Book/:bookId/ch/:chapterId', {
+  templateUrl: 'chapter.html',
+  controller: ChapterCntl,
+  controllerAs: 'chapter',
+  animation: 'page-slide'
+  });
+});
 
-  function BookCntl($routeParams) {
-    this.params = $routeParams;
-  }
+function BookCntl($routeParams) {
+  this.params = $routeParams;
+}
 
-  function ChapterCntl($routeParams) {
-    this.params = $routeParams;
-  }
+function ChapterCntl($routeParams) {
+  this.params = $routeParams;
+}
 </script>
 </div>
 </div><h4>Demo</h4>
