@@ -135,11 +135,11 @@ describe('jqmView', function () {
         module(function($routeProvider) {
           $routeProvider.when('/page1', {
             template: '<div>page1</div>',
-            animation: 'page-slide'
+            animation: 'page-fade'
           });
           $routeProvider.when('/page2', {
             template: '<div>page2</div>',
-            animation: 'page-fade'
+            animation: 'page-slide'
           });
         });
         inject(function($route, $location, $rootScope, $timeout) {
@@ -156,16 +156,8 @@ describe('jqmView', function () {
 
           $location.url('/page2');
           $rootScope.$digest();
-          //Fade out old page
           $timeout.flush();
           viewEl.children().triggerHandler('animationend');
-          //Make leave() done be called
-          $timeout.flush();
-          //Fade in new page
-          $timeout.flush();
-          viewEl.triggerHandler('animationend');
-          viewEl.children().triggerHandler('animationend');
-          //Make enter() done be called
           $timeout.flush();
 
           back = true;

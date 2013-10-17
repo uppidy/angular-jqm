@@ -31,7 +31,6 @@
     "require": true,
     "jqmCreateMockWindow": true
   },
-  "strict": true,
   "globalstrict": true,
   "curly": true,
   "immed": true,

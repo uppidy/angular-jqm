@@ -201,6 +201,7 @@ function($compile, $templateCache, $http, $q, $route, $controller, $injector, $n
       var animationClassName = animationName + (reverse ? ' reverse' : '');
 
       view.element.addClass(animationClassName);
+      view.animationName = animationName;
       if (lastView) {
         lastView.element.addClass(animationClassName);
       }

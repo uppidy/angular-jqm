@@ -16,33 +16,32 @@
   to { opacity: 1.0; }
 }
 
-.modal {
-  -webkit-animation-duration: 450ms;
-  -moz-animation-duration: 450ms;
-  animation-duration: 450ms;
-}
 .modal.out,
 .modal.in.reverse {
-  -webkit-animation-name: still;
-  -moz-animation-name: still;
-  animation-name: still;
+  -webkit-animation: still 450ms;
+  -moz-animation: still 450ms;
+  animation: still 450ms;
+  z-index: -1; /* below the animated modal element */
+  -webkit-animation: still 450ms;
+  -moz-animation: still 450ms;
+  animation: still 450ms;
   z-index: -1; /* below the animated modal element */
 }
 .modal.in {
-	-webkit-animation-name: slideinfrombottom;
-	-moz-animation-name: slideinfrombottom;
-	animation-name: slideinfrombottom;
   -webkit-transform: translateY(0);
+	-webkit-animation: slideinfrombottom 450ms;
 	-moz-transform: translateY(0);
+	-moz-animation: slideinfrombottom 450ms;
 	transform: translateY(0);
+	animation: slideinfrombottom 450ms;
   z-index: 0;
 }
 .modal.out.reverse {
-	-webkit-animation: slideouttobottom;
-	-moz-animation: slideouttobottom;
-	animation: slideouttobottom;
   -webkit-transform: translateY(0);
+	-webkit-animation: slideouttobottom 450ms;
 	-moz-transform: translateY(0);
+	-moz-animation: slideouttobottom 450ms;
 	transform: translateY(0);
+	animation: slideouttobottom 450ms;
   z-index: 0;
 }
