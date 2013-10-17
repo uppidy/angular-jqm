@@ -12,15 +12,20 @@ function registerJqmAnimation(animationName) {
     function makeAnimationFn(className) {
       return function(element, done) {
         var unbind;
-        element.removeClass('in out');
         $timeout(function() {
           element.addClass(className);
-          unbind = $animationComplete(element, done, true);
+          unbind = $animationComplete(element, function() {
+            cleanup();
+            done();
+          }, true);
         }, 1, false);
-        return function done(cancelled) {
-          //Might be cancelled before timeout
+
+        function cleanup() {
           (unbind || noop)();
+          element.removeClass('in out');
         };
+
+        return cleanup;
       };
     }
     var inAnimation = makeAnimationFn('in');
@@ -30,14 +35,14 @@ function registerJqmAnimation(animationName) {
       leave: outAnimation,
       move: inAnimation,
       addClass: function(element, className, done) {
-        if (className === 'out') {
+        if (className === 'out' || className === 'ng-hide') {
           outAnimation(element, done);
         } else {
           inAnimation(element, done);
         }
       },
       removeClass: function(element, className, done) {
-        if (className === 'out') {
+        if (className === 'out' || className === 'ng-hide') {
           inAnimation(element, done);
         } else {
           outAnimation(element, done);
