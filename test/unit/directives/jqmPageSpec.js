@@ -119,7 +119,7 @@ describe('jqmPage controller', function() {
 
     it('page method with two args calls easeTo', function() {
         spyOn(transformer, 'easeTo').andCallThrough();
-        pageCtrl.scroll({x:0,y:-50}, 50);
+        pageCtrl.scroll(-50, 50);
         expect(transformer.easeTo).toHaveBeenCalledWith({x:0,y:-50}, 50);
     });
 });
