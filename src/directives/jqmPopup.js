@@ -46,9 +46,8 @@
   </file>
 </example>
  */
-jqmModule.directive('jqmPopup', ['$position', '$animationComplete', '$parse', '$rootElement', '$timeout', '$compile', '$rootScope',
-function($position, animationComplete, $parse, $rootElement, $timeout, $compile, $rootScope) {
-  var isDef = angular.isDefined;
+jqmModule.directive('jqmPopup', ['$position', '$parse', '$compile', '$rootScope', '$animate',
+function($position, $parse, $compile, $rootScope, $animate) {
   var popupOverlayTemplate = '<div jqm-popup-overlay></div>';
 
   return {
@@ -61,27 +60,23 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
       corners: '@',
       shadow: '@',
       placement: '@',
-      animation: '@',
       overlayTheme: '@'
     },
-    compile: function(elm, attr) {
-      attr.animation = isDef(attr.animation) ? attr.animation : 'fade';
-      attr.corners = isDef(attr.corners) ? attr.corners==='true' : true;
-      attr.shadow = isDef(attr.shadow) ? attr.shadow==='true' : true;
+    compile: function(element, attr) {
+      attr.corners = isDefined(attr.corners) ? attr.corners==='true' : true;
+      attr.shadow = isDefined(attr.shadow) ? attr.shadow==='true' : true;
 
       return postLink;
     }
   };
-  function postLink(scope, elm, attr, pageCtrl) {
-    animationComplete(elm, onAnimationComplete);
-
+  function postLink(scope, element, attr, pageCtrl) {
     var popupModel = $parse(attr.jqmPopup);
     if (!popupModel.assign) {
       throw new Error("jqm-popup expected assignable expression for jqm-popup attribute, got '" + attr.jqmPopup + "'");
     }
     popupModel.assign(scope.$parent, scope);
 
-    elm.parent().prepend( $compile(popupOverlayTemplate)(scope) );
+    element.parent().prepend( $compile(popupOverlayTemplate)(scope) );
 
     //Publicly expose show, hide methods
     scope.show = show;
@@ -95,14 +90,11 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
       scope.opened = true;
       placement = placement || scope.placement;
 
-      elm.css( getPosition(elm, target, placement) );
+      element.css( getPosition(element, target, placement) );
       scope.$root.$broadcast('$popupStateChanged', scope);
-      if (scope.animation === 'none') {
-        onAnimationComplete();
-      } else {
-        elm.addClass('in').removeClass('out');
-      }
 
+      element.removeClass('ui-popup-hidden');
+      $animate.removeClass(element, 'out', onDoneAnimating);
     }
     function hideForElement(target) {
       if (scope.target && target && scope.target[0] === target[0]) {
@@ -112,28 +104,25 @@ function($position, animationComplete, $parse, $rootElement, $timeout, $compile,
     function hide() {
       scope.target = null;
       scope.opened = false;
-      elm.addClass('out').removeClass('in');
 
       scope.$root.$broadcast('$popupStateChanged', scope);
-      if (scope.animation === 'none') {
-        onAnimationComplete();
-      } else {
-        elm.addClass('out').removeClass('in');
-      }
+
+      $animate.addClass(element, 'out', onDoneAnimating);
     }
 
-    function onAnimationComplete() {
-      elm.toggleClass('ui-popup-active', scope.opened);
-      elm.toggleClass('ui-popup-hidden', !scope.opened);
+    function onDoneAnimating() {
+      element.removeClass('in out');
+      element.toggleClass('ui-popup-active', scope.opened);
+      element.toggleClass('ui-popup-hidden', !scope.opened);
       if (!scope.opened) {
-        elm.css('left', '');
-        elm.css('top', '');
+        element.css('left', '');
+        element.css('top', '');
       }
     }
 
-    function getPosition(elm, target, placement) {
-      var popWidth = elm.prop( 'offsetWidth' );
-      var popHeight = elm.prop( 'offsetHeight' );
+    function getPosition(element, target, placement) {
+      var popWidth = element.prop( 'offsetWidth' );
+      var popHeight = element.prop( 'offsetHeight' );
       var pos = $position.position(target);
 
       var newPosition = {};

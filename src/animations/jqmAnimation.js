@@ -12,6 +12,7 @@ function registerJqmAnimation(animationName) {
     function makeAnimationFn(className) {
       return function(element, done) {
         var unbind;
+        element.removeClass('in out');
         $timeout(function() {
           element.addClass(className);
           unbind = $animationComplete(element, function() {
@@ -22,8 +23,7 @@ function registerJqmAnimation(animationName) {
 
         function cleanup() {
           (unbind || noop)();
-          element.removeClass('in out');
-        };
+        }
 
         return cleanup;
       };

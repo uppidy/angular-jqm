@@ -37,7 +37,6 @@ describe('jqmAnimation', function() {
     expect(doneSpy).not.toHaveBeenCalled();
     fireAnimationEnd();
     expect(doneSpy).toHaveBeenCalled();
-    expect(elm).not.toHaveClass('in out');
   }
   function expectOut(animationName) {
     expect(elm).not.toHaveClass('in out');
@@ -48,7 +47,6 @@ describe('jqmAnimation', function() {
     expect(doneSpy).not.toHaveBeenCalled();
     fireAnimationEnd();
     expect(doneSpy).toHaveBeenCalled();
-    expect(elm).not.toHaveClass('in out');
   }
 
   it('enter should animate in', function() {
