@@ -60,7 +60,7 @@ module.exports = function(grunt) {
     },
     watch: {
       files: ['src/**/*','test/**/*'],
-      tasks: ['build', 'karma:dev:run']
+      tasks: ['quickbuild', 'karma:dev:run']
     },
     jshint: {
       options: {

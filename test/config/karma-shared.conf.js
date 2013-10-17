@@ -20,7 +20,7 @@ module.exports = function(config) {
     ],
 
     // web server port
-    port: 9876,
+    port: 9678,
 
     preprocessors: {
       'src/directives/*.js': ['inlineTemplate']
