@@ -30,7 +30,7 @@ describe('jqmPopup', function() {
   });
 
   it('should be hidden by default', function() {
-    expect(el).toHaveClass('ui-popup-hidden');
+    expect(el).toHaveClass('ng-hide');
   });
 
   it('should create one overlay per popup', function() {
@@ -56,7 +56,7 @@ describe('jqmPopup', function() {
       scope.$apply();
       expect(scope.poppy.opened).toBe(false);
       expect(scope.poppy.target).toBeFalsy();
-      expect(el).not.toHaveClass('ui-popup-active');
+      expect(el).not.toHaveClass('ui-popup-open');
     });
     it('hideForElement should only hide if given element is current target', function() {
       spyOn(scope.poppy, 'hide').andCallThrough();

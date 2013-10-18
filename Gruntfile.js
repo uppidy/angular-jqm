@@ -3,7 +3,6 @@ var fs = require('fs');
 
 module.exports = function(grunt) {
   var pkg = grunt.file.readJSON('./package.json');
-  // needed for karma to locate phantomjs correctly.
   grunt.initConfig({
     pkg: pkg,
     concat: {
@@ -96,21 +95,6 @@ module.exports = function(grunt) {
     karma: {
       options: {
         configFile: 'test/config/karma-shared.conf.js',
-        files: ['components/angular/angular.js',
-          'components/angular/angular-touch.js',
-          'components/angular/angular-animate.js',
-          'components/angular/angular-route.js',
-          'components/angular/angular-mocks.js',
-          'test/lib/createMockWindow.js',
-          'test/lib/testutils.js',
-          'test/lib/matchers.js',
-          'src/module.js',
-          'src/**/*.js',
-          'components/angular-scrolly/angular-scrolly.js',
-          'components/angular-bootstrap/position.js',
-          'test/**/*Spec.js',
-          {pattern: 'test/**/*', watched: true, included: false, served: true},
-          {pattern: 'components/**/*', watched: true, included: false, served: true}],
       },
       dev: {
         options: {

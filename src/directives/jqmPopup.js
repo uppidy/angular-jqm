@@ -94,7 +94,7 @@ function($position, $parse, $compile, $rootScope, $animate) {
       scope.$root.$broadcast('$popupStateChanged', scope);
 
       element.removeClass('ui-popup-hidden');
-      $animate.removeClass(element, 'out', onDoneAnimating);
+      $animate.removeClass(element, 'ng-hide');
     }
     function hideForElement(target) {
       if (scope.target && target && scope.target[0] === target[0]) {
@@ -107,17 +107,11 @@ function($position, $parse, $compile, $rootScope, $animate) {
 
       scope.$root.$broadcast('$popupStateChanged', scope);
 
-      $animate.addClass(element, 'out', onDoneAnimating);
-    }
-
-    function onDoneAnimating() {
-      element.removeClass('in out');
-      element.toggleClass('ui-popup-active', scope.opened);
-      element.toggleClass('ui-popup-hidden', !scope.opened);
-      if (!scope.opened) {
+      $animate.addClass(element, 'ng-hide', function() {
+        element.addClass('ui-popup-hidden');
         element.css('left', '');
         element.css('top', '');
-      }
+      });
     }
 
     function getPosition(element, target, placement) {

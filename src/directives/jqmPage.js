@@ -32,7 +32,7 @@ jqmModule.directive('jqmPage', ['$rootScope', '$controller', '$scroller', functi
     replace: true,
     transclude: true,
     require: '^?jqmView',
-    controller: ['$scope', '$element', '$scroller', JqmPageController],
+    controller: ['$scope', '$element', JqmPageController],
     link: function(scope, element, attr, jqmViewCtrl) {
       if (!jqmViewCtrl) {
         element.addClass('ui-page-active jqm-standalone-page');
@@ -40,7 +40,7 @@ jqmModule.directive('jqmPage', ['$rootScope', '$controller', '$scroller', functi
     }
   };
 
-  function JqmPageController($scope, $element, $scroller) {
+  function JqmPageController($scope, $element) {
     this.$scope = $scope;
     this.$element = $element;
 

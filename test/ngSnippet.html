@@ -19,6 +19,14 @@
             });
             $routeProvider.when("/main.html", {
                 templateUrl: 'main.html',
+                controller: function($scope, $timeout) {
+                  $scope.loadDialog = function() {
+                    $scope.$root.loadDialog = true;
+                    $timeout(function() {
+                      $scope.$root.loadDialog = false;
+                    },1500);
+                  };
+                },
                 animation: 'page-slide'
             });
             $routeProvider.when("/page2.html", {
@@ -43,8 +51,8 @@
 <body ng-app="app">
 <script type="text/ng-template" id="main.html">
     <!-- the main page of your app -->
-    <div jqm-page jqm-popup-target="$root.myPopup" jqm-popup-model="popIsShown">
-        <div jqm-popup="$root.myPopup" class="pop">
+    <div jqm-page jqm-popup-target="$root.myPopup" jqm-popup-model="$root.popIsShown">
+        <div jqm-popup="$root.myPopup" class="flip">
           <div jqm-view="{ templateUrl: 'page2.html' }" style="width: 200px; height: 200px;" view-deep-watch="true"></div>
         </div>
 
@@ -55,16 +63,19 @@
         </div>
         <a href="#/page2.html">To page2</a>
 
-        <div jqm-button ng-click="popIsShown = true">
+        <div jqm-button ng-click="$root.popIsShown = true">
           Popup on the page
         </div>
         <div jqm-button jqm-popup-target="$root.myPopup" jqm-popup-model="buttonPopup" ng-click="buttonPopup = true">
           Popup on the button
         </div>
 
-        <div jqm-button>
-          Test
+        <div jqm-button ng-click="loadDialog()">
+          Test Dialog
         </div>
+
+<div jqm-button ng-click="SHOWME=!SHOWME">ng-show test</div>
+        <div ng-show="SHOWME" class="slide" style="width: 200px; height: 50px; background: red;">Hello!</div>
 
         <div jqm-controlgroup type="horizontal">
           <div jqm-button ng-repeat="d in ['push','reveal','overlay']" ng-click="$root.display=d">
@@ -115,6 +126,9 @@
     </div>
 </script>
 
+<div jqm-load-dialog="$root.loadDialog" class="flow">
+  <i>Hey</i>, guys!
+</div>
 <div jqm-panel-container="$root.panel" ng-init="$root.display = 'reveal'">
   <div jqm-panel display="{{$root.display}}">
     <h1>Hello</h1>

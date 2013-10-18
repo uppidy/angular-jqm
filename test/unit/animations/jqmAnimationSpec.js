@@ -1,7 +1,7 @@
 "use strict";
 describe('jqmAnimation', function() {
 
-  var elm, $timeout, doneSpy;
+  var elm, $timeout, doneSpy, cleanup;
   beforeEach(inject(function(_$timeout_) {
     $timeout = _$timeout_;
   }));
@@ -22,9 +22,9 @@ describe('jqmAnimation', function() {
     doneSpy = jasmine.createSpy('done');
     elm.addClass(name);
     if (className) {
-      return getAnimation(name)[methodName](elm, className, doneSpy);
+      cleanup = getAnimation(name)[methodName](elm, className, doneSpy);
     } else {
-      return getAnimation(name)[methodName](elm, doneSpy);
+      cleanup = getAnimation(name)[methodName](elm, doneSpy);
     }
   }
 
@@ -37,6 +37,8 @@ describe('jqmAnimation', function() {
     expect(doneSpy).not.toHaveBeenCalled();
     fireAnimationEnd();
     expect(doneSpy).toHaveBeenCalled();
+    cleanup();
+    expect(elm).not.toHaveClass('in out');
   }
   function expectOut(animationName) {
     expect(elm).not.toHaveClass('in out');
@@ -47,6 +49,8 @@ describe('jqmAnimation', function() {
     expect(doneSpy).not.toHaveBeenCalled();
     fireAnimationEnd();
     expect(doneSpy).toHaveBeenCalled();
+    cleanup();
+    expect(elm).not.toHaveClass('in out');
   }
 
   it('enter should animate in', function() {
@@ -56,24 +60,6 @@ describe('jqmAnimation', function() {
   it('leave should animate out', function() {
     animate('fade', 'leave');
     expectOut('fade');
-  });
-
-  it('addClass in should enter', function() {
-    animate('flow', 'addClass', 'in');
-    expectIn('flow');
-  });
-  it('removeClass in should leave', function() {
-    animate('slidefade', 'removeClass', 'in');
-    expectOut('slidefade');
-  });
-  
-  it('addClass out should leave', function() {
-    animate('pop', 'addClass', 'out');
-    expectOut('pop');
-  });
-  it('removeClass out should enter', function() {
-    animate('turn', 'removeClass', 'out');
-    expectIn('turn');
   });
 
   it('removeClass ng-hide should enter', function() {

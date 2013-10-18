@@ -1,0 +1,13 @@
+/* 
+ * display: none isn't used because the size of the popup
+ * can't be calculated while the element is display:none'd
+ */
+.ui-popup-container.ng-hide {
+  display: inline-block !important;
+  visibility: hidden;
+  top: -9999px;
+  left: -99999px;
+}
+.ui-popup-container.ui-popup-open.ng-hide {
+  visibility: visible;
+}
