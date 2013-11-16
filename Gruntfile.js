@@ -136,7 +136,7 @@ module.exports = function(grunt) {
         styles: [
           /* TODO css stylesheets are not put into jsfiddles,
              so we use a javascript that adds the style (jquery.mobile.css.js)
-             '//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.3.1/jquery.mobile.css'
+             '//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.3.2/jquery.mobile.css'
              */
           'docs/scripts/example_resets.css'
         ],
@@ -160,25 +160,25 @@ module.exports = function(grunt) {
     //We will switch back to bower once bower-1.1.2 resolves its problems with zip files
     'curl-dir': {
       'components/angular': [
-        'http://code.angularjs.org/snapshot/angular.js',
-        'http://code.angularjs.org/snapshot/angular-route.js',
-        'http://code.angularjs.org/snapshot/angular-animate.js',
-        'http://code.angularjs.org/snapshot/angular-touch.js',
-        'http://code.angularjs.org/snapshot/angular-mocks.js',
+        'http://code.angularjs.org/1.2.1/angular.js',
+        'http://code.angularjs.org/1.2.1/angular-route.js',
+        'http://code.angularjs.org/1.2.1/angular-animate.js',
+        'http://code.angularjs.org/1.2.1/angular-touch.js',
+        'http://code.angularjs.org/1.2.1/angular-mocks.js',
       ],
       'components/jquery-mobile': [
-        'http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.js',
-        'http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css'
+        'http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.js',
+        'http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css'
       ],
       'components/jquery': [
-        'http://code.jquery.com/jquery-1.10.2.js'
+        'http://code.jquery.com/jquery-1.9.1.js'
       ],
       'components/angular-scrolly': [
         'https://raw.github.com/ajoslin/angular-scrolly/master/angular-scrolly.js'
       ],
       //This is temporary until we have a way to download this easily (all of these will be put on bower in near future)
       'components/angular-bootstrap': [
-        'https://rawgithub.com/angular-ui/bootstrap/master/src/position/position.js'
+        'https://raw.github.com/angular-ui/bootstrap/master/src/position/position.js'
       ]
     }
   });
