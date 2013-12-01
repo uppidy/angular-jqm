@@ -9,7 +9,7 @@ describe('jqmScopeAs', function() {
             $compileProvider.directive('someTag', function() {
                 return {
                     scope: {},
-                    template: 
+                    template:
                       '<div jqm-scope-as="someScopeName">' +
                         '<span>{{someProp}}</span>' +
                         '<span>{{$scopeAs.someScopeName.someProp}}</span>' +

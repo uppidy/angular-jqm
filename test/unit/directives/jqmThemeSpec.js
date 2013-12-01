@@ -4,12 +4,12 @@ describe('jqmTheme directive', function () {
     $compileProvider.directive('childScope', function() {
       return {
         scope: true
-      }
+      };
     });
     $compileProvider.directive('isolateScope', function() {
       return {
         scope: {}
-      }
+      };
     });
   }));
 

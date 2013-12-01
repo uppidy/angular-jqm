@@ -220,7 +220,6 @@ function($compile, $templateCache, $http, $q, $route, $controller, $injector, $n
           });
         });
       } else {
-        console.log('entering');
         $animate.enter(view.element, element, null, onDone);
         if (lastView) {
           $animate.leave(lastView.element);
