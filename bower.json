@@ -1,8 +1,5 @@
 {
   "name": "angular-jqm",
-  "authors": [
-    "Andy Joslin <andytjoslin@gmail.com>"
-  ],
   "license": "MIT",
   "private": true,
   "devDependencies": {
