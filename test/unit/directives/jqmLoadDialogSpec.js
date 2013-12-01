@@ -1,5 +1,5 @@
 "use strict";
-ddescribe('jqmLoadDialog', function() {
+describe('jqmLoadDialog', function() {
   var elm, scope;
   function create(loadDialog, attr, content) {
     inject(function($compile, $rootScope) {

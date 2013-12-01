@@ -20,15 +20,14 @@
 jqmModule.directive('jqmTheme', [function () {
   return {
     restrict: 'A',
-    priority: 1,
-    scope: true,
     compile: function compile() {
       return {
         pre: function preLink(scope, iElement, iAttrs) {
+          var themeScope = iElement.isolateScope() || iElement.scope();
           // Set the theme before all other link functions of children
           var theme = iAttrs.jqmTheme;
           if (theme) {
-            scope.$theme = theme;
+            themeScope.$theme = theme;
           }
         }
       };

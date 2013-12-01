@@ -46,8 +46,8 @@
   </file>
 </example>
  */
-jqmModule.directive('jqmPopup', ['$position', '$parse', '$compile', '$rootScope', '$animate',
-function($position, $parse, $compile, $rootScope, $animate) {
+jqmModule.directive('jqmPopup', ['$position', '$parse', '$compile', '$rootScope', '$animate', '$timeout',
+function($position, $parse, $compile, $rootScope, $animate, $timeout) {
   var popupOverlayTemplate = '<div jqm-popup-overlay></div>';
 
   return {
@@ -90,11 +90,15 @@ function($position, $parse, $compile, $rootScope, $animate) {
       scope.opened = true;
       placement = placement || scope.placement;
 
-      element.css( getPosition(element, target, placement) );
       scope.$root.$broadcast('$popupStateChanged', scope);
 
       element.removeClass('ui-popup-hidden');
       $animate.removeClass(element, 'ng-hide');
+      
+      //Make sure display: block applies before trying to detect width of popup
+      $timeout(function() {
+        element.css( getPosition(element, target, placement) );
+      }, 0, false);
     }
     function hideForElement(target) {
       if (scope.target && target && scope.target[0] === target[0]) {

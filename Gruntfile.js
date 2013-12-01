@@ -2,9 +2,8 @@ var path = require('path');
 var fs = require('fs');
 
 module.exports = function(grunt) {
-  var pkg = grunt.file.readJSON('./package.json');
   grunt.initConfig({
-    pkg: pkg,
+    pkg: grunt.file.readJSON('./package.json'),
     concat: {
       nodeps: {
         options: {
@@ -18,8 +17,8 @@ module.exports = function(grunt) {
       },
       all: {
         src: ['<%= concat.nodeps.dest %>',
-          'components/angular-scrolly/angular-scrolly.js',
-          'components/angular-bootstrap/position.js'],
+          'bower_components/angular-scrolly/angular-scrolly.js',
+          'bower_components/bootstrap/src/position/position.js'],
         dest: 'dist/<%= pkg.name %>.js'
       }
     },
@@ -130,7 +129,7 @@ module.exports = function(grunt) {
         scripts: [
           'docs/scripts/jquery.mobile.css.js',
           'angular.js',
-          'components/angular-scrolly/angular-scrolly.js',
+          'bower_components/angular-scrolly/angular-scrolly.js',
           'docs/scripts/angular-scrolly-docs.js'
         ],
         styles: [
@@ -154,32 +153,6 @@ module.exports = function(grunt) {
         title: 'API Documentation'
       },
 
-    },
-
-    //After lots of bower problems, we switched to grunt-curl
-    //We will switch back to bower once bower-1.1.2 resolves its problems with zip files
-    'curl-dir': {
-      'components/angular': [
-        'http://code.angularjs.org/snapshot/angular.js',
-        'http://code.angularjs.org/snapshot/angular-route.js',
-        'http://code.angularjs.org/snapshot/angular-animate.js',
-        'http://code.angularjs.org/snapshot/angular-touch.js',
-        'http://code.angularjs.org/snapshot/angular-mocks.js',
-      ],
-      'components/jquery-mobile': [
-        'http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.js',
-        'http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css'
-      ],
-      'components/jquery': [
-        'http://code.jquery.com/jquery-1.10.2.js'
-      ],
-      'components/angular-scrolly': [
-        'https://raw.github.com/ajoslin/angular-scrolly/master/angular-scrolly.js'
-      ],
-      //This is temporary until we have a way to download this easily (all of these will be put on bower in near future)
-      'components/angular-bootstrap': [
-        'https://rawgithub.com/angular-ui/bootstrap/master/src/position/position.js'
-      ]
     }
   });
 
@@ -200,7 +173,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-conventional-changelog');
-  grunt.loadNpmTasks('grunt-curl');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-inline-template');
   grunt.loadNpmTasks('grunt-ngdocs');

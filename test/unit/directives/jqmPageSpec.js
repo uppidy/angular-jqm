@@ -111,7 +111,7 @@ describe('jqmPage controller', function() {
     it('page method gives $transformer.pos with args',  function() {
         expect(pageCtrl.scroll()).toEqual(transformer.pos);
         transformer.setTo({y:-50});
-        expect(pageCtrl.scroll()).toEqual({x:0,y:-50});
+        expect(pageCtrl.scroll()).toEqual({y:-50});
     });
 
     it('page method calls setTo with one arg', function() {

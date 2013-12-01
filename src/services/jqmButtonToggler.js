@@ -47,12 +47,12 @@ jqmModule.factory('jqmButtonToggler', function() {
     return self;
 
     function toggleBtnDown(el, isDown) {
-      var theme = el.scope().$theme;
+      var theme = (el.isolateScope() || el.scope()).$theme;
       el.toggleClass('ui-btn-down-' + theme, isDown);
       el.toggleClass('ui-btn-up-' + theme, !isDown);
     }
     function toggleBtnHover(el, isHover) {
-      var theme = el.scope().$theme;
+      var theme = (el.isolateScope() || el.scope()).$theme;
       el.toggleClass('ui-btn-hover-' + theme, isHover);
     }
     function parentWithClass(el, className) {
