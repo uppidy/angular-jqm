@@ -160,11 +160,6 @@ module.exports = function(grunt) {
   grunt.registerTask('quickbuild', ['cssmin', 'css2js', 'concat', 'inlineTemplate']);
   grunt.registerTask('dev', ['connect','karma:dev','watch']);
   grunt.registerTask('default', ['build','jshint','karma:localBuild','ngdocs']);
-  grunt.registerTask('install', 'Prepare development environment', function() {
-    grunt.task.run('curl-dir');
-    install();
-  });
-  grunt.registerTask('curl', 'curl-dir'); //alias
 
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
