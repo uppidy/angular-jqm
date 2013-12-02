@@ -157,9 +157,11 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('build', ['quickbuild', 'uglify']);
-  grunt.registerTask('quickbuild', ['cssmin', 'css2js', 'concat', 'inlineTemplate']);
+  grunt.registerTask('quickbuild', ['commit-hook', 'cssmin', 'css2js', 'concat', 'inlineTemplate']);
   grunt.registerTask('dev', ['connect','karma:dev','watch']);
   grunt.registerTask('default', ['build','jshint','karma:localBuild','ngdocs']);
+
+  grunt.registerTask('commit-hook', commitHook);
 
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -173,7 +175,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-ngdocs');
   grunt.loadTasks('build/grunt');
 
-  function install() {
+  function commitHook() {
     if (!grunt.file.exists('.git/hooks/commit-msg')) {
       grunt.file.copy('build/validate-commit-msg.js', '.git/hooks/commit-msg');
       require('fs').chmodSync('.git/hooks/commit-msg', '0755');
