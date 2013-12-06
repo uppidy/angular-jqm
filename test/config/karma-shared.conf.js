@@ -13,21 +13,21 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'components/angular/angular.js',
-      'components/angular/angular-touch.js',
-      'components/angular/angular-animate.js',
-      'components/angular/angular-route.js',
-      'components/angular/angular-mocks.js',
+      'bower_components/angular/angular.js',
+      'bower_components/angular-touch/angular-touch.js',
+      'bower_components/angular-animate/angular-animate.js',
+      'bower_components/angular-route/angular-route.js',
+      'bower_components/angular-mocks/angular-mocks.js',
       'test/lib/createMockWindow.js',
       'test/lib/testutils.js',
       'test/lib/matchers.js',
       'src/module.js',
       'src/**/*.js',
-      'components/angular-scrolly/angular-scrolly.js',
-      'components/angular-bootstrap/position.js',
+      'bower_components/angular-scrolly/angular-scrolly.js',
+      'bower_components/bootstrap/src/position/position.js',
       'test/**/*Spec.js',
       {pattern: 'test/**/*', watched: true, included: false, served: true},
-      {pattern: 'components/**/*', watched: true, included: false, served: true}
+      {pattern: 'bower_components/**/*', watched: true, included: false, served: true}
     ],
 
     // list of files to exclude
@@ -55,7 +55,7 @@ module.exports = function(config) {
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_DEBUG,
+    logLevel: config.LOG_INFO,
 
 
     // enable / disable watching file and executing tests whenever any file changes
@@ -70,7 +70,7 @@ module.exports = function(config) {
     // - Safari (only Mac)
     // - PhantomJS
     // - IE (only Windows)
-    browsers: ['PhantomJS'],
+    browsers: ['Chrome'],
 
 
     // If browser does not capture in given timeout [ms], kill it

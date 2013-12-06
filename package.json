@@ -11,16 +11,15 @@
     "grunt-contrib-connect": "latest",
     "grunt-contrib-watch": "latest",
     "grunt-contrib-jshint": "latest",
-    "grunt-karma": "~0.6.2",
     "grunt-ngdocs": "~0.1.6",
     "grunt-conventional-changelog": "~1.0.0",
-    "grunt-curl": "~1.1.1",
-    "karma-sauce-launcher": "~0.1.0",
-    "karma": "~0.10",
     "grunt-contrib-cssmin": "~0.6.2",
     "grunt-contrib-uglify": "~0.2.4",
     "karma-inline-template-preprocessor": "0.0.1",
-    "grunt-inline-template": "0.0.1"
+    "grunt-inline-template": "0.0.1",
+    "karma-sauce-launcher": "~0.1.5",
+    "karma": "~0.10.7",
+    "grunt-karma": "~0.6.2"
   },
   "engine": "node 0.8.x",
   "repository": {

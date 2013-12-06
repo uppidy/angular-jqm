@@ -42,7 +42,7 @@
   </file>
 </example>
  */
-jqmModule.directive('jqmButton', ['jqmClassDirective', 'jqmOnceClassDirective', function(jqmClassDirectives, jqmOnceClassDirectives) {
+jqmModule.directive('jqmButton', ['jqmClassDirective', function(jqmClassDirectives, jqmOnceClassDirectives) {
   var isDef = angular.isDefined;
   return {
     restrict: 'A',
@@ -62,7 +62,6 @@ jqmModule.directive('jqmButton', ['jqmClassDirective', 'jqmOnceClassDirective', 
       attr.corners = isDef(attr.corners) ? attr.corners==='true' : 'true';
 
       elm[0].className += ' ui-btn';
-      attr.$set('jqmOnceClass', "{{$scopeAs.jqmBtn.getIconPos() ? 'ui-btn-icon-'+$scopeAs.jqmBtn.getIconPos() : ''}}");
       attr.$set('jqmClass',
         "{'ui-first-child': $scopeAs.jqmBtn.$position.first," +
         "'ui-submit': $scopeAs.jqmBtn.type," +
@@ -96,7 +95,12 @@ jqmModule.directive('jqmButton', ['jqmClassDirective', 'jqmOnceClassDirective', 
       }
 
       return function(scope, elm, attr, controlGroup) {
-        elm.addClass('ui-btn-up-' + scope.$theme);
+        //These are here instead of as data-bound template attributes because we are out of
+        //directives to bind these classes with.  We already use jqmClass above for key-value
+        //type bindings, which doesn't support classNames with variables in them. And we
+        //can't use ngClass directive, because the end-user will want to use that.
+        elm.addClass('ui-btn-up-' + scope.$theme + ' ' +
+                     (getIconPos() ? 'ui-btn-icon-'+ getIconPos() : ''));
 
         scope.$$scopeAs = 'jqmBtn';
         scope.isMini = isMini;
@@ -105,9 +109,6 @@ jqmModule.directive('jqmButton', ['jqmClassDirective', 'jqmOnceClassDirective', 
         scope.type = attr.jqmButton;
 
         angular.forEach(jqmClassDirectives, function(directive) {
-          directive.link(scope, elm, attr);
-        });
-        angular.forEach(jqmOnceClassDirectives, function(directive) {
           directive.link(scope, elm, attr);
         });
 

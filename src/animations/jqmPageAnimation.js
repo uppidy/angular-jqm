@@ -49,8 +49,11 @@ function registerAnimation(animationName, ngAnimationName) {
         element.removeClass('ui-page-pre-in');
         element.css('z-index', '');
         element.addClass('in');
-        unbind = $animationComplete(element, function() {
-          done();
+        unbind = $animationComplete(element, function(e) {
+          //Make sure child-element animation events don't cause page animation end to fire
+          if (!e.target || e.target === element[0]) {
+            done();
+          }
         });
       }
 
@@ -76,8 +79,11 @@ function registerAnimation(animationName, ngAnimationName) {
 
       function animate() {
         element.addClass('out');
-        unbind = $animationComplete(element, function() {
-          done();
+        unbind = $animationComplete(element, function(e) {
+          //Make sure child-element animation events don't cause page animation end to fire
+          if (!e.target || e.target === element[0]) {
+            done();
+          }
         });
       }
 

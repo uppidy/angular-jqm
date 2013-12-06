@@ -179,21 +179,5 @@ describe('testutils', function () {
                 expect(api.activePage().text()).toContain('secondPage');
             });
         });
-        describe('fireAnimationEndEvents', function () {
-            it('triggers animationend listeners for elements with .in classes', function () {
-                var spy = jasmine.createSpy();
-                var el = api.init('<div class="in"></div>');
-                el.bind('animationend', spy);
-                api.fireAnimationEndEvents();
-                expect(spy).toHaveBeenCalled();
-            });
-            it('triggers animationend listeners for elements with .out classes', function () {
-                var spy = jasmine.createSpy();
-                var el = api.init('<div class="out"></div>');
-                el.bind('animationend', spy);
-                api.fireAnimationEndEvents();
-                expect(spy).toHaveBeenCalled();
-            });
-        });
     }
 });

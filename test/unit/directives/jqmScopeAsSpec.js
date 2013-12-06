@@ -9,13 +9,17 @@ describe('jqmScopeAs', function() {
             $compileProvider.directive('someTag', function() {
                 return {
                     scope: {},
-                    template: '<div jqm-scope-as="someScopeName"><span>{{someProp}}</span><span>{{$scopeAs.someScopeName.someProp}}</span></div>',
+                    template:
+                      '<div jqm-scope-as="someScopeName">' +
+                        '<span>{{someProp}}</span>' +
+                        '<span>{{$scopeAs.someScopeName.someProp}}</span>' +
+                      '</div>',
                     replace: true
                 };
             });
         });
         var elm = testutils.ng.init('<div some-tag></div>'),
-            scope = elm.scope(),
+            scope = elm.isolateScope(),
             parentScope = scope.$parent,
             test1Span = elm.children().eq(0),
             test2Span = elm.children().eq(1);

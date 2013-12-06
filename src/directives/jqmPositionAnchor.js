@@ -53,7 +53,7 @@ jqmModule.directive('jqmPositionAnchor', [ '$rootScope', function ($rootScope) {
           i, child, newPos, childScope;
         for (i = 0; i < length; i++) {
           child = children.eq(i);
-          childScope = child.scope();
+          childScope = child.isolateScope() || child.scope();
           if (childScope !== scope) {
             childScope.$position = getPosition(i, length);
           }
@@ -67,7 +67,6 @@ jqmModule.directive('jqmPositionAnchor', [ '$rootScope', function ($rootScope) {
           middle: index > 0 && index < length - 1
         };
       }
-
     }
   };
 }]);

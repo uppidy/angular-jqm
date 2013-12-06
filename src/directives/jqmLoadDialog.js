@@ -12,9 +12,23 @@
  *
  * For a global load dialog, place it as a child of the body.
  *
+ * If you would like to have loading spinners which track different http requests or promises, we recommend [angular-promise-tracker](http://github.com/ajoslin/angular-promise-tracker).
+ *
  * @param {expression} jqmLoadDialog If the expression is truthy then the element is shown or hidden respectively.
  * @param {string} icon The icon to display in the loading dialog. Default: 'ui-icon-loading'.
  *
+ * @example
+ * <example module="jqm">
+    <file name="index.html">
+      <div jqm-load-dialog="showBasic"></div>
+      <div jqm-button ng-click="showBasic = !showBasic">Toggle Basic Load Dialog</div>
+
+      <div jqm-load-dialog="showAdvanced" icon="ui-icon-home" class="slidedown">
+        Fancy, eh?
+      </div>
+      <div jqm-button ng-click="showAdvanced = !showAdvanced">Toggle Animated Load Dialog</div>
+    </file>
+  </example>
  */
 jqmModule.directive('jqmLoadDialog', ['$animate', '$rootElement', function($animate, $rootElement) {
   return {
